@@ -7,7 +7,6 @@ import java.util.Set;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 
@@ -24,8 +23,8 @@ public class DBApp {
 	// execute at application startup
 	public void init() {
 		// deleteMetaDataFile();
-		readMetaDataFile();
-		System.out.println(tableNames);
+		updateMetaDataFile();
+		// System.out.println(tableNames);
 	}
 
 	public void deleteMetaDataFile() {
@@ -43,7 +42,7 @@ public class DBApp {
 		}
 	}
 
-	public static void readMetaDataFile() {
+	public static void updateMetaDataFile() {
 		tableNames = new HashSet<String>();
 		String filePath = "metadata.txt";
 		File file = new File(filePath);
@@ -80,7 +79,9 @@ public class DBApp {
 		if (tableNames.contains(strTableName)) {
 			throw new DBAppException("Table " + strTableName + " already exists!");
 		} else {
+			@SuppressWarnings("unused")
 			Table myTable = new Table(strTableName, strClusteringKeyColumn, htblColNameType);
+			Table.addTable(strTableName, strClusteringKeyColumn, htblColNameType);
 		}
 
 		// throw new DBAppException("not implemented yet");
@@ -130,7 +131,8 @@ public class DBApp {
 		return null;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked", "removal" })
+	// @SuppressWarnings({ "rawtypes", "unchecked", "removal" })
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 
 		try {
