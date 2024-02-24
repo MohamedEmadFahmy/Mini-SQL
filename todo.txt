@@ -1,0 +1,2 @@
+Table class implementation that references all pages
+Find out what attributes should be stored in the table class
