@@ -2,12 +2,20 @@
 /** * @author Wael Abouelsaadat */
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 
 public class DBApp {
+	static Set<String> tableNames;
 
 	public DBApp() {
+		tableNames = new HashSet<String>();
 		init();
 	}
 
@@ -15,10 +23,12 @@ public class DBApp {
 	// or leave it empty if there is no code you want to
 	// execute at application startup
 	public void init() {
-		deletMetaDataFile();
+		// deleteMetaDataFile();
+		readMetaDataFile();
+		System.out.println(tableNames);
 	}
 
-	public void deletMetaDataFile() {
+	public void deleteMetaDataFile() {
 		String filePath = "metadata.txt";
 		File file = new File(filePath);
 
@@ -27,6 +37,32 @@ public class DBApp {
 				System.out.println("File deleted successfully.");
 			} else {
 				System.out.println("Failed to delete the file.");
+			}
+		} else {
+			System.out.println("Meta Data File does not exist.");
+		}
+	}
+
+	public static void readMetaDataFile() {
+		tableNames = new HashSet<String>();
+		String filePath = "metadata.txt";
+		File file = new File(filePath);
+
+		if (file.exists()) {
+			// Read all table names in metadata file
+			try {
+				// Read all lines from the file
+				List<String> lines = Files.readAllLines(file.toPath());
+
+				// Process each line
+				for (String line : lines) {
+					// Do something with each line
+					String[] splittedLine = line.split(",");
+					// System.out.println(splittedLine[0]);
+					tableNames.add(splittedLine[0]);
+				}
+			} catch (IOException e) {
+				System.err.println("Error reading file: " + e.getMessage());
 			}
 		} else {
 			System.out.println("File does not exist.");
@@ -41,7 +77,12 @@ public class DBApp {
 	// type as value
 	public void createTable(String strTableName, String strClusteringKeyColumn,
 			Hashtable<String, String> htblColNameType) throws DBAppException {
-		Table myTable = new Table(strTableName, strClusteringKeyColumn, htblColNameType);
+		if (tableNames.contains(strTableName)) {
+			throw new DBAppException("Table " + strTableName + " already exists!");
+		} else {
+			Table myTable = new Table(strTableName, strClusteringKeyColumn, htblColNameType);
+		}
+
 		// throw new DBAppException("not implemented yet");
 	}
 
@@ -93,14 +134,26 @@ public class DBApp {
 	public static void main(String[] args) {
 
 		try {
-			String strTableName = "Student";
 			DBApp dbApp = new DBApp();
 
-			Hashtable htblColNameType = new Hashtable();
-			htblColNameType.put("id", "java.lang.Integer");
-			htblColNameType.put("name", "java.lang.String");
-			htblColNameType.put("gpa", "java.lang.double");
-			dbApp.createTable(strTableName, "id", htblColNameType);
+			// ---------------------Student Table--------------------------
+			// String strTableName = "Student";
+			// Hashtable htblColNameType = new Hashtable();
+			// htblColNameType.put("id", "java.lang.Integer");
+			// htblColNameType.put("name", "java.lang.String");
+			// htblColNameType.put("gpa", "java.lang.double");
+			// dbApp.createTable(strTableName, "id", htblColNameType);
+			// ---------------------Student Table--------------------------
+
+			// ---------------------Employee Table--------------------------
+			// String strTableName = "Employee";
+			// Hashtable htblColNameType = new Hashtable();
+			// htblColNameType.put("id", "java.lang.Integer");
+			// htblColNameType.put("name", "java.lang.String");
+			// htblColNameType.put("gpa", "java.lang.double");
+			// dbApp.createTable(strTableName, "id", htblColNameType);
+			// ---------------------Employee Table--------------------------
+
 			// dbApp.createIndex(strTableName, "gpa", "gpaIndex");
 
 			// Hashtable htblColNameValue = new Hashtable();

@@ -15,6 +15,9 @@ public class Table {
 
         addMetaData();
 
+        // Update table names arraylist with table names from metadata file
+        DBApp.readMetaDataFile();
+
     }
 
     public void addMetaData() {
@@ -28,8 +31,9 @@ public class Table {
             String indexName = "null";
             String indexType = "null";
 
-            System.out.println(String.format("%s,%s,%s,%s,%s,%s\n", tableName, colName, colDataType, isClusteringKey,
-                    indexName, indexType));
+            // System.out.println(String.format("%s,%s,%s,%s,%s,%s\n", tableName, colName,
+            // colDataType, isClusteringKey,
+            // indexName, indexType));
 
             contentBuilder.append(String.format("%s,%s,%s,%s,%s,%s\n", tableName, colName, colDataType, isClusteringKey,
                     indexName, indexType));
