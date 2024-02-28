@@ -22,8 +22,10 @@ public class DBApp {
 	// or leave it empty if there is no code you want to
 	// execute at application startup
 	public void init() {
-		// deleteMetaDataFile();
+
 		updateMetaDataFile();
+
+		// deleteMetaDataFile();
 		// System.out.println(tableNames);
 	}
 
@@ -138,15 +140,6 @@ public class DBApp {
 		try {
 			DBApp dbApp = new DBApp();
 
-			// ---------------------Student Table--------------------------
-			// String strTableName = "Student";
-			// Hashtable htblColNameType = new Hashtable();
-			// htblColNameType.put("id", "java.lang.Integer");
-			// htblColNameType.put("name", "java.lang.String");
-			// htblColNameType.put("gpa", "java.lang.double");
-			// dbApp.createTable(strTableName, "id", htblColNameType);
-			// ---------------------Student Table--------------------------
-
 			// ---------------------Employee Table--------------------------
 			// String strTableName = "Employee";
 			// Hashtable htblColNameType = new Hashtable();
@@ -154,7 +147,16 @@ public class DBApp {
 			// htblColNameType.put("name", "java.lang.String");
 			// htblColNameType.put("gpa", "java.lang.double");
 			// dbApp.createTable(strTableName, "id", htblColNameType);
-			// ---------------------Employee Table--------------------------
+			// -------------------------------------------------------------
+
+			// ---------------------Student Table--------------------------
+			// String strTableName = "Student";
+			// Hashtable htblColNameType = new Hashtable();
+			// htblColNameType.put("id", "java.lang.Integer");
+			// htblColNameType.put("name", "java.lang.String");
+			// htblColNameType.put("gpa", "java.lang.double");
+			// dbApp.createTable(strTableName, "id", htblColNameType);
+			// ------------------------------------------------------------
 
 			// dbApp.createIndex(strTableName, "gpa", "gpaIndex");
 
