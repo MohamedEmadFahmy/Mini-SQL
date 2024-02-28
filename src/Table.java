@@ -54,6 +54,11 @@ public class Table {
         }
     }
 
+    public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue)
+            throws DBAppException {
+
+    }
+
     // public static void readFile(String filePath) {
     // try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
     // String line;
