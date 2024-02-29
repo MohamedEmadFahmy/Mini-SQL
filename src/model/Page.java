@@ -28,11 +28,8 @@ public class Page {
         this.indexedColumns = new ArrayList<String>();
 
         loadMaxTuplesCount();
-
-        
-        if (typeof(clusteringKey) == Java.Integer) {
-
-        }
+        min = null;
+        max = null;
     }
 
     public void loadMaxTuplesCount() {

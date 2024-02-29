@@ -1,4 +1,9 @@
+Table Class:
 Find out what attributes should be stored in the table class DONE
 Table class implementation that references all pages
+
+
+Page Class: 
 Review instance variables of Page class (especially strClusteringKey)
 Review all of Page class
+Use min and max after inserts and deletions(BIG ISSUE ON DELETIONS HERE)
