@@ -71,7 +71,6 @@ public class Table {
 
     public void insertTuple(String strTableName, Hashtable<String, Object> htblColNameValue)
             throws DBAppException {
-
     }
 
     public void deleteTuple(String strTableName, Hashtable<String, Object> htblColNameValue)
