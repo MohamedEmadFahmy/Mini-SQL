@@ -2,7 +2,6 @@ package model;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.security.cert.TrustAnchor;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -13,21 +12,45 @@ import exceptions.DBAppException;
 
 public class Page {
     private Vector<Tuple> Tuples;
-    private int TupleCount;
-    private String ClusteringKey;
-    private Hashtable<String, String> ColNameType;
+    private int tupleCount;
+    private int maxTupleCount;
+    private String clusteringKey;
+    private Hashtable<String, String> colNameType;
     private List<String> indexedColumns;
-    private static final long serialVersionUID = -4544542885377264750L;
     private Object min;
     private Object max;
-    private int maxTupleCount;
+    // private static final long serialVersionUID = -4544542885377264750L;
 
     public Page(String clusteringKey, Hashtable<String, String> colNameType) {
-        TupleCount = 0;
-        ClusteringKey = clusteringKey;
-        ColNameType = colNameType;
+        this.tupleCount = 0;
+        this.clusteringKey = clusteringKey;
+        this.colNameType = colNameType;
         this.indexedColumns = new ArrayList<String>();
-        maxTupleCount = 200;
+
+        loadMaxTuplesCount();
+
+        
+        if (typeof(clusteringKey) == Java.Integer) {
+
+        }
+    }
+
+    public void loadMaxTuplesCount() {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("resources/DBApp.config"));
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("MaximumRowsCountinPage")) {
+                    this.maxTupleCount = Integer.parseInt(line.split("=")[1].trim());
+                    break;
+                }
+            }
+            reader.close();
+        } catch (Exception e) {
+            // Handle exceptions, e.g., file not found or format error
+            e.printStackTrace();
+        }
     }
 
     public void addTuple(Tuple tuple, Object strClusteringKey) throws DBAppException {
@@ -76,30 +99,12 @@ public class Page {
     }
 
     public boolean isPageFull() {
-        int maxTuples = 0;
 
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("resources/DBApp.config"));
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith("MaximumRowsCountinPage")) {
-                    maxTuples = Integer.parseInt(line.split("=")[1].trim());
-                    break;
-                }
-            }
-
-            reader.close();
-        } catch (Exception e) {
-            // Handle exceptions, e.g., file not found or format error
-            e.printStackTrace();
-        }
-
-        return TupleCount == maxTuples;
+        return tupleCount == maxTupleCount;
     }
 
     public Boolean isPageEmpty() {
-        return TupleCount == 0;
+        return tupleCount == 0;
     }
 
     // public Tuple ReturnTuple(){
@@ -108,8 +113,8 @@ public class Page {
 
     @Override
     public String toString() {
-        return "Page [Tuples=" + Tuples + ", TupleCount=" + TupleCount + ", ClusteringKey=" + ClusteringKey
-                + ", ColNameType=" + ColNameType + ", indexedColumns=" + indexedColumns + "]";
+        return "Page [Tuples=" + Tuples + ", Tuple Count=" + tupleCount + ", Clustering Key=" + clusteringKey
+                + ", Column Name/Types=" + colNameType + ", Indexed Columns=" + indexedColumns + "]";
     }
 
 }

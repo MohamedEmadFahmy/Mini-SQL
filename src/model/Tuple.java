@@ -2,7 +2,7 @@ package model;
 
 import java.util.Hashtable;
 
-public class Tuple implements Comparable {
+public class Tuple implements Comparable<Tuple> {
     Hashtable<String, Object> colNameVal;
     Object primaryKey;
 
@@ -12,7 +12,7 @@ public class Tuple implements Comparable {
     }
 
     @Override
-    public int compareTo(Object o) {
+    public int compareTo(Tuple o) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'compareTo'");
     }

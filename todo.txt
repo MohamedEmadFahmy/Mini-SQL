@@ -1,2 +1,4 @@
+Find out what attributes should be stored in the table class DONE
 Table class implementation that references all pages
-Find out what attributes should be stored in the table class
+Review instance variables of Page class (especially strClusteringKey)
+Review all of Page class
