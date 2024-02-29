@@ -6,46 +6,41 @@ import java.security.cert.TrustAnchor;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import exceptions.DBAppException;
 
 public class Page {
-    Vector<Hashtable<String, Object>> Tuples;
-    int TupleCount;
-    String ClusteringKey;
-    Hashtable<String, String> ColNameType;
-    List<String> indexedColumns;
+    private Vector<Tuple> Tuples;
+    private int TupleCount;
+    private String ClusteringKey;
+    private Hashtable<String, String> ColNameType;
+    private List<String> indexedColumns;
     private static final long serialVersionUID = -4544542885377264750L;
-    Object min;
-    Object max;
+    private Object min;
+    private Object max;
+    private int maxTupleCount;
 
     public Page(String clusteringKey, Hashtable<String, String> colNameType) {
         TupleCount = 0;
         ClusteringKey = clusteringKey;
         ColNameType = colNameType;
         this.indexedColumns = new ArrayList<String>();
+        maxTupleCount = 200;
     }
 
-    public Hashtable<String, Object> AddTupleToPage(Hashtable<String, Object> htblColNameValue) { // returns overflow
-                                                                                                  // tuple, null if no
-                                                                                                  // overflow
-        TupleCount += 1;
-        Object primaryKey;
-        for (int i = 0; i < htblColNameValue.size(); i++) {
-            // if (ClusteringKey == htblColNameValue) {
+    public void addTuple(Tuple tuple, Object strClusteringKey) throws DBAppException {
+        Tuples.add(tuple);
+        Tuples.sort(null);
+    }
+    // don't need to check if the page is full as that would be done in the Tables
+    // method
 
-            // }
-        }
-        Tuples.add(htblColNameValue);
-        return null;
-    }// don't need to check if the page is full as that would be done in the Tables
-     // method
-
-    public boolean deleteTupleFromPage(Hashtable<String, Object> x, String strClusteringKey) {
+    public boolean deleteTupleFromPage(Tuple x, String strClusteringKey) {
         for (int i = 0; i < this.Tuples.size(); i++) {
-            Hashtable<String, Object> tuple = this.Tuples.get(i);
-            if (tuple.get(strClusteringKey).equals(x.get(strClusteringKey))) {
+            Tuple tuple = this.Tuples.get(i);
+            if (tuple.colNameVal.get(strClusteringKey).equals(x.colNameVal.get(strClusteringKey))) {
                 this.Tuples.remove(i);
                 if (this.Tuples.isEmpty()) {
                     return true;
@@ -58,12 +53,12 @@ public class Page {
 
     public void updatePage(String strClusteringKeyValue, Hashtable<String, Object> htblColNameValue)
             throws DBAppException {
-        for (int i = 0; i < Tuples.size(); i++) {
-            Hashtable<String, Object> tuple = Tuples.get(i);
-            if (tuple.contains(strClusteringKeyValue)) {
-                if (tuple.get(strClusteringKeyValue).equals(strClusteringKeyValue)) {
-                    for (String colName : htblColNameValue.keySet()) {
-                        tuple.put(colName, htblColNameValue.get(colName));
+        for (Tuple tuple : Tuples) {
+            if (tuple.colNameVal.containsKey(strClusteringKeyValue)) {
+                Object tupleClusteringKeyValue = tuple.colNameVal.get(strClusteringKeyValue);
+                if (tupleClusteringKeyValue != null && tupleClusteringKeyValue.equals(strClusteringKeyValue)) {
+                    for (Map.Entry<String, Object> entry : htblColNameValue.entrySet()) {
+                        tuple.colNameVal.put(entry.getKey(), entry.getValue());
                     }
                     return;
                 }
@@ -72,7 +67,7 @@ public class Page {
         throw new DBAppException("Tuple not found in the page.");
     }
 
-    public Hashtable<String, Object> getTuple(int index) {
+    public Tuple getTuple(int index) {
         if (index >= 0 && index < Tuples.size()) {
             return Tuples.get(index);
         } else {
@@ -80,7 +75,7 @@ public class Page {
         }
     }
 
-    public boolean CheckPageFull() {
+    public boolean isPageFull() {
         int maxTuples = 0;
 
         try {
@@ -103,7 +98,7 @@ public class Page {
         return TupleCount == maxTuples;
     }
 
-    public Boolean checkPageEmpty() {
+    public Boolean isPageEmpty() {
         return TupleCount == 0;
     }
 
