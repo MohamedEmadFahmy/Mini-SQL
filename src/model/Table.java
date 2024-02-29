@@ -1,21 +1,32 @@
 package model;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
+
+import javax.swing.text.html.HTMLDocument.Iterator;
 
 import engine.DBApp;
+import engine.SQLTerm;
 import exceptions.DBAppException;
 
 public class Table {
     String strTableName;
     String strClusteringKeyColumn;
     Hashtable<String, String> htblColNameType;
+    List<String> indexedColumns;
+    Vector<Page> pages;
 
     public Table(String strTableName, String strClusteringKeyColumn, Hashtable<String, String> htblColNameType) {
         this.strTableName = strTableName;
         this.strClusteringKeyColumn = strClusteringKeyColumn;
         this.htblColNameType = htblColNameType;
+        this.indexedColumns = new ArrayList<String>();
+        this.pages = new Vector<Page>();
     }
 
     public static void addTable(String strTableName, String strClusteringKeyColumn,
@@ -27,7 +38,7 @@ public class Table {
         DBApp.updateMetaDataFile();
     }
 
-    public static void addMetaData(String strTableName, String strClusteringKeyColumn,
+    private static void addMetaData(String strTableName, String strClusteringKeyColumn,
             Hashtable<String, String> htblColNameType) {
         StringBuilder contentBuilder = new StringBuilder();
 
@@ -58,9 +69,38 @@ public class Table {
         }
     }
 
-    public void insertIntoTable(String strTableName, Hashtable<String, Object> htblColNameValue)
+    public void insertTuple(String strTableName, Hashtable<String, Object> htblColNameValue)
             throws DBAppException {
 
+    }
+
+    public void deleteTuple(String strTableName, Hashtable<String, Object> htblColNameValue)
+            throws DBAppException {
+
+    }
+
+    public Iterator selectTuple(SQLTerm[] arrSQLTerms, String[] strarrOperators)
+            throws DBAppException {
+        return null;
+    }
+
+    public void updateTuple(String strTableName, String strClusteringKeyValue,
+            Hashtable<String, Object> htblColNameValue) throws DBAppException {
+
+    }
+
+    public void createIndex(String strTableName,
+            String strColName,
+            String strIndexName) throws DBAppException {
+
+    }
+
+    public void addPage(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException {
+
+    }
+
+    public String toString() {
+        return "";
     }
 
     // public static void readFile(String filePath) {
