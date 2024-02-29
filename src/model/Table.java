@@ -1,7 +1,11 @@
+package model;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Hashtable;
+
+import engine.DBApp;
+import exceptions.DBAppException;
 
 public class Table {
     String strTableName;
