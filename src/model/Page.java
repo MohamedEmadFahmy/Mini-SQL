@@ -1,3 +1,4 @@
+package model;
 import java.util.Hashtable;
 import java.util.Vector;
 
