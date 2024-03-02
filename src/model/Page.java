@@ -17,6 +17,7 @@ public class Page {
     Hashtable<String, String> ColNameType;
     List<String> indexedColumns;
     private static final long serialVersionUID = -4544542885377264750L;
+    int maxTuples = 0;
     Object min;
     Object max;
 
@@ -25,22 +26,49 @@ public class Page {
         ClusteringKey = clusteringKey;
         ColNameType = colNameType;
         this.indexedColumns = new ArrayList<String>();
+
+        // retrieving maxtuples
+
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("resources/DBApp.config"));
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("MaximumRowsCountinPage")) {
+                    maxTuples = Integer.parseInt(line.split("=")[1].trim());
+                    break;
+                }
+            }
+            reader.close();
+
+        } catch (Exception e) {
+            // Handle exceptions, e.g., file not found or format error
+            e.printStackTrace();
+        }
+
     }
 
     public Hashtable<String, Object> AddTupleToPage(Hashtable<String, Object> htblColNameValue) { // returns overflow
                                                                                                   // tuple, null if no
                                                                                                   // overflow
         TupleCount += 1;
-        Object primaryKey;
-        for (int i = 0; i < htblColNameValue.size(); i++) {
-            // if (ClusteringKey == htblColNameValue) {
-
-            // }
+        Object primaryKey = null;
+        if (htblColNameValue.containsKey(ClusteringKey)) {
+            primaryKey = htblColNameValue.get(ClusteringKey);
+        }
+        for (int i = 0; i < TupleCount; i++) {
+            if (Tuples.elementAt(i).get(ClusteringKey).equals(primaryKey)) {
+                System.out.println("Primary Key already in use");
+                return null;
+            }
         }
         Tuples.add(htblColNameValue);
+        TupleCount += 1;
+        if (TupleCount > maxTuples) {
+            return Tuples.elementAt(TupleCount);
+        }
         return null;
-    }// don't need to check if the page is full as that would be done in the Tables
-     // method
+    }
 
     public boolean deleteTupleFromPage(Hashtable<String, Object> x, String strClusteringKey) {
         for (int i = 0; i < this.Tuples.size(); i++) {
@@ -81,25 +109,6 @@ public class Page {
     }
 
     public boolean CheckPageFull() {
-        int maxTuples = 0;
-
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("resources/DBApp.config"));
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith("MaximumRowsCountinPage")) {
-                    maxTuples = Integer.parseInt(line.split("=")[1].trim());
-                    break;
-                }
-            }
-
-            reader.close();
-        } catch (Exception e) {
-            // Handle exceptions, e.g., file not found or format error
-            e.printStackTrace();
-        }
-
         return TupleCount == maxTuples;
     }
 
