@@ -75,6 +75,7 @@ public class Page {
             Hashtable<String, Object> tuple = this.Tuples.get(i);
             if (tuple.get(strClusteringKey).equals(x.get(strClusteringKey))) {
                 this.Tuples.remove(i);
+                TupleCount -= 1;
                 if (this.Tuples.isEmpty()) {
                     return true;
                 }
