@@ -62,26 +62,39 @@ public class Page {
             Tuple tuple = this.Tuples.get(i);
             if (tuple.colNameVal.get(strClusteringKey).equals(x.colNameVal.get(strClusteringKey))) {
                 this.Tuples.remove(i);
-                if (this.Tuples.isEmpty()) {
-                    return true;
-                }
-                return false;
+                tupleCount -= 1;
+            }
+            if (this.Tuples.isEmpty()) {
+                return true;
             }
         }
         return false;
     }
 
-    public void updatePage(String strClusteringKeyValue, Hashtable<String, Object> htblColNameValue)
+    // used the hasmatching values in a similar fashion to the deleteTuple method
+    // assuming a similar input
+    public Vector<Tuple> returnTuple(Hashtable<String, Object> x) {
+        Vector<Tuple> selectedTuples = new Vector<Tuple>();
+        Tuple currentTuple = null;
+        for (int i = 0; i < this.Tuples.size(); i++) {
+            currentTuple = this.Tuples.get(i);
+            if (hasMatchingValues(x, currentTuple)) {
+                selectedTuples.add(currentTuple);
+            }
+        }
+        return selectedTuples;
+    }
+
+    public void updatePage(String oldPrimaryKey, Hashtable<String, Object> newValues)
             throws DBAppException {
-        for (Tuple tuple : Tuples) {
-            if (tuple.colNameVal.containsKey(strClusteringKeyValue)) {
-                Object tupleClusteringKeyValue = tuple.colNameVal.get(strClusteringKeyValue);
-                if (tupleClusteringKeyValue != null && tupleClusteringKeyValue.equals(strClusteringKeyValue)) {
-                    for (Map.Entry<String, Object> entry : htblColNameValue.entrySet()) {
-                        tuple.colNameVal.put(entry.getKey(), entry.getValue());
-                    }
-                    return;
+        for (int i = 0; i < Tuples.size(); i++) {
+            Hashtable<String, Object> tuple = this.Tuples.get(i).colNameVal;
+
+            if (tuple.contains(oldPrimaryKey) && tuple.get(oldPrimaryKey).equals(oldPrimaryKey)) {
+                for (String colName : newValues.keySet()) {
+                    tuple.put(colName, newValues.get(colName));
                 }
+                return;
             }
         }
         throw new DBAppException("Tuple not found in the page.");
@@ -89,7 +102,7 @@ public class Page {
 
     public Tuple getTuple(int index) {
         if (index >= 0 && index < Tuples.size()) {
-            return Tuples.get(index);
+            return this.Tuples.get(index);
         } else {
             return null; // Index out of bounds, return null
         }
@@ -104,7 +117,13 @@ public class Page {
         return tupleCount == 0;
     }
 
-    // public Tuple ReturnTuple(){
+    public boolean CheckPageFull() {
+        return tupleCount == maxTupleCount;
+    }
+
+    public boolean checkPageEmpty() {
+        return tupleCount == 0;
+    }
 
     // }
 
@@ -114,4 +133,9 @@ public class Page {
                 + ", Column Name/Types=" + colNameType + ", Indexed Columns=" + indexedColumns + "]";
     }
 
+    public static void main(String[] args) {
+        Hashtable<Integer, String> ht = new Hashtable<>();
+        ht.put(1, "Mohamed");
+        System.out.println(ht.get(2));
+    }
 }
