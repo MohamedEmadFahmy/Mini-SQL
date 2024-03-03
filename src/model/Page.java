@@ -70,19 +70,50 @@ public class Page {
         return null;
     }
 
-    public boolean deleteTupleFromPage(Hashtable<String, Object> x, String strClusteringKey) {
-        for (int i = 0; i < this.Tuples.size(); i++) {
-            Hashtable<String, Object> tuple = this.Tuples.get(i);
-            if (tuple.get(strClusteringKey).equals(x.get(strClusteringKey))) {
-                this.Tuples.remove(i);
-                TupleCount -= 1;
-                if (this.Tuples.isEmpty()) {
-                    return true;
-                }
+    // I created this helper method to check if for all keys in htblX the
+    // corresponding values in htblX & htblY are equal
+    private static boolean hasMatchingValues(Hashtable<String, Object> hashtableX,
+            Hashtable<String, Object> hashtableY) {
+        for (String key : hashtableX.keySet()) {
+            if (!hashtableY.containsKey(key) || !hashtableX.get(key).equals(hashtableY.get(key))) {
                 return false;
             }
         }
+        return true;
+    }
+
+    public boolean deleteTupleFromPage(Hashtable<String, Object> x) {
+        // since the pk isnt given by the user, the code will need to be completely
+        // redone;
+        // since the user could ask for multiple tuples to be deleted, process will
+        // require n^2 to loop
+        // on the given hashtable and then the Tuples vector hashtables.
+        Hashtable<String, Object> currentTuple = null;
+        for (int i = 0; i < this.Tuples.size(); i++) {
+            currentTuple = this.Tuples.get(i);
+            if (hasMatchingValues(x, currentTuple)) {
+                this.Tuples.remove(i);
+                TupleCount -= 1;
+            }
+            if (this.Tuples.isEmpty()) {
+                return true;
+            }
+        }
         return false;
+    }
+
+    // used the hasmatching values in a similar fashion to the deleteTuple method
+    // assuming a similar input
+    public Vector<Hashtable<String, Object>> ReturnTuple(Hashtable<String, Object> x) {
+        Vector<Hashtable<String, Object>> selectedTuples = new Vector<Hashtable<String, Object>>();
+        Hashtable<String, Object> currentTuple = null;
+        for (int i = 0; i < this.Tuples.size(); i++) {
+            currentTuple = this.Tuples.get(i);
+            if (hasMatchingValues(x, currentTuple)) {
+                selectedTuples.add(currentTuple);
+            }
+        }
+        return selectedTuples;
     }
 
     public void updatePage(String strClusteringKeyValue, Hashtable<String, Object> htblColNameValue)
@@ -116,8 +147,6 @@ public class Page {
     public Boolean checkPageEmpty() {
         return TupleCount == 0;
     }
-
-    // public Tuple ReturnTuple(){
 
     // }
 
