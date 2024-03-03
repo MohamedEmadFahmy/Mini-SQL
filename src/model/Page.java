@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 import exceptions.DBAppException;
@@ -50,9 +49,9 @@ public class Page {
         }
     }
 
-    public Tuple addTuple(Tuple htblColNameValue) { // returns overflow
-                                                    // tuple, null if no
-                                                    // overflow
+    public Tuple addTuple(Tuple htblColNameValue) {
+        // returns overflow tuple, null if no overflow
+
         Object primaryKey = null;
         if (htblColNameValue.colNameVal.containsKey(clusteringKey)) {
             primaryKey = htblColNameValue.colNameVal.get(clusteringKey);
@@ -74,8 +73,6 @@ public class Page {
     // don't need to check if the page is full as that would be done in the Tables
     // method
 
-    // I created this helper method to check if for all keys in htblX the
-    // corresponding values in htblX & htblY are equal
     private static boolean hasMatchingValues(Hashtable<String, Object> criteria,
             Tuple tuple) {
         for (String key : criteria.keySet()) {

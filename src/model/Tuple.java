@@ -1,25 +1,85 @@
 package model;
 
 import java.util.Hashtable;
+import java.util.Map;
 
 public class Tuple implements Comparable<Tuple> {
     Hashtable<String, Object> colNameVal;
-    Object primaryKey;
+    private String primaryKeyName;
+    private Object primaryKey;
 
-    public Tuple(Hashtable<String, Object> colNameVal, Object primaryKey) {
+    public Tuple(Hashtable<String, Object> colNameVal, String primaryKeyName) {
         this.colNameVal = colNameVal;
-        this.primaryKey = primaryKey;
+
+        this.primaryKeyName = primaryKeyName;
+
+        for (Map.Entry<String, Object> entry : colNameVal.entrySet()) {
+
+            String key = entry.getKey();
+
+            if (key.equals(primaryKeyName)) {
+                primaryKey = entry.getValue();
+            }
+        }
+    }
+
+    public Object getPrimaryKey() {
+        return primaryKey;
     }
 
     @Override
     public int compareTo(Tuple o) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'compareTo'");
+        if (primaryKey instanceof String) {
+            return ((String) this.primaryKey).compareTo(((String) o.primaryKey));
+        }
+        if (primaryKey instanceof Integer) {
+            return ((Integer) this.primaryKey).compareTo((Integer) o.primaryKey);
+
+        }
+        if (primaryKey instanceof Double) {
+            return ((Double) this.primaryKey).compareTo((Double) o.primaryKey);
+        }
+
+        return 0;
     }
 
     @Override
     public String toString() {
-        // TODO Auto-generated method stub
-        return super.toString();
+        String result = "";
+        result += primaryKey;
+
+        for (Map.Entry<String, Object> entry : colNameVal.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            if (!key.equals(primaryKeyName)) {
+                result += "," + value;
+            }
+        }
+
+        return result;
+    }
+
+    public boolean equals(Tuple t) {
+        for (String key : t.colNameVal.keySet()) {
+            if (!this.colNameVal.containsKey(key) || !t.colNameVal.get(key).equals(this.colNameVal.get(key))) {
+                return false;
+            }
+        }
+        return this.primaryKey.equals(t.primaryKey) && this.primaryKeyName.equals(t.primaryKeyName);
+    }
+
+    public static void main(String[] args) {
+        Hashtable<String, Object> ht = new Hashtable<>();
+        ht.put("id", 1);
+        ht.put("age", 15);
+        ht.put("name", "moski");
+        String primaryKey = "id";
+
+        Tuple tuple = new Tuple(ht, primaryKey);
+
+        // System.out.println(tuple.primaryKey);
+
+        System.out.println(tuple);
     }
 }
