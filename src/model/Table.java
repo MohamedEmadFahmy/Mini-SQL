@@ -16,29 +16,29 @@ import exceptions.DBAppException;
 
 public class Table {
     String strTableName;
-    String strClusteringKeyColumn;
+    String primaryKeyName;
     Hashtable<String, String> htblColNameType;
     List<String> indexedColumns;
-    Vector<Page> pages;
+    Vector<Page> pagesList;
 
-    public Table(String strTableName, String strClusteringKeyColumn, Hashtable<String, String> htblColNameType) {
+    public Table(String strTableName, String primaryKeyName, Hashtable<String, String> htblColNameType) {
         this.strTableName = strTableName;
-        this.strClusteringKeyColumn = strClusteringKeyColumn;
+        this.primaryKeyName = primaryKeyName;
         this.htblColNameType = htblColNameType;
         this.indexedColumns = new ArrayList<String>();
-        this.pages = new Vector<Page>();
+        this.pagesList = new Vector<Page>();
     }
 
-    public static void addTable(String strTableName, String strClusteringKeyColumn,
+    public static void addTable(String strTableName, String primaryKeyName,
             Hashtable<String, String> htblColNameType) {
 
-        addMetaData(strTableName, strClusteringKeyColumn, htblColNameType);
+        addMetaData(strTableName, primaryKeyName, htblColNameType);
 
         // Update table names arraylist with table names from metadata file
         DBApp.updateMetaDataFile();
     }
 
-    private static void addMetaData(String strTableName, String strClusteringKeyColumn,
+    private static void addMetaData(String strTableName, String primaryKeyName,
             Hashtable<String, String> htblColNameType) {
         StringBuilder contentBuilder = new StringBuilder();
 
@@ -46,7 +46,7 @@ public class Table {
             String tableName = strTableName;
             String colName = key;
             String colDataType = value;
-            String isClusteringKey = key.equals(strClusteringKeyColumn) ? "True" : "False";
+            String isClusteringKey = key.equals(primaryKeyName) ? "True" : "False";
             String indexName = "null";
             String indexType = "null";
 
@@ -69,8 +69,25 @@ public class Table {
         }
     }
 
-    public void insertTuple(String strTableName, Hashtable<String, Object> htblColNameValue)
+    public void insertTuple(Hashtable<String, Object> htblColNameValue)
             throws DBAppException {
+        Tuple tuple = new Tuple(htblColNameValue, primaryKeyName);
+
+        if (pagesList.isEmpty()) {
+            Page page = new Page(htblColNameType, primaryKeyName);
+            page.addTuple(tuple);
+            pagesList.add(page);
+        } else {
+            Page lastPage = pagesList.lastElement();
+            if (lastPage.isFull()) {
+                Page newPage = new Page(htblColNameType, primaryKeyName);
+                newPage.addTuple(tuple);
+                pagesList.add(newPage);
+            } else {
+                lastPage.addTuple(tuple);
+            }
+        }
+
     }
 
     public void deleteTuple(String strTableName, Hashtable<String, Object> htblColNameValue)

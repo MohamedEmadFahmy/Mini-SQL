@@ -13,22 +13,30 @@ public class Page {
     private Vector<Tuple> Tuples;
     private int tupleCount;
     private int maxTupleCount;
-    private String clusteringKey;
+    private String primaryKeyName;
     private Hashtable<String, String> colNameType;
     private List<String> indexedColumns;
     private Object min;
     private Object max;
     // private static final long serialVersionUID = -4544542885377264750L;
 
-    public Page(String clusteringKey, Hashtable<String, String> colNameType) {
+    public Page(Hashtable<String, String> colNameType, String primaryKeyName) {
         this.tupleCount = 0;
-        this.clusteringKey = clusteringKey;
+        this.primaryKeyName = primaryKeyName;
         this.colNameType = colNameType;
         this.indexedColumns = new ArrayList<String>();
 
         loadMaxTuplesCount();
         min = null;
         max = null;
+    }
+
+    public Object getMin() {
+        return min;
+    }
+
+    public Object getMax() {
+        return max;
     }
 
     public void loadMaxTuplesCount() {
@@ -53,11 +61,11 @@ public class Page {
         // returns overflow tuple, null if no overflow
 
         Object primaryKey = null;
-        if (htblColNameValue.colNameVal.containsKey(clusteringKey)) {
-            primaryKey = htblColNameValue.colNameVal.get(clusteringKey);
+        if (htblColNameValue.colNameVal.containsKey(primaryKeyName)) {
+            primaryKey = htblColNameValue.colNameVal.get(primaryKeyName);
         }
         for (int i = 0; i < this.tupleCount; i++) {
-            if (Tuples.elementAt(i).colNameVal.get(clusteringKey).equals(primaryKey)) {
+            if (Tuples.elementAt(i).colNameVal.get(primaryKeyName).equals(primaryKey)) {
                 System.out.println("Primary Key already in use");
                 return null;
             }
@@ -140,18 +148,18 @@ public class Page {
         }
     }
 
-    public boolean isPageFull() {
+    public boolean isFull() {
 
         return this.tupleCount == this.maxTupleCount;
     }
 
-    public boolean isPageEmpty() {
+    public boolean isEmpty() {
         return this.tupleCount == 0;
     }
 
     @Override
     public String toString() {
-        return "Page [Tuples=" + Tuples + ", Tuple Count=" + this.tupleCount + ", Clustering Key=" + clusteringKey
+        return "Page [Tuples=" + Tuples + ", Tuple Count=" + this.tupleCount + ", Clustering Key=" + primaryKeyName
                 + ", Column Name/Types=" + colNameType + ", Indexed Columns=" + indexedColumns + "]";
     }
 
