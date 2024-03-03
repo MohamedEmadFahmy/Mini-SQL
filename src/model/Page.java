@@ -51,7 +51,6 @@ public class Page {
     public Hashtable<String, Object> AddTupleToPage(Hashtable<String, Object> htblColNameValue) { // returns overflow
                                                                                                   // tuple, null if no
                                                                                                   // overflow
-        TupleCount += 1;
         Object primaryKey = null;
         if (htblColNameValue.containsKey(ClusteringKey)) {
             primaryKey = htblColNameValue.get(ClusteringKey);
@@ -65,7 +64,8 @@ public class Page {
         Tuples.add(htblColNameValue);
         TupleCount += 1;
         if (TupleCount > maxTuples) {
-            return Tuples.elementAt(TupleCount);
+            TupleCount -= 1;
+            return Tuples.remove(maxTuples);
         }
         return null;
     }
@@ -86,7 +86,7 @@ public class Page {
         // since the pk isnt given by the user, the code will need to be completely
         // redone;
         // since the user could ask for multiple tuples to be deleted, process will
-        // require n^2 to loop
+        // require n*m to loop
         // on the given hashtable and then the Tuples vector hashtables.
         Hashtable<String, Object> currentTuple = null;
         for (int i = 0; i < this.Tuples.size(); i++) {
