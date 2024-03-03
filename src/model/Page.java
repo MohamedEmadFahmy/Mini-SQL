@@ -2,7 +2,6 @@ package model;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.security.cert.TrustAnchor;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -11,12 +10,12 @@ import java.util.Vector;
 import exceptions.DBAppException;
 
 public class Page {
-    Vector<Hashtable<String, Object>> Tuples;
+    Vector<Tuple> Tuples;
     int TupleCount;
     String ClusteringKey;
     Hashtable<String, String> ColNameType;
     List<String> indexedColumns;
-    private static final long serialVersionUID = -4544542885377264750L;
+    // private static final long serialVersionUID = -4544542885377264750L;
     int maxTuples = 0;
     Object min;
     Object max;
@@ -48,15 +47,15 @@ public class Page {
 
     }
 
-    public Hashtable<String, Object> AddTupleToPage(Hashtable<String, Object> htblColNameValue) { // returns overflow
-                                                                                                  // tuple, null if no
-                                                                                                  // overflow
+    public Tuple AddTupleToPage(Tuple htblColNameValue) { // returns overflow
+                                                          // tuple, null if no
+                                                          // overflow
         Object primaryKey = null;
-        if (htblColNameValue.containsKey(ClusteringKey)) {
-            primaryKey = htblColNameValue.get(ClusteringKey);
+        if (htblColNameValue.colNameVal.containsKey(ClusteringKey)) {
+            primaryKey = htblColNameValue.colNameVal.get(ClusteringKey);
         }
         for (int i = 0; i < TupleCount; i++) {
-            if (Tuples.elementAt(i).get(ClusteringKey).equals(primaryKey)) {
+            if (Tuples.elementAt(i).colNameVal.get(ClusteringKey).equals(primaryKey)) {
                 System.out.println("Primary Key already in use");
                 return null;
             }
@@ -72,10 +71,10 @@ public class Page {
 
     // I created this helper method to check if for all keys in htblX the
     // corresponding values in htblX & htblY are equal
-    private static boolean hasMatchingValues(Hashtable<String, Object> hashtableX,
-            Hashtable<String, Object> hashtableY) {
-        for (String key : hashtableX.keySet()) {
-            if (!hashtableY.containsKey(key) || !hashtableX.get(key).equals(hashtableY.get(key))) {
+    private static boolean hasMatchingValues(Hashtable<String, Object> criteria,
+            Tuple tuple) {
+        for (String key : criteria.keySet()) {
+            if (!tuple.colNameVal.containsKey(key) || !criteria.get(key).equals(tuple.colNameVal.get(key))) {
                 return false;
             }
         }
@@ -88,7 +87,7 @@ public class Page {
         // since the user could ask for multiple tuples to be deleted, process will
         // require n*m to loop
         // on the given hashtable and then the Tuples vector hashtables.
-        Hashtable<String, Object> currentTuple = null;
+        Tuple currentTuple = null;
         for (int i = 0; i < this.Tuples.size(); i++) {
             currentTuple = this.Tuples.get(i);
             if (hasMatchingValues(x, currentTuple)) {
@@ -104,9 +103,9 @@ public class Page {
 
     // used the hasmatching values in a similar fashion to the deleteTuple method
     // assuming a similar input
-    public Vector<Hashtable<String, Object>> ReturnTuple(Hashtable<String, Object> x) {
-        Vector<Hashtable<String, Object>> selectedTuples = new Vector<Hashtable<String, Object>>();
-        Hashtable<String, Object> currentTuple = null;
+    public Vector<Tuple> returnTuple(Hashtable<String, Object> x) {
+        Vector<Tuple> selectedTuples = new Vector<Tuple>();
+        Tuple currentTuple = null;
         for (int i = 0; i < this.Tuples.size(); i++) {
             currentTuple = this.Tuples.get(i);
             if (hasMatchingValues(x, currentTuple)) {
@@ -116,25 +115,24 @@ public class Page {
         return selectedTuples;
     }
 
-    public void updatePage(String strClusteringKeyValue, Hashtable<String, Object> htblColNameValue)
+    public void updatePage(String oldPrimaryKey, Hashtable<String, Object> newValues)
             throws DBAppException {
         for (int i = 0; i < Tuples.size(); i++) {
-            Hashtable<String, Object> tuple = Tuples.get(i);
-            if (tuple.contains(strClusteringKeyValue)) {
-                if (tuple.get(strClusteringKeyValue).equals(strClusteringKeyValue)) {
-                    for (String colName : htblColNameValue.keySet()) {
-                        tuple.put(colName, htblColNameValue.get(colName));
-                    }
-                    return;
+            Hashtable<String, Object> tuple = this.Tuples.get(i).colNameVal;
+
+            if (tuple.contains(oldPrimaryKey) && tuple.get(oldPrimaryKey).equals(oldPrimaryKey)) {
+                for (String colName : newValues.keySet()) {
+                    tuple.put(colName, newValues.get(colName));
                 }
+                return;
             }
         }
         throw new DBAppException("Tuple not found in the page.");
     }
 
-    public Hashtable<String, Object> getTuple(int index) {
+    public Tuple getTuple(int index) {
         if (index >= 0 && index < Tuples.size()) {
-            return Tuples.get(index);
+            return this.Tuples.get(index);
         } else {
             return null; // Index out of bounds, return null
         }
@@ -144,7 +142,7 @@ public class Page {
         return TupleCount == maxTuples;
     }
 
-    public Boolean checkPageEmpty() {
+    public boolean checkPageEmpty() {
         return TupleCount == 0;
     }
 
@@ -156,4 +154,9 @@ public class Page {
                 + ", ColNameType=" + ColNameType + ", indexedColumns=" + indexedColumns + "]";
     }
 
+    public static void main(String[] args) {
+        Hashtable<Integer, String> ht = new Hashtable<>();
+        ht.put(1, "Mohamed");
+        System.out.println(ht.get(2));
+    }
 }
