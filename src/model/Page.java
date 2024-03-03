@@ -16,8 +16,8 @@ public class Page {
     private String primaryKeyName;
     private Hashtable<String, String> colNameType;
     private List<String> indexedColumns;
-    private Object min;
-    private Object max;
+    private Tuple min;
+    private Tuple max;
     // private static final long serialVersionUID = -4544542885377264750L;
 
     public Page(Hashtable<String, String> colNameType, String primaryKeyName) {
@@ -31,11 +31,11 @@ public class Page {
         max = null;
     }
 
-    public Object getMin() {
+    public Tuple getMin() {
         return min;
     }
 
-    public Object getMax() {
+    public Tuple getMax() {
         return max;
     }
 

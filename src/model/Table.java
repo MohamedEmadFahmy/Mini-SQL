@@ -72,19 +72,34 @@ public class Table {
     public void insertTuple(Hashtable<String, Object> htblColNameValue)
             throws DBAppException {
         Tuple tuple = new Tuple(htblColNameValue, primaryKeyName);
-
+        Object primaryKey = tuple.getPrimaryKey();
         if (pagesList.isEmpty()) {
             Page page = new Page(htblColNameType, primaryKeyName);
             page.addTuple(tuple);
             pagesList.add(page);
         } else {
-            Page lastPage = pagesList.lastElement();
-            if (lastPage.isFull()) {
-                Page newPage = new Page(htblColNameType, primaryKeyName);
-                newPage.addTuple(tuple);
-                pagesList.add(newPage);
-            } else {
-                lastPage.addTuple(tuple);
+            Tuple OverflowTuple = null;
+            for (int i = 0; i < pagesList.size(); i++) {
+                Page currentPage = pagesList.elementAt(i);
+                if (tuple.compareTo(currentPage.getMin()) == -1) {
+                    OverflowTuple = currentPage.addTuple(tuple);
+                } else if ((tuple.compareTo(currentPage.getMin()) == 1) && (tuple
+                        .compareTo(currentPage.getMax()) == -1)) {
+                    OverflowTuple = currentPage.addTuple(tuple);
+                } else if (tuple.compareTo(currentPage.getMax()) == 1) {
+                    Page nextPage = pagesList.elementAt(i + 1); // out of bounds
+                    if (nextPage == null) {
+                        OverflowTuple = currentPage.addTuple(tuple);
+                    } else if ((tuple.compareTo(nextPage.getMin()) == 1)
+                            && (tuple.compareTo(currentPage.getMax()) == -1)) {
+                        OverflowTuple = nextPage.addTuple(tuple);
+                    } else if (tuple.compareTo(nextPage.getMin()) == -1) {
+                        OverflowTuple = currentPage.addTuple(tuple);
+                    }
+                }
+            }
+            if (OverflowTuple != null) {
+                insertTuple(tuple.colNameVal);
             }
         }
 
@@ -139,4 +154,11 @@ public class Table {
     // // htblColNameType.put("gpa", "java.lang.double");
     // // Table myTable = new Table(strTableName, "id", htblColNameType);
     // }
+    public static void main(String[] args) {
+
+        Integer x = 3;
+        Integer y = 5;
+        System.out.println(x.compareTo(y));
+    }
+
 }
