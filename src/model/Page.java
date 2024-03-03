@@ -50,19 +50,54 @@ public class Page {
         }
     }
 
-    public void addTuple(Tuple tuple, Object strClusteringKey) throws DBAppException {
-        Tuples.add(tuple);
-        Tuples.sort(null);
+    public Tuple addTuple(Tuple htblColNameValue) { // returns overflow
+                                                    // tuple, null if no
+                                                    // overflow
+        Object primaryKey = null;
+        if (htblColNameValue.colNameVal.containsKey(clusteringKey)) {
+            primaryKey = htblColNameValue.colNameVal.get(clusteringKey);
+        }
+        for (int i = 0; i < this.tupleCount; i++) {
+            if (Tuples.elementAt(i).colNameVal.get(clusteringKey).equals(primaryKey)) {
+                System.out.println("Primary Key already in use");
+                return null;
+            }
+        }
+        Tuples.add(htblColNameValue);
+        this.tupleCount += 1;
+        if (this.tupleCount > this.maxTupleCount) {
+            this.tupleCount -= 1;
+            return Tuples.remove(this.maxTupleCount);
+        }
+        return null;
     }
     // don't need to check if the page is full as that would be done in the Tables
     // method
 
-    public boolean deleteTupleFromPage(Tuple x, String strClusteringKey) {
+    // I created this helper method to check if for all keys in htblX the
+    // corresponding values in htblX & htblY are equal
+    private static boolean hasMatchingValues(Hashtable<String, Object> criteria,
+            Tuple tuple) {
+        for (String key : criteria.keySet()) {
+            if (!tuple.colNameVal.containsKey(key) || !criteria.get(key).equals(tuple.colNameVal.get(key))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean deleteTuple(Hashtable<String, Object> x) {
+        // since the pk isnt given by the user, the code will need to be completely
+        // redone;
+        // since the user could ask for multiple tuples to be deleted, process will
+        // require n*m to loop
+        // on the given hashtable and then the Tuples vector hashtables.
+        Tuple currentTuple = null;
         for (int i = 0; i < this.Tuples.size(); i++) {
-            Tuple tuple = this.Tuples.get(i);
-            if (tuple.colNameVal.get(strClusteringKey).equals(x.colNameVal.get(strClusteringKey))) {
+            currentTuple = this.Tuples.get(i);
+            if (hasMatchingValues(x, currentTuple)) {
                 this.Tuples.remove(i);
-                tupleCount -= 1;
+                this.tupleCount -= 1;
             }
             if (this.Tuples.isEmpty()) {
                 return true;
@@ -85,7 +120,7 @@ public class Page {
         return selectedTuples;
     }
 
-    public void updatePage(String oldPrimaryKey, Hashtable<String, Object> newValues)
+    public void updateTuple(String oldPrimaryKey, Hashtable<String, Object> newValues)
             throws DBAppException {
         for (int i = 0; i < Tuples.size(); i++) {
             Hashtable<String, Object> tuple = this.Tuples.get(i).colNameVal;
@@ -100,7 +135,7 @@ public class Page {
         throw new DBAppException("Tuple not found in the page.");
     }
 
-    public Tuple getTuple(int index) {
+    public Tuple getTupleAtIndex(int index) {
         if (index >= 0 && index < Tuples.size()) {
             return this.Tuples.get(index);
         } else {
@@ -110,26 +145,16 @@ public class Page {
 
     public boolean isPageFull() {
 
-        return tupleCount == maxTupleCount;
+        return this.tupleCount == this.maxTupleCount;
     }
 
-    public Boolean isPageEmpty() {
-        return tupleCount == 0;
+    public boolean isPageEmpty() {
+        return this.tupleCount == 0;
     }
-
-    public boolean CheckPageFull() {
-        return tupleCount == maxTupleCount;
-    }
-
-    public boolean checkPageEmpty() {
-        return tupleCount == 0;
-    }
-
-    // }
 
     @Override
     public String toString() {
-        return "Page [Tuples=" + Tuples + ", Tuple Count=" + tupleCount + ", Clustering Key=" + clusteringKey
+        return "Page [Tuples=" + Tuples + ", Tuple Count=" + this.tupleCount + ", Clustering Key=" + clusteringKey
                 + ", Column Name/Types=" + colNameType + ", Indexed Columns=" + indexedColumns + "]";
     }
 
