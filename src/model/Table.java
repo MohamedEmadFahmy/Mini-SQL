@@ -120,9 +120,16 @@ public class Table {
         return null;
     }
 
-    public void updateTuple(String strTableName, String strClusteringKeyValue,
-            Hashtable<String, Object> htblColNameValue) throws DBAppException {
-
+    public void updateTuple(String strClusteringKeyValue, Hashtable<String, Object> htblColNameValue)
+            throws DBAppException {
+        Tuple tuple = new Tuple(htblColNameValue, strClusteringKeyValue);
+        for (int i = 0; i < pagesList.size(); i++) {
+            Page currentPage = pagesList.elementAt(i);
+            if (tuple.compareTo(currentPage.getMin()) >= -1 && tuple.compareTo(currentPage.getMin()) <= 1) {
+                currentPage.updateTuple(strClusteringKeyValue, htblColNameValue);
+                return;
+            }
+        }
     }
 
     public void createIndex(String strTableName,
