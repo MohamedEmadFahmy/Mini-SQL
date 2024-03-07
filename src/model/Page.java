@@ -72,6 +72,18 @@ public class Page {
         }
         Tuples.add(htblColNameValue);
         this.tupleCount += 1;
+        // min & max tuple functionality
+        if (this.max.equals(null)) {
+            this.max = htblColNameValue;
+        } else if (htblColNameValue.compareTo(this.max) == 1) {
+            this.max = htblColNameValue;
+        }
+        if (this.min.equals(null)) {
+            this.min = htblColNameValue;
+        } else if (htblColNameValue.compareTo(this.min) == -1) {
+            this.min = htblColNameValue;
+        }
+
         if (this.tupleCount > this.maxTupleCount) {
             this.tupleCount -= 1;
             return Tuples.remove(this.maxTupleCount);
@@ -103,11 +115,32 @@ public class Page {
             if (hasMatchingValues(x, currentTuple)) {
                 this.Tuples.remove(i);
                 this.tupleCount -= 1;
+                if (currentTuple.equals(min)) { // checks if the deleted value was the min or the max
+                    min = null;
+                }
+                if (currentTuple.equals(max)) {
+                    max = null;
+                }
             }
             if (this.Tuples.isEmpty()) {
+                min = null;
+                max = null;
                 return true;
             }
         }
+        // min & max functionality (here they require a loop incase one of them is
+        // deleted)
+        min = this.Tuples.get(0);
+        max = this.Tuples.get(0);
+        for (int j = 0; j < Tuples.size(); j++) {
+            if (Tuples.get(j).compareTo(min) == -1) {
+                min = Tuples.get(j);
+            }
+            if (Tuples.get(j).compareTo(max) == 1) {
+                max = Tuples.get(j);
+            }
+        }
+
         return false;
     }
 
