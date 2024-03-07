@@ -107,7 +107,12 @@ public class Table {
 
     public void deleteTuple(String strTableName, Hashtable<String, Object> htblColNameValue)
             throws DBAppException {
-
+        for (int i = 0; i < pagesList.size(); i++) {
+            Page currentPage = pagesList.get(i);
+            if (currentPage.deleteTuple(htblColNameValue)) {
+                pagesList.remove(i);
+            }
+        }
     }
 
     public Iterator selectTuple(SQLTerm[] arrSQLTerms, String[] strarrOperators)
