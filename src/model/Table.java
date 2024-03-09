@@ -72,7 +72,7 @@ public class Table {
     public void insertTuple(Hashtable<String, Object> htblColNameValue)
             throws DBAppException {
         Tuple tuple = new Tuple(htblColNameValue, primaryKeyName);
-        Object primaryKey = tuple.getPrimaryKey();
+        // Object primaryKey = tuple.getPrimaryKey();
         if (pagesList.isEmpty()) {
             Page page = new Page(htblColNameType, primaryKeyName);
             page.addTuple(tuple);

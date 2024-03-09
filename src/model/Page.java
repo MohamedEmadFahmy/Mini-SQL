@@ -57,7 +57,7 @@ public class Page {
         }
     }
 
-    public Tuple addTupleToPage(Tuple htblColNameValue) {
+    public Tuple addTuple(Tuple htblColNameValue) {
         // returns overflow tuple, null if no overflow
 
         Object primaryKey = null;
@@ -103,7 +103,7 @@ public class Page {
         return true;
     }
 
-    public boolean deleteTupleFromPage(Hashtable<String, Object> x) {
+    public boolean deleteTuple(Hashtable<String, Object> x) {
         // since the pk isnt given by the user, the code will need to be completely
         // redone;
         // since the user could ask for multiple tuples to be deleted, process will
