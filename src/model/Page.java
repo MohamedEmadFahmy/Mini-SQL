@@ -10,7 +10,7 @@ import java.util.Vector;
 import exceptions.DBAppException;
 
 public class Page {
-    private Vector<Tuple> Tuples;
+    private Vector<Tuple> tuples;
     private int tupleCount;
     private int maxTupleCount;
     private String primaryKeyName;
@@ -41,12 +41,13 @@ public class Page {
 
     public void loadMaxTuplesCount() {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader("resources/DBApp.config"));
+            BufferedReader reader = new BufferedReader(new FileReader("src/resources/DBApp.config"));
             String line;
 
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("MaximumRowsCountinPage")) {
                     this.maxTupleCount = Integer.parseInt(line.split("=")[1].trim());
+                    System.out.println(this.maxTupleCount);
                     break;
                 }
             }
@@ -57,41 +58,65 @@ public class Page {
         }
     }
 
-    public Tuple addTuple(Tuple htblColNameValue) {
+    public Tuple addTuple(Tuple tuple) throws DBAppException {
         // returns overflow tuple, null if no overflow
 
         Object primaryKey = null;
-        if (htblColNameValue.colNameVal.containsKey(primaryKeyName)) {
-            primaryKey = htblColNameValue.colNameVal.get(primaryKeyName);
+
+        // To be moved to DBApp using metadata or table class
+        if (tuple.colNameVal.containsKey(this.primaryKeyName)) {
+            primaryKey = tuple.colNameVal.get(this.primaryKeyName);
         }
-        for (int i = 0; i < this.tupleCount; i++) {
-            if (Tuples.elementAt(i).colNameVal.get(primaryKeyName).equals(primaryKey)) {
-                System.out.println("Primary Key already in use");
-                return null;
+
+        for (Tuple currentTuple : this.tuples) {
+            if (currentTuple.colNameVal.get(primaryKeyName).equals(primaryKey)) {
+                throw new DBAppException("Primary Key already in use");
             }
         }
-        Tuples.add(htblColNameValue);
+
+        tuples.add(tuple);
+        int index = locateCorrectPosition(tuple);
+        tuples.insertElementAt(tuple, index);
+
         this.tupleCount += 1;
-        // min & max tuple functionality
-        if (this.max.equals(null)) {
-            this.max = htblColNameValue;
-        } else if (htblColNameValue.compareTo(this.max) == 1) {
-            this.max = htblColNameValue;
-        }
-        if (this.min.equals(null)) {
-            this.min = htblColNameValue;
-        } else if (htblColNameValue.compareTo(this.min) == -1) {
-            this.min = htblColNameValue;
-        }
+
+        Tuple overflow = null;
 
         if (this.tupleCount > this.maxTupleCount) {
             this.tupleCount -= 1;
-            return Tuples.remove(this.maxTupleCount);
+            overflow = tuples.remove(this.maxTupleCount);
+            // returns the last tuple
+            // (not intended behavior, but it's the closest thing to an overflow tuple)
         }
-        return null;
+
+        min = this.tuples.firstElement();
+        max = this.tuples.lastElement();
+
+        return overflow;
     }
-    // don't need to check if the page is full as that would be done in the Tables
-    // method
+
+    private int locateCorrectPosition(Tuple tuple) {
+        // returns the correct index for the tuple in the page
+        // using binary search
+
+        int low = 0;
+        int high = this.tuples.size() - 1;
+
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            Tuple currentTuple = this.tuples.get(mid);
+
+            if (currentTuple.compareTo(tuple) < 0) {
+                low = mid + 1;
+            } else if (currentTuple.compareTo(tuple) > 0) {
+                high = mid - 1;
+            } else {
+                return mid;
+            }
+        }
+
+        return low;
+    }
 
     private static boolean hasMatchingValues(Hashtable<String, Object> criteria,
             Tuple tuple) {
@@ -104,53 +129,27 @@ public class Page {
     }
 
     public boolean deleteTuple(Hashtable<String, Object> x) {
-        // since the pk isnt given by the user, the code will need to be completely
-        // redone;
-        // since the user could ask for multiple tuples to be deleted, process will
-        // require n*m to loop
-        // on the given hashtable and then the Tuples vector hashtables.
-        Tuple currentTuple = null;
-        for (int i = 0; i < this.Tuples.size(); i++) {
-            currentTuple = this.Tuples.get(i);
+        // deletes any tuple that matches the given criteria
+        // returns true if the page is empty after deletion
+        // updates the min and max tuples
+
+        for (Tuple currentTuple : this.tuples) {
             if (hasMatchingValues(x, currentTuple)) {
-                this.Tuples.remove(i);
+                this.tuples.remove(currentTuple);
                 this.tupleCount -= 1;
-                if (currentTuple.equals(min)) { // checks if the deleted value was the min or the max
-                    min = null;
-                }
-                if (currentTuple.equals(max)) {
-                    max = null;
-                }
-            }
-            if (this.Tuples.isEmpty()) {
-                min = null;
-                max = null;
-                return true;
-            }
-        }
-        // min & max functionality (here they require a loop incase one of them is
-        // deleted)
-        min = this.Tuples.get(0);
-        max = this.Tuples.get(0);
-        for (int j = 0; j < Tuples.size(); j++) {
-            if (Tuples.get(j).compareTo(min) == -1) {
-                min = Tuples.get(j);
-            }
-            if (Tuples.get(j).compareTo(max) == 1) {
-                max = Tuples.get(j);
             }
         }
 
-        return false;
+        this.min = this.tuples.firstElement();
+        this.max = this.tuples.lastElement();
+
+        return this.tuples.isEmpty();
     }
 
-    // used the hasmatching values in a similar fashion to the deleteTuple method
-    // assuming a similar input
-    public Vector<Tuple> returnTuple(Hashtable<String, Object> x) {
+    public Vector<Tuple> selectTuple(Hashtable<String, Object> x) {
         Vector<Tuple> selectedTuples = new Vector<Tuple>();
-        Tuple currentTuple = null;
-        for (int i = 0; i < this.Tuples.size(); i++) {
-            currentTuple = this.Tuples.get(i);
+
+        for (Tuple currentTuple : this.tuples) {
             if (hasMatchingValues(x, currentTuple)) {
                 selectedTuples.add(currentTuple);
             }
@@ -160,8 +159,8 @@ public class Page {
 
     public void updateTuple(String oldPrimaryKey, Hashtable<String, Object> newValues)
             throws DBAppException {
-        for (int i = 0; i < Tuples.size(); i++) {
-            Hashtable<String, Object> tuple = this.Tuples.get(i).colNameVal;
+        for (int i = 0; i < tuples.size(); i++) {
+            Hashtable<String, Object> tuple = this.tuples.get(i).colNameVal;
 
             if (tuple.contains(oldPrimaryKey) && tuple.get(oldPrimaryKey).equals(oldPrimaryKey)) {
                 for (String colName : newValues.keySet()) {
@@ -173,16 +172,7 @@ public class Page {
         throw new DBAppException("Tuple not found in the page.");
     }
 
-    public Tuple getTupleAtIndex(int index) {
-        if (index >= 0 && index < Tuples.size()) {
-            return this.Tuples.get(index);
-        } else {
-            return null; // Index out of bounds, return null
-        }
-    }
-
     public boolean isFull() {
-
         return this.tupleCount == this.maxTupleCount;
     }
 
@@ -192,13 +182,41 @@ public class Page {
 
     @Override
     public String toString() {
-        return "Page [Tuples=" + Tuples + ", Tuple Count=" + this.tupleCount + ", Clustering Key=" + primaryKeyName
+        return "Page [tuples=" + tuples + ", Tuple Count=" + this.tupleCount + ", Clustering Key=" + primaryKeyName
                 + ", Column Name/Types=" + colNameType + ", Indexed Columns=" + indexedColumns + "]";
     }
 
+    // private static int binarySearch(int[] array, int num) {
+    // int low = 0;
+    // int high = array.length - 1;
+
+    // while (low <= high) {
+    // int mid = (low + high) / 2;
+    // int currentElement = array[mid];
+
+    // if (currentElement < num) {
+    // low = mid + 1;
+    // } else if (currentElement > num) {
+    // high = mid - 1;
+    // } else {
+    // return mid;
+    // }
+    // }
+
+    // return low;
+    // }
+
     public static void main(String[] args) {
-        Hashtable<Integer, String> ht = new Hashtable<>();
-        ht.put(1, "Mohamed");
-        System.out.println(ht.get(2));
+        // Hashtable<Integer, String> ht = new Hashtable<>();
+        // ht.put(1, "Mohamed");
+        // System.out.println(ht.get(2));
+
+        // int[] array = { 1, 2, 3, 7, 8, 9 };
+
+        // System.out.println(binarySearch(array, 5));
+        // System.out.println(binarySearch(array, 0));
+        // System.out.println(binarySearch(array, -1));
+        // System.out.println(binarySearch(array, 20));
+        // Page page = new Page(new Hashtable<String, String>(), "id");
     }
 }
