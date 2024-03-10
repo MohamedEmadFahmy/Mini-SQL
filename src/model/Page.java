@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import exceptions.DBAppException;
@@ -21,6 +22,7 @@ public class Page {
     // private static final long serialVersionUID = -4544542885377264750L;
 
     public Page(Hashtable<String, String> colNameType, String primaryKeyName) {
+        this.tuples = new Vector<Tuple>();
         this.tupleCount = 0;
         this.primaryKeyName = primaryKeyName;
         this.colNameType = colNameType;
@@ -47,7 +49,7 @@ public class Page {
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("MaximumRowsCountinPage")) {
                     this.maxTupleCount = Integer.parseInt(line.split("=")[1].trim());
-                    System.out.println(this.maxTupleCount);
+                    // System.out.println(this.maxTupleCount);
                     break;
                 }
             }
@@ -74,7 +76,6 @@ public class Page {
             }
         }
 
-        tuples.add(tuple);
         int index = locateCorrectPosition(tuple);
         tuples.insertElementAt(tuple, index);
 
@@ -180,10 +181,37 @@ public class Page {
         return this.tupleCount == 0;
     }
 
+    public int size() {
+        return this.tuples.size();
+    }
+
     @Override
     public String toString() {
-        return "Page [tuples=" + tuples + ", Tuple Count=" + this.tupleCount + ", Clustering Key=" + primaryKeyName
-                + ", Column Name/Types=" + colNameType + ", Indexed Columns=" + indexedColumns + "]";
+        String result = "    ";
+
+        result += primaryKeyName;
+
+        for (Map.Entry<String, String> entry : colNameType.entrySet()) {
+            String key = entry.getKey();
+            // Object value = entry.getValue();
+
+            if (!key.equals(primaryKeyName)) {
+                result += "    " + key;
+            }
+        }
+
+        result += "\n";
+
+        for (int i = 0; i < this.tuples.size(); i++) {
+            Tuple currentTuple = this.tuples.get(i);
+            result += (i + 1) + " " + currentTuple.toString();
+            if (i != 0) {
+                result += ",";
+            }
+            result += "\n";
+        }
+
+        return result;
     }
 
     // private static int binarySearch(int[] array, int num) {
@@ -206,7 +234,7 @@ public class Page {
     // return low;
     // }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws DBAppException {
         // Hashtable<Integer, String> ht = new Hashtable<>();
         // ht.put(1, "Mohamed");
         // System.out.println(ht.get(2));
@@ -218,5 +246,21 @@ public class Page {
         // System.out.println(binarySearch(array, -1));
         // System.out.println(binarySearch(array, 20));
         // Page page = new Page(new Hashtable<String, String>(), "id");
+
+        Hashtable<String, String> htblColNameType = new Hashtable<>();
+        htblColNameType.put("id", "java.lang.Integer");
+        htblColNameType.put("name", "java.lang.String");
+        htblColNameType.put("gpa", "java.lang.double");
+
+        Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+        htblColNameValue.put("id", 2343432);
+        htblColNameValue.put("name", "Ahmed Noor");
+        htblColNameValue.put("gpa", 0.95);
+
+        Page page = new Page(htblColNameType, "id");
+        Tuple tuple = new Tuple(htblColNameValue, "id");
+        page.addTuple(tuple);
+        System.out.println(page);
+        System.out.println(page.size());
     }
 }

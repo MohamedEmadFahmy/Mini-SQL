@@ -143,7 +143,16 @@ public class Table {
     }
 
     public String toString() {
-        return "";
+        String result = "";
+        result += strTableName + " Table \n\n\n";
+        for (int i = 0; i < pagesList.size(); i++) {
+            result += "Page " + (i + 1) + ":\n";
+            result += "-------------------------------\n";
+            result += pagesList.elementAt(i).toString();
+            result += "-------------------------------\n";
+        }
+
+        return result;
     }
 
     // public static void readFile(String filePath) {
@@ -166,11 +175,32 @@ public class Table {
     // // htblColNameType.put("gpa", "java.lang.double");
     // // Table myTable = new Table(strTableName, "id", htblColNameType);
     // }
-    public static void main(String[] args) {
+    @SuppressWarnings("unchecked")
+    public static void main(String[] args) throws DBAppException {
 
-        Integer x = 3;
-        Integer y = 5;
-        System.out.println(x.compareTo(y));
+        // Integer x = 3;
+        // Integer y = 5;
+        // System.out.println(x.compareTo(y));
+
+        String strTableName = "Student";
+        Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
+        htblColNameType.put("id", "java.lang.Integer");
+        htblColNameType.put("name", "java.lang.String");
+        htblColNameType.put("gpa", "java.lang.double");
+        Table myTable = new Table(strTableName, "id", htblColNameType);
+
+        Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+        htblColNameValue.put("id", 2343432);
+        htblColNameValue.put("name", "Ahmed Noor");
+        htblColNameValue.put("gpa", 0.95);
+        myTable.insertTuple(htblColNameValue);
+
+        // Page firstPage = myTable.pagesList.firstElement();
+
+        // System.out.println(myTable.pagesList.firstElement().size());
+        // System.out.println(firstPage);
+
+        System.out.println(myTable);
+
     }
-
 }

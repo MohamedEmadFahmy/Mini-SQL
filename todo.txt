@@ -1,6 +1,7 @@
 Table Class:
 DONE Find out what attributes should be stored in the table class
 Fix implementation of pagesList (should be referencing page names)
+Check implementation of locating page for insert (whether or not to do it linearly or using binary search and min max values)
 
 
 Page Class: 
