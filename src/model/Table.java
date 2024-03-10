@@ -71,38 +71,62 @@ public class Table {
 
     public void insertTuple(Hashtable<String, Object> htblColNameValue)
             throws DBAppException {
-        Tuple tuple = new Tuple(htblColNameValue, primaryKeyName);
+        Tuple tuple = new Tuple(htblColNameValue, this.primaryKeyName);
         // Object primaryKey = tuple.getPrimaryKey();
         if (pagesList.isEmpty()) {
-            Page page = new Page(htblColNameType, primaryKeyName);
+            Page page = new Page(htblColNameType, this.primaryKeyName);
             page.addTuple(tuple);
             pagesList.add(page);
-        } else {
-            Tuple OverflowTuple = null;
-            for (int i = 0; i < pagesList.size(); i++) {
-                Page currentPage = pagesList.elementAt(i);
-                if (tuple.compareTo(currentPage.getMin()) == -1) {
+            return;
+        }
+
+        Tuple OverflowTuple = null;
+        for (int i = 0; i < pagesList.size(); i++) {
+
+            // System.out.println(this);
+
+            Page currentPage = pagesList.elementAt(i);
+
+            if (currentPage.isEmpty()) {
+                currentPage.addTuple(tuple);
+                return;
+            }
+
+            if (tuple.compareTo(currentPage.getMin()) < 0) {
+                OverflowTuple = currentPage.addTuple(tuple);
+            } else if ((tuple.compareTo(currentPage.getMin()) > 0) && (tuple
+                    .compareTo(currentPage.getMax()) < 0)) {
+                OverflowTuple = currentPage.addTuple(tuple);
+            } else if (tuple.compareTo(currentPage.getMax()) > 0) {
+                if (i + 1 >= pagesList.size()) { // check if we are at the last page
                     OverflowTuple = currentPage.addTuple(tuple);
-                } else if ((tuple.compareTo(currentPage.getMin()) == 1) && (tuple
-                        .compareTo(currentPage.getMax()) == -1)) {
-                    OverflowTuple = currentPage.addTuple(tuple);
-                } else if (tuple.compareTo(currentPage.getMax()) == 1) {
+                    if (OverflowTuple != null) {
+                        Page newPage = new Page(htblColNameType, this.primaryKeyName);
+                        newPage.addTuple(OverflowTuple);
+                        pagesList.add(newPage);
+                        return;
+                    }
+                } else {
                     Page nextPage = pagesList.elementAt(i + 1); // out of bounds
-                    if (nextPage == null) {
-                        OverflowTuple = currentPage.addTuple(tuple);
-                    } else if ((tuple.compareTo(nextPage.getMin()) == 1)
-                            && (tuple.compareTo(currentPage.getMax()) == -1)) {
+                    if (nextPage.isEmpty()) {
+                        nextPage.addTuple(tuple);
+                        return;
+                    }
+
+                    if ((tuple.compareTo(nextPage.getMin()) > 0)
+                            && (tuple.compareTo(currentPage.getMax()) < 0)) {
                         OverflowTuple = nextPage.addTuple(tuple);
-                    } else if (tuple.compareTo(nextPage.getMin()) == -1) {
+                    } else if (tuple.compareTo(nextPage.getMin()) < 0) {
                         OverflowTuple = currentPage.addTuple(tuple);
                     }
                 }
             }
-            if (OverflowTuple != null) {
-                insertTuple(tuple.colNameVal);
-            }
         }
-
+        if (OverflowTuple != null) {
+            // Page page = new Page(htblColNameType, this.primaryKeyName);
+            // pagesList.add(page);
+            insertTuple(OverflowTuple.colNameVal);
+        }
     }
 
     public void deleteTuple(String strTableName, Hashtable<String, Object> htblColNameValue)
@@ -148,7 +172,7 @@ public class Table {
         for (int i = 0; i < pagesList.size(); i++) {
             result += "Page " + (i + 1) + ":\n";
             result += "-------------------------------\n";
-            result += pagesList.elementAt(i).toString();
+            result += pagesList.elementAt(i).toString() + "\n";
             result += "-------------------------------\n";
         }
 
@@ -189,18 +213,26 @@ public class Table {
         htblColNameType.put("gpa", "java.lang.double");
         Table myTable = new Table(strTableName, "id", htblColNameType);
 
-        Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-        htblColNameValue.put("id", 2343432);
-        htblColNameValue.put("name", "Ahmed Noor");
-        htblColNameValue.put("gpa", 0.95);
-        myTable.insertTuple(htblColNameValue);
+        // for (int i = 50; i >= 0; i--) {
+        // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+        // htblColNameValue.put("id", i);
+        // htblColNameValue.put("name", "Moski no " + i);
+        // htblColNameValue.put("gpa", 3.5);
+        // myTable.insertTuple(htblColNameValue);
+        // }
+        for (int i = 50; i >= 43; i--) {
+            Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+            htblColNameValue.put("id", i);
+            htblColNameValue.put("name", "Moski no " + i);
+            htblColNameValue.put("gpa", 3.5);
+            myTable.insertTuple(htblColNameValue);
+            System.out.println(myTable);
+        }
 
         // Page firstPage = myTable.pagesList.firstElement();
 
         // System.out.println(myTable.pagesList.firstElement().size());
         // System.out.println(firstPage);
-
-        System.out.println(myTable);
 
     }
 }

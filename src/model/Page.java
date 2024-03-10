@@ -86,6 +86,7 @@ public class Page {
         if (this.tupleCount > this.maxTupleCount) {
             this.tupleCount -= 1;
             overflow = tuples.remove(this.maxTupleCount);
+            System.out.println("Overflow: " + overflow.toString());
             // returns the last tuple
             // (not intended behavior, but it's the closest thing to an overflow tuple)
         }
@@ -204,8 +205,9 @@ public class Page {
 
         for (int i = 0; i < this.tuples.size(); i++) {
             Tuple currentTuple = this.tuples.get(i);
-            result += (i + 1) + " " + currentTuple.toString();
-            if (i != 0) {
+            // result += (i + 1) + " " + currentTuple.toString();
+            result += currentTuple.toString();
+            if (i != this.tuples.size() - 1) {
                 result += ",";
             }
             result += "\n";

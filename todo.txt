@@ -8,3 +8,8 @@ Page Class:
 DONE Review instance variables of Page class (especially strClusteringKey)
 DONE Review all of Page class
 DONE Use min and max after inserts and deletions(BIG ISSUE ON DELETIONS HERE)
+
+
+
+Thoughts:
+how to check if primary key is already inserted if its the last record in the page
