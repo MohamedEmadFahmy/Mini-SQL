@@ -49,7 +49,12 @@ public class Tuple implements Comparable<Tuple> {
                 return false;
             }
         }
-        return this.primaryKey.equals(t.primaryKey) && this.primaryKeyName.equals(t.primaryKeyName);
+        for (String key : this.colNameVal.keySet()) {
+            if (!t.colNameVal.containsKey(key) || !this.colNameVal.get(key).equals(t.colNameVal.get(key))) {
+                return false;
+            }
+        }
+        return t.primaryKey.equals(this.primaryKey) && this.primaryKeyName.equals(t.primaryKeyName);
     }
 
     public boolean matchesCriteria(Hashtable<String, Object> criteria) {
