@@ -112,6 +112,12 @@ public class Table {
                         nextPage.addTuple(tuple);
                         return;
                     }
+                    if (nextPage.isFull()) {
+                        currentPage.addTuple(nextPage.getMin());
+                        nextPage.deleteTuple(nextPage.getMin().colNameVal);
+                        nextPage.addTuple(tuple);
+                        return;
+                    }
 
                     if ((tuple.compareTo(nextPage.getMin()) > 0)
                             && (tuple.compareTo(currentPage.getMax()) < 0)) {

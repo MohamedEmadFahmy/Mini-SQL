@@ -120,23 +120,13 @@ public class Page {
         return low;
     }
 
-    private static boolean hasMatchingValues(Hashtable<String, Object> criteria,
-            Tuple tuple) {
-        for (String key : criteria.keySet()) {
-            if (!tuple.colNameVal.containsKey(key) || !criteria.get(key).equals(tuple.colNameVal.get(key))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     public boolean deleteTuple(Hashtable<String, Object> x) {
         // deletes any tuple that matches the given criteria
         // returns true if the page is empty after deletion
         // updates the min and max tuples
 
         for (Tuple currentTuple : this.tuples) {
-            if (hasMatchingValues(x, currentTuple)) {
+            if (currentTuple.matchesCriteria(x)) {
                 this.tuples.remove(currentTuple);
                 this.tupleCount -= 1;
             }
@@ -152,7 +142,7 @@ public class Page {
         Vector<Tuple> selectedTuples = new Vector<Tuple>();
 
         for (Tuple currentTuple : this.tuples) {
-            if (hasMatchingValues(x, currentTuple)) {
+            if (currentTuple.matchesCriteria(x)) {
                 selectedTuples.add(currentTuple);
             }
         }

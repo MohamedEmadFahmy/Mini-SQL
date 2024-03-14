@@ -43,6 +43,24 @@ public class Tuple implements Comparable<Tuple> {
         return 0;
     }
 
+    public boolean equals(Tuple t) {
+        for (String key : t.colNameVal.keySet()) {
+            if (!this.colNameVal.containsKey(key) || !t.colNameVal.get(key).equals(this.colNameVal.get(key))) {
+                return false;
+            }
+        }
+        return this.primaryKey.equals(t.primaryKey) && this.primaryKeyName.equals(t.primaryKeyName);
+    }
+
+    public boolean matchesCriteria(Hashtable<String, Object> criteria) {
+        for (String key : criteria.keySet()) {
+            if (!this.colNameVal.containsKey(key) || !criteria.get(key).equals(this.colNameVal.get(key))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     @Override
     public String toString() {
         String result = "";
@@ -58,15 +76,6 @@ public class Tuple implements Comparable<Tuple> {
         }
 
         return result;
-    }
-
-    public boolean equals(Tuple t) {
-        for (String key : t.colNameVal.keySet()) {
-            if (!this.colNameVal.containsKey(key) || !t.colNameVal.get(key).equals(this.colNameVal.get(key))) {
-                return false;
-            }
-        }
-        return this.primaryKey.equals(t.primaryKey) && this.primaryKeyName.equals(t.primaryKeyName);
     }
 
     public static void main(String[] args) {
