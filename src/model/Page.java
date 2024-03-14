@@ -1,7 +1,6 @@
 package model;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -11,7 +10,7 @@ import java.util.Vector;
 import exceptions.DBAppException;
 
 @SuppressWarnings("unused")
-public class Page {
+public class Page implements Serializable {
     private Vector<Tuple> tuples;
     private int tupleCount;
     private int maxTupleCount;
@@ -227,7 +226,48 @@ public class Page {
     // return low;
     // }
 
-    public static void main(String[] args) throws DBAppException {
+    public void serializePage(String pageName) throws IOException {
+        try {
+            FileOutputStream fileOut = new FileOutputStream(
+                    ".//src//resources//Serialized_Pages//" + pageName + ".class");
+            ObjectOutputStream ObjectOut = new ObjectOutputStream(fileOut);
+            ObjectOut.writeObject(this);
+            ObjectOut.close();
+            fileOut.close();
+            System.out.println("Page Serialized");
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public static Page deserializePage(String pageName) throws IOException, ClassNotFoundException {
+        try {
+            FileInputStream fileIn = new FileInputStream(".//src//resources//Serialized_Pages//" + pageName + ".class");
+            ObjectInputStream ObjectIn = new ObjectInputStream(fileIn);
+            Page page = null;
+            page = (Page) ObjectIn.readObject();
+            ObjectIn.close();
+            fileIn.close();
+            System.out.println("Page Deserialied, tupleCount =" + page.tupleCount);
+            return page;
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void main(String[] args) throws DBAppException, IOException, ClassNotFoundException {
         // Hashtable<Integer, String> ht = new Hashtable<>();
         // ht.put(1, "Mohamed");
         // System.out.println(ht.get(2));
@@ -253,7 +293,17 @@ public class Page {
         Page page = new Page(htblColNameType, "id");
         Tuple tuple = new Tuple(htblColNameValue, "id");
         page.addTuple(tuple);
-        System.out.println(page);
-        System.out.println(page.size());
+        // System.out.println(page);
+        // System.out.println(page.size());
+
+        System.out.println(page.tupleCount);
+        page.serializePage("page1");
+
+        Page page1 = null;
+        page1 = Page.deserializePage("page1");
+        System.out.println(page1.maxTupleCount);
+        System.out.println(page.maxTupleCount);
+
     }
+
 }
