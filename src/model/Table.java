@@ -25,14 +25,14 @@ public class Table implements Serializable {
     private String primaryKeyName;
     private Hashtable<String, String> htblColNameType;
     private List<String> indexedColumns;
-    private Vector<Page> pagesList;
+    private Vector<String> pagesList;
 
     public Table(String strTableName, String primaryKeyName, Hashtable<String, String> htblColNameType) {
         this.strTableName = strTableName;
         this.primaryKeyName = primaryKeyName;
         this.htblColNameType = htblColNameType;
         this.indexedColumns = new ArrayList<String>();
-        this.pagesList = new Vector<Page>();
+        this.pagesList = new Vector<String>();
     }
 
     public String getStrTableName() {
@@ -79,14 +79,15 @@ public class Table implements Serializable {
         }
     }
 
-    public void insertTuple(Hashtable<String, Object> htblColNameValue)
-            throws DBAppException {
+    public void insertTuple(Hashtable<String, Object> htblColNameValue) // TODO serialize statement and fix method
+            throws DBAppException, IOException, ClassNotFoundException {
         Tuple tuple = new Tuple(htblColNameValue, this.primaryKeyName);
         // Object primaryKey = tuple.getPrimaryKey();
         if (pagesList.isEmpty()) {
             Page page = new Page(htblColNameType, this.primaryKeyName);
             page.addTuple(tuple);
-            pagesList.add(page);
+            pagesList.add(this.strTableName + "" + 0);
+            page.serializePage(this.strTableName + "" + 0);
             return;
         }
 
@@ -95,29 +96,36 @@ public class Table implements Serializable {
 
             // System.out.println(this);
 
-            Page currentPage = pagesList.elementAt(i);
+            String currentPageName = pagesList.elementAt(i);
+            Page currentPage = Page.deserializePage(currentPageName);
 
             if (currentPage.isEmpty()) {
                 currentPage.addTuple(tuple);
+                currentPage.serializePage(currentPageName);
                 return;
             }
 
             if (tuple.compareTo(currentPage.getMin()) < 0) {
                 OverflowTuple = currentPage.addTuple(tuple);
+                currentPage.serializePage(currentPageName);
             } else if ((tuple.compareTo(currentPage.getMin()) > 0) && (tuple
                     .compareTo(currentPage.getMax()) < 0)) {
                 OverflowTuple = currentPage.addTuple(tuple);
+                currentPage.serializePage(currentPageName);
             } else if (tuple.compareTo(currentPage.getMax()) > 0) {
                 if (i + 1 >= pagesList.size()) { // check if we are at the last page
                     OverflowTuple = currentPage.addTuple(tuple);
+                    // currentPage.serializePage(currentPageName);
                     if (OverflowTuple != null) {
                         Page newPage = new Page(htblColNameType, this.primaryKeyName);
                         newPage.addTuple(OverflowTuple);
-                        pagesList.add(newPage);
-                        return;
+                        // pagesList.add(newPage);
+                        pagesList.add(this.strTableName + "" + (i + 1));
+                        newPage.serializePage(this.strTableName + "" + (i + 1));
                     }
                 } else {
-                    Page nextPage = pagesList.elementAt(i + 1); // out of bounds
+                    String nextPageName = pagesList.elementAt(i + 1);
+                    Page nextPage = Page.deserializePage(nextPageName);
                     if (nextPage.isEmpty()) {
                         nextPage.addTuple(tuple);
                         return;
@@ -146,12 +154,14 @@ public class Table implements Serializable {
     }
 
     public void deleteTuple(String strTableName, Hashtable<String, Object> htblColNameValue)
-            throws DBAppException {
+            throws DBAppException, ClassNotFoundException, IOException {
         for (int i = 0; i < pagesList.size(); i++) {
-            Page currentPage = pagesList.get(i);
+            String currentPageName = pagesList.elementAt(i);
+            Page currentPage = Page.deserializePage(currentPageName);
             if (currentPage.deleteTuple(htblColNameValue)) {
-                pagesList.remove(i);
+                pagesList.remove(i); // delete serialized file
             }
+            currentPage.serializePage(currentPageName);
         }
     }
 
@@ -162,12 +172,14 @@ public class Table implements Serializable {
     }
 
     public void updateTuple(String strClusteringKeyValue, Hashtable<String, Object> htblColNameValue)
-            throws DBAppException {
+            throws DBAppException, ClassNotFoundException, IOException {
         Tuple tuple = new Tuple(htblColNameValue, strClusteringKeyValue);
         for (int i = 0; i < pagesList.size(); i++) {
-            Page currentPage = pagesList.elementAt(i);
+            String currentPageName = pagesList.elementAt(i);
+            Page currentPage = Page.deserializePage(currentPageName);
             if (tuple.compareTo(currentPage.getMin()) >= -1 && tuple.compareTo(currentPage.getMin()) <= 1) {
                 currentPage.updateTuple(strClusteringKeyValue, htblColNameValue);
+                currentPage.serializePage(currentPageName);
                 return;
             }
         }
@@ -258,21 +270,21 @@ public class Table implements Serializable {
         // Integer y = 5;
         // System.out.println(x.compareTo(y));
 
-        String strTableName = "Student";
-        Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
-        htblColNameType.put("id", "java.lang.Integer");
-        htblColNameType.put("name", "java.lang.String");
-        htblColNameType.put("gpa", "java.lang.double");
-        Table myTable = new Table(strTableName, "id", htblColNameType);
+        // String strTableName = "Student";
+        // Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
+        // htblColNameType.put("id", "java.lang.Integer");
+        // htblColNameType.put("name", "java.lang.String");
+        // htblColNameType.put("gpa", "java.lang.double");
+        // Table myTable = new Table(strTableName, "id", htblColNameType);
 
-        for (int i = 1; i <= 10; i++) {
-            Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-            htblColNameValue.put("id", i);
-            htblColNameValue.put("name", "Moski no " + i);
-            htblColNameValue.put("gpa", 3.5);
-            myTable.insertTuple(htblColNameValue);
-        }
-        System.out.println(myTable);
+        // for (int i = 1; i <= 10; i++) {
+        // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+        // htblColNameValue.put("id", i);
+        // htblColNameValue.put("name", "Moski no " + i);
+        // htblColNameValue.put("gpa", 3.5);
+        // myTable.insertTuple(htblColNameValue);
+        // }
+        // System.out.println(myTable);
 
         // --------------DOESNT WORK--------------
         // for (int i = 50; i >= 43; i--) {
