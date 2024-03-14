@@ -1,8 +1,14 @@
 package model;
 
 import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -14,7 +20,7 @@ import engine.SQLTerm;
 import exceptions.DBAppException;
 
 @SuppressWarnings("unused")
-public class Table {
+public class Table implements Serializable {
     private String strTableName;
     private String primaryKeyName;
     private Hashtable<String, String> htblColNameType;
@@ -27,6 +33,10 @@ public class Table {
         this.htblColNameType = htblColNameType;
         this.indexedColumns = new ArrayList<String>();
         this.pagesList = new Vector<Page>();
+    }
+
+    public String getStrTableName() {
+        return strTableName;
     }
 
     public static void addTable(String strTableName, String primaryKeyName,
@@ -169,10 +179,6 @@ public class Table {
 
     }
 
-    public void addPage(String strTableName, Hashtable<String, Object> htblColNameValue) throws DBAppException {
-
-    }
-
     public String toString() {
         String result = "";
         result += strTableName + " Table \n\n\n";
@@ -184,6 +190,45 @@ public class Table {
         }
 
         return result;
+    }
+
+    public void serializeTable() {
+        // Store table on disk
+        try {
+            FileOutputStream fileOut = new FileOutputStream(
+                    "./src/resources/Serialized_Tables/" + this.getStrTableName() + ".class");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(this);
+            out.close();
+            fileOut.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public static Table deserializeTable(String strTableName) {
+        Table myTable = null;
+        // Load table from disk
+        try {
+            FileInputStream fileIn = new FileInputStream(
+                    "./src/resources/Serialized_Tables/" + strTableName + ".class");
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            myTable = (Table) in.readObject();
+            in.close();
+            fileIn.close();
+
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return myTable;
     }
 
     // public static void readFile(String filePath) {

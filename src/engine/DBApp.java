@@ -10,7 +10,9 @@ import model.Table;
 import exceptions.DBAppException;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -211,6 +213,27 @@ public class DBApp {
 			// strarrOperators[0] = "OR";
 			// // select * from Student where name = "John Noor" or gpa = 1.5;
 			// Iterator resultSet = dbApp.selectFromTable(arrSQLTerms, strarrOperators);
+
+			// MOSKI SHIT
+			String strTableName = "Employee";
+			Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
+			htblColNameType.put("id", "java.lang.Integer");
+			htblColNameType.put("name", "java.lang.String");
+			htblColNameType.put("gpa", "java.lang.double");
+
+			Table table = new Table(strTableName, "id", htblColNameType);
+
+			System.out.println(table);
+			System.out.println(table.getStrTableName());
+
+			table.serializeTable();
+
+			System.out.println("---------------");
+
+			Table deserialized = Table.deserializeTable("Employee");
+			System.out.println(deserialized);
+			System.out.println(deserialized.getStrTableName());
+
 		} catch (Exception exp) {
 			exp.printStackTrace();
 		}

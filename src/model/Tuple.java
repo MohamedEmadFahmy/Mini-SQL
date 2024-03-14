@@ -1,9 +1,10 @@
 package model;
 
+import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Map;
 
-public class Tuple implements Comparable<Tuple> {
+public class Tuple implements Comparable<Tuple>, Serializable {
     Hashtable<String, Object> colNameVal;
     private String primaryKeyName;
     private Object primaryKey;
