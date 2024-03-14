@@ -10,6 +10,7 @@ import java.util.Vector;
 
 import exceptions.DBAppException;
 
+@SuppressWarnings("unused")
 public class Page {
     private Vector<Tuple> tuples;
     private int tupleCount;

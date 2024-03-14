@@ -5,21 +5,21 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-
-import javax.swing.text.html.HTMLDocument.Iterator;
 
 import engine.DBApp;
 import engine.SQLTerm;
 import exceptions.DBAppException;
 
+@SuppressWarnings("unused")
 public class Table {
-    String strTableName;
-    String primaryKeyName;
-    Hashtable<String, String> htblColNameType;
-    List<String> indexedColumns;
-    Vector<Page> pagesList;
+    private String strTableName;
+    private String primaryKeyName;
+    private Hashtable<String, String> htblColNameType;
+    private List<String> indexedColumns;
+    private Vector<Page> pagesList;
 
     public Table(String strTableName, String primaryKeyName, Hashtable<String, String> htblColNameType) {
         this.strTableName = strTableName;
@@ -145,6 +145,7 @@ public class Table {
         }
     }
 
+    @SuppressWarnings("rawtypes")
     public Iterator selectTuple(SQLTerm[] arrSQLTerms, String[] strarrOperators)
             throws DBAppException {
         return null;
@@ -205,7 +206,7 @@ public class Table {
     // // htblColNameType.put("gpa", "java.lang.double");
     // // Table myTable = new Table(strTableName, "id", htblColNameType);
     // }
-    @SuppressWarnings("unchecked")
+
     public static void main(String[] args) throws DBAppException {
 
         // Integer x = 3;
@@ -219,21 +220,24 @@ public class Table {
         htblColNameType.put("gpa", "java.lang.double");
         Table myTable = new Table(strTableName, "id", htblColNameType);
 
-        // for (int i = 50; i >= 0; i--) {
-        // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-        // htblColNameValue.put("id", i);
-        // htblColNameValue.put("name", "Moski no " + i);
-        // htblColNameValue.put("gpa", 3.5);
-        // myTable.insertTuple(htblColNameValue);
-        // }
-        for (int i = 50; i >= 43; i--) {
+        for (int i = 1; i <= 10; i++) {
             Hashtable<String, Object> htblColNameValue = new Hashtable<>();
             htblColNameValue.put("id", i);
             htblColNameValue.put("name", "Moski no " + i);
             htblColNameValue.put("gpa", 3.5);
             myTable.insertTuple(htblColNameValue);
-            System.out.println(myTable);
         }
+        System.out.println(myTable);
+
+        // --------------DOESNT WORK--------------
+        // for (int i = 50; i >= 43; i--) {
+        // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+        // htblColNameValue.put("id", i);
+        // htblColNameValue.put("name", "Moski no " + i);
+        // htblColNameValue.put("gpa", 3.5);
+        // myTable.insertTuple(htblColNameValue);
+        // System.out.println(myTable);
+        // }
 
         // Page firstPage = myTable.pagesList.firstElement();
 
