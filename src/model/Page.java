@@ -108,9 +108,9 @@ public class Page implements Serializable {
             int mid = (low + high) / 2;
             Tuple currentTuple = this.tuples.get(mid);
 
-            if (currentTuple.compareTo(tuple) < 0) {
+            if (currentTuple.compareTo(tuple, primaryKeyName) < 0) {
                 low = mid + 1;
-            } else if (currentTuple.compareTo(tuple) > 0) {
+            } else if (currentTuple.compareTo(tuple, primaryKeyName) > 0) {
                 high = mid - 1;
             } else {
                 return mid;

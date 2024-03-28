@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Map;
 
-public class Tuple implements Comparable<Tuple>, Serializable {
+public class Tuple implements Serializable {
     Hashtable<String, Object> colNameVal;
     private String primaryKeyName;
     private Object primaryKey;
@@ -28,17 +28,16 @@ public class Tuple implements Comparable<Tuple>, Serializable {
         return primaryKey;
     }
 
-    @Override
-    public int compareTo(Tuple o) {
-        if (primaryKey instanceof String) {
-            return ((String) this.primaryKey).compareTo(((String) o.primaryKey));
+    public int compareTo(Tuple o, String columnName) {
+        if (colNameVal.get(columnName) instanceof String) {
+            return ((String) this.colNameVal.get(columnName)).compareTo(((String) o.colNameVal.get(columnName)));
         }
-        if (primaryKey instanceof Integer) {
-            return ((Integer) this.primaryKey).compareTo((Integer) o.primaryKey);
+        if (colNameVal.get(columnName) instanceof Integer) {
+            return ((Integer) this.colNameVal.get(columnName)).compareTo((Integer) o.colNameVal.get(columnName));
 
         }
-        if (primaryKey instanceof Double) {
-            return ((Double) this.primaryKey).compareTo((Double) o.primaryKey);
+        if (colNameVal.get(columnName) instanceof Double) {
+            return ((Double) this.colNameVal.get(columnName)).compareTo((Double) o.primaryKey);
         }
 
         return 0;

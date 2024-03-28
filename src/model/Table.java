@@ -105,14 +105,14 @@ public class Table implements Serializable {
                 return;
             }
 
-            if (tuple.compareTo(currentPage.getMin()) < 0) {
+            if (tuple.compareTo(currentPage.getMin(), primaryKeyName) < 0) {
                 OverflowTuple = currentPage.addTuple(tuple);
                 currentPage.serializePage(currentPageName);
-            } else if ((tuple.compareTo(currentPage.getMin()) > 0) && (tuple
-                    .compareTo(currentPage.getMax()) < 0)) {
+            } else if ((tuple.compareTo(currentPage.getMin(), primaryKeyName) > 0) && (tuple
+                    .compareTo(currentPage.getMax(), primaryKeyName) < 0)) {
                 OverflowTuple = currentPage.addTuple(tuple);
                 currentPage.serializePage(currentPageName);
-            } else if (tuple.compareTo(currentPage.getMax()) > 0) {
+            } else if (tuple.compareTo(currentPage.getMax(), primaryKeyName) > 0) {
                 if (i + 1 >= pagesList.size()) { // check if we are at the last page
                     OverflowTuple = currentPage.addTuple(tuple);
                     // currentPage.serializePage(currentPageName);
@@ -137,10 +137,10 @@ public class Table implements Serializable {
                         return;
                     }
 
-                    if ((tuple.compareTo(nextPage.getMin()) > 0)
-                            && (tuple.compareTo(currentPage.getMax()) < 0)) {
+                    if ((tuple.compareTo(nextPage.getMin(), primaryKeyName) > 0)
+                            && (tuple.compareTo(currentPage.getMax(), primaryKeyName) < 0)) {
                         OverflowTuple = nextPage.addTuple(tuple);
-                    } else if (tuple.compareTo(nextPage.getMin()) < 0) {
+                    } else if (tuple.compareTo(nextPage.getMin(), primaryKeyName) < 0) {
                         OverflowTuple = currentPage.addTuple(tuple);
                     }
                 }
@@ -178,7 +178,8 @@ public class Table implements Serializable {
         for (int i = 0; i < pagesList.size(); i++) {
             String currentPageName = pagesList.elementAt(i);
             Page currentPage = Page.deserializePage(currentPageName);
-            if (tuple.compareTo(currentPage.getMin()) >= -1 && tuple.compareTo(currentPage.getMin()) <= 1) {
+            if (tuple.compareTo(currentPage.getMin(), primaryKeyName) >= -1
+                    && tuple.compareTo(currentPage.getMin(), primaryKeyName) <= 1) {
                 currentPage.updateTuple(strClusteringKeyValue, htblColNameValue);
                 currentPage.serializePage(currentPageName);
                 return;
@@ -276,7 +277,7 @@ public class Table implements Serializable {
 
         // Integer x = 3;
         // Integer y = 5;
-        // System.out.println(x.compareTo(y));
+        // System.out.println(x.compareTo(y));, primaryKeyName
 
         String strTableName = "Student";
         Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
