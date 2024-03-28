@@ -34,21 +34,6 @@ public class DBApp {
 		// System.out.println(tableNames);
 	}
 
-	public void deleteMetaDataFile() {
-		String filePath = "metadata.txt";
-		File file = new File(filePath);
-
-		if (file.exists()) {
-			if (file.delete()) {
-				System.out.println("File deleted successfully.");
-			} else {
-				System.out.println("Failed to delete the file.");
-			}
-		} else {
-			System.out.println("Meta Data File does not exist.");
-		}
-	}
-
 	public static void updateMetaDataFile() {
 		tableNames = new HashSet<String>();
 		String filePath = "metadata.txt";
@@ -213,24 +198,40 @@ public class DBApp {
 			// Iterator resultSet = dbApp.selectFromTable(arrSQLTerms, strarrOperators);
 
 			// MOSKI SHIT
-			String strTableName = "Employee";
+			// String strTableName = "Employee";
+			// Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
+			// htblColNameType.put("id", "java.lang.Integer");
+			// htblColNameType.put("name", "java.lang.String");
+			// htblColNameType.put("gpa", "java.lang.double");
+
+			// Table table = new Table(strTableName, "id", htblColNameType);
+
+			// System.out.println(table);
+			// System.out.println(table.getStrTableName());
+
+			// table.serializeTable();
+
+			// System.out.println("---------------");
+
+			// Table deserialized = Table.deserializeTable("Employee");
+			// System.out.println(deserialized);
+			// System.out.println(deserialized.getStrTableName());
+
+			String strTableName = "Student";
 			Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
 			htblColNameType.put("id", "java.lang.Integer");
 			htblColNameType.put("name", "java.lang.String");
 			htblColNameType.put("gpa", "java.lang.double");
+			dbApp.createTable(strTableName, "id", htblColNameType);
 
-			Table table = new Table(strTableName, "id", htblColNameType);
-
-			System.out.println(table);
-			System.out.println(table.getStrTableName());
-
-			table.serializeTable();
-
-			System.out.println("---------------");
-
-			Table deserialized = Table.deserializeTable("Employee");
-			System.out.println(deserialized);
-			System.out.println(deserialized.getStrTableName());
+			for (int i = 1; i <= 10; i++) {
+				Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+				htblColNameValue.put("id", i);
+				htblColNameValue.put("name", "Moski no " + i);
+				htblColNameValue.put("gpa", 3.5);
+				dbApp.insertIntoTable(strTableName, htblColNameValue);
+			}
+			// System.out.println(myTable);
 
 		} catch (Exception exp) {
 			exp.printStackTrace();
