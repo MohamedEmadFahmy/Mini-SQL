@@ -145,6 +145,7 @@ public class Table implements Serializable {
                     }
                 }
             }
+            currentPage.serializePage(currentPageName);
         }
         if (OverflowTuple != null) {
             // Page page = new Page(htblColNameType, this.primaryKeyName);
@@ -197,7 +198,14 @@ public class Table implements Serializable {
         for (int i = 0; i < pagesList.size(); i++) {
             result += "Page " + (i + 1) + ":\n";
             result += "-------------------------------\n";
-            result += pagesList.elementAt(i).toString() + "\n";
+            Page currentPage = null;
+            try {
+                currentPage = Page.deserializePage(pagesList.elementAt(i));
+            } catch (ClassNotFoundException | IOException e) {
+                // TODO Auto-generated catch block
+                result += "Error reading page at index + " + i + "\n";
+            }
+            result += currentPage.toString() + "\n";
             result += "-------------------------------\n";
         }
 
@@ -264,27 +272,27 @@ public class Table implements Serializable {
     // // Table myTable = new Table(strTableName, "id", htblColNameType);
     // }
 
-    public static void main(String[] args) throws DBAppException {
+    public static void main(String[] args) throws DBAppException, ClassNotFoundException, IOException {
 
         // Integer x = 3;
         // Integer y = 5;
         // System.out.println(x.compareTo(y));
 
-        // String strTableName = "Student";
-        // Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
-        // htblColNameType.put("id", "java.lang.Integer");
-        // htblColNameType.put("name", "java.lang.String");
-        // htblColNameType.put("gpa", "java.lang.double");
-        // Table myTable = new Table(strTableName, "id", htblColNameType);
+        String strTableName = "Student";
+        Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
+        htblColNameType.put("id", "java.lang.Integer");
+        htblColNameType.put("name", "java.lang.String");
+        htblColNameType.put("gpa", "java.lang.double");
+        Table myTable = new Table(strTableName, "id", htblColNameType);
 
-        // for (int i = 1; i <= 10; i++) {
-        // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-        // htblColNameValue.put("id", i);
-        // htblColNameValue.put("name", "Moski no " + i);
-        // htblColNameValue.put("gpa", 3.5);
-        // myTable.insertTuple(htblColNameValue);
-        // }
-        // System.out.println(myTable);
+        for (int i = 1; i <= 10; i++) {
+            Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+            htblColNameValue.put("id", i);
+            htblColNameValue.put("name", "Moski no " + i);
+            htblColNameValue.put("gpa", 3.5);
+            myTable.insertTuple(htblColNameValue);
+        }
+        System.out.println(myTable);
 
         // --------------DOESNT WORK--------------
         // for (int i = 50; i >= 43; i--) {
@@ -293,8 +301,8 @@ public class Table implements Serializable {
         // htblColNameValue.put("name", "Moski no " + i);
         // htblColNameValue.put("gpa", 3.5);
         // myTable.insertTuple(htblColNameValue);
-        // System.out.println(myTable);
         // }
+        // System.out.println(myTable);
 
         // Page firstPage = myTable.pagesList.firstElement();
 
