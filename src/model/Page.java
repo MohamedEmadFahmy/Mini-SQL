@@ -86,7 +86,7 @@ public class Page implements Serializable {
         if (this.tupleCount > this.maxTupleCount) {
             this.tupleCount -= 1;
             overflow = tuples.remove(this.maxTupleCount);
-            System.out.println("Overflow: " + overflow.toString());
+            // System.out.println("Overflow: " + overflow.toString());
             // returns the last tuple
             // (not intended behavior, but it's the closest thing to an overflow tuple)
         }
@@ -234,7 +234,7 @@ public class Page implements Serializable {
             ObjectOut.writeObject(this);
             ObjectOut.close();
             fileOut.close();
-            System.out.println("Page Serialized");
+            // System.out.println("Page Serialized");
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -252,7 +252,7 @@ public class Page implements Serializable {
             page = (Page) ObjectIn.readObject();
             ObjectIn.close();
             fileIn.close();
-            System.out.println("Page Deserialied, tupleCount =" + page.tupleCount);
+            // System.out.println("Page Deserialied, tupleCount =" + page.tupleCount);
             return page;
         } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
@@ -296,13 +296,13 @@ public class Page implements Serializable {
         // System.out.println(page);
         // System.out.println(page.size());
 
-        System.out.println(page.tupleCount);
+        // System.out.println(page.tupleCount);
         page.serializePage("page1");
 
         Page page1 = null;
         page1 = Page.deserializePage("page1");
-        System.out.println(page1.maxTupleCount);
-        System.out.println(page.maxTupleCount);
+        // System.out.println(page1.maxTupleCount);
+        // System.out.println(page.maxTupleCount);
 
     }
 
