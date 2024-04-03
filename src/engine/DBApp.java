@@ -36,7 +36,7 @@ public class DBApp {
 
 	public static void updateMetaDataFile() {
 		tableNames = new HashSet<String>();
-		String filePath = "metadata.txt";
+		String filePath = "metadata.csv";
 		File file = new File(filePath);
 
 		if (file.exists()) {
@@ -83,7 +83,7 @@ public class DBApp {
 	public void createIndex(String strTableName,
 			String strColName,
 			String strIndexName) throws DBAppException {
-
+		Table table = Table.loadTable(strTableName);
 		throw new DBAppException("not implemented yet");
 	}
 
@@ -123,8 +123,6 @@ public class DBApp {
 		return null;
 	}
 
-	// @SuppressWarnings({ "rawtypes", "unchecked", "removal" })
-	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 
 		try {
@@ -213,7 +211,7 @@ public class DBApp {
 
 			// System.out.println("---------------");
 
-			// Table deserialized = Table.deserializeTable("Employee");
+			// Table deserialized = Table.loadTable("Employee");
 			// System.out.println(deserialized);
 			// System.out.println(deserialized.getStrTableName());
 

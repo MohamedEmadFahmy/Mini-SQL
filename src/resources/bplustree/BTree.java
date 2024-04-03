@@ -65,4 +65,17 @@ public class BTree<TKey extends Comparable<TKey>, TValue> {
 
 		return (BTreeLeafNode<TKey, TValue>) node;
 	}
+
+	public static void main(String[] args) {
+		BTree<Double, Integer> tree = new BTree<Double, Integer>();
+
+		tree.insert(54.3, 1);
+		tree.insert(60.10, 10);
+
+		System.out.println(tree.search(54.3));
+		System.out.println(tree.search(60.10));
+
+		tree.delete(54.3);
+		System.out.println(tree.search(54.3));
+	}
 }

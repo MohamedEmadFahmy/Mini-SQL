@@ -226,7 +226,7 @@ public class Page implements Serializable {
     // return low;
     // }
 
-    public void serializePage(String pageName) throws IOException {
+    public void savePage(String pageName) throws IOException {
         try {
             FileOutputStream fileOut = new FileOutputStream(
                     ".//src//resources//Serialized_Pages//" + pageName + ".class");
@@ -244,7 +244,7 @@ public class Page implements Serializable {
         }
     }
 
-    public static Page deserializePage(String pageName) throws IOException, ClassNotFoundException {
+    public static Page loadPage(String pageName) throws IOException, ClassNotFoundException {
         try {
             FileInputStream fileIn = new FileInputStream(".//src//resources//Serialized_Pages//" + pageName + ".class");
             ObjectInputStream ObjectIn = new ObjectInputStream(fileIn);
@@ -297,10 +297,10 @@ public class Page implements Serializable {
         // System.out.println(page.size());
 
         // System.out.println(page.tupleCount);
-        page.serializePage("page1");
+        page.savePage("page1");
 
         Page page1 = null;
-        page1 = Page.deserializePage("page1");
+        page1 = Page.loadPage("page1");
         // System.out.println(page1.maxTupleCount);
         // System.out.println(page.maxTupleCount);
 

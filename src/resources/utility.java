@@ -36,7 +36,7 @@ public class utility {
     }
 
     public static void recreateMetaDataFile() {
-        String filePath = "metadata.txt";
+        String filePath = "metadata.csv";
         File file = new File(filePath);
 
         if (file.exists()) {

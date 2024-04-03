@@ -81,7 +81,8 @@ public class Table implements Serializable {
         }
     }
 
-    public void insertTuple(Hashtable<String, Object> htblColNameValue)// plan is on figma
+    // plan is on figma
+    public void insertTuple(Hashtable<String, Object> htblColNameValue)
             throws DBAppException, IOException, ClassNotFoundException {
         Tuple tuple = new Tuple(htblColNameValue, this.primaryKeyName);
 
@@ -90,7 +91,8 @@ public class Table implements Serializable {
             page.addTuple(tuple);
             // System.out.println("inserted, 0");
             pagesList.add(this.strTableName + "" + 0);
-            page.serializePage(this.strTableName + "" + 0);
+            page.savePage(this.strTableName + "" + 0);
+            this.saveTable();
             return;
         }
 
@@ -99,17 +101,17 @@ public class Table implements Serializable {
         for (int i = 0; i < pagesList.size(); i++) {
             // System.out.println("insert loop: " + i);
             String currentPageName = pagesList.elementAt(i);
-            Page currentPage = Page.deserializePage(currentPageName);
+            Page currentPage = Page.loadPage(currentPageName);
 
             if (currentPage.isEmpty()) {
                 currentPage.addTuple(tuple);
-                currentPage.serializePage(currentPageName);
-                return;
+                currentPage.savePage(currentPageName);
+                break;
             }
 
             if (tuple.compareTo(currentPage.getMin(), primaryKeyName) == -1) {
                 OverflowTuple = currentPage.addTuple(tuple);
-                currentPage.serializePage(currentPageName);
+                currentPage.savePage(currentPageName);
                 insertedpage = i;
                 // System.out.println("loop:" + i + ", inserted, 1");
                 break;
@@ -118,7 +120,7 @@ public class Table implements Serializable {
             if ((tuple.compareTo(currentPage.getMin(), primaryKeyName) == 1)
                     && (tuple.compareTo(currentPage.getMax(), primaryKeyName) == -1)) {
                 OverflowTuple = currentPage.addTuple(tuple);
-                currentPage.serializePage(currentPageName);
+                currentPage.savePage(currentPageName);
                 insertedpage = i;
                 // System.out.println("loop:" + i + ", inserted, 2");
                 break;
@@ -127,13 +129,15 @@ public class Table implements Serializable {
             if (i == pagesList.size() - 1) { // @final page
                 // System.out.println("entered third insert");
                 OverflowTuple = currentPage.addTuple(tuple);
-                currentPage.serializePage(currentPageName);
+                currentPage.savePage(currentPageName);
                 insertedpage = i;
                 // System.out.println("loop:" + i + ", inserted, 3");
                 break;
             }
             // System.out.println("loop:" + i + ",No insert, next page");
         }
+
+        this.saveTable();
 
         // System.out.println("page size: " + pagesList.size());
         // System.out.println("reached Overflow loop, i= " + insertedpage);
@@ -142,26 +146,26 @@ public class Table implements Serializable {
 
             if (OverflowTuple == null) {
                 // System.out.println("No overflow");
-                return;
+                break;
             }
 
             String currentPageName = pagesList.elementAt(i);
-            Page currentPage = Page.deserializePage(currentPageName);
+            Page currentPage = Page.loadPage(currentPageName);
 
             OverflowTuple = currentPage.addTuple(OverflowTuple);
             // System.out.println("inserted overflow, 0");
-            currentPage.serializePage(currentPageName);
+            currentPage.savePage(currentPageName);
 
             if ((OverflowTuple != null) && (i == pagesList.size() - 1)) {
                 Page page = new Page(htblColNameType, this.primaryKeyName);
                 page.addTuple(OverflowTuple);
                 // System.out.println("inserted overflow, 1");
                 pagesList.add(this.strTableName + "" + (i + 1));
-                page.serializePage(this.strTableName + "" + (i + 1));
-                return;
+                page.savePage(this.strTableName + "" + (i + 1));
+                break;
             }
-
         }
+        this.saveTable();
 
     }
 
@@ -169,12 +173,13 @@ public class Table implements Serializable {
             throws DBAppException, ClassNotFoundException, IOException {
         for (int i = 0; i < pagesList.size(); i++) {
             String currentPageName = pagesList.elementAt(i);
-            Page currentPage = Page.deserializePage(currentPageName);
+            Page currentPage = Page.loadPage(currentPageName);
             if (currentPage.deleteTuple(htblColNameValue)) {
                 pagesList.remove(i); // delete serialized file
             }
-            currentPage.serializePage(currentPageName);
+            currentPage.savePage(currentPageName);
         }
+        this.saveTable();
     }
 
     @SuppressWarnings("rawtypes")
@@ -188,15 +193,16 @@ public class Table implements Serializable {
         Tuple tuple = new Tuple(htblColNameValue, strClusteringKeyValue);
         for (int i = 0; i < pagesList.size(); i++) {
             String currentPageName = pagesList.elementAt(i);
-            Page currentPage = Page.deserializePage(currentPageName);
+            Page currentPage = Page.loadPage(currentPageName);
             if (tuple.compareTo(currentPage.getMin(), tuple.getPrimaryKeyName()) >= -1
                     && tuple.compareTo(currentPage.getMin(),
                             tuple.getPrimaryKeyName()) <= 1) {
                 currentPage.updateTuple(strClusteringKeyValue, htblColNameValue);
-                currentPage.serializePage(currentPageName);
+                currentPage.savePage(currentPageName);
                 return;
             }
         }
+        this.saveTable();
     }
 
     public void createIndex(String strTableName,
@@ -213,9 +219,9 @@ public class Table implements Serializable {
             result += "-------------------------------\n";
             Page currentPage = null;
             try {
-                currentPage = Page.deserializePage(pagesList.elementAt(i));
+                currentPage = Page.loadPage(pagesList.elementAt(i));
             } catch (ClassNotFoundException | IOException e) {
-                // TODO Auto-generated catch block
+
                 result += "Error reading page at index + " + i + "\n";
             }
             result += currentPage.toString() + "\n";
@@ -225,7 +231,7 @@ public class Table implements Serializable {
         return result;
     }
 
-    public void serializeTable() {
+    public void saveTable() {
         // Store table on disk
         try {
             FileOutputStream fileOut = new FileOutputStream(
@@ -235,12 +241,11 @@ public class Table implements Serializable {
             out.close();
             fileOut.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
-    public static Table deserializeTable(String strTableName) {
+    public static Table loadTable(String strTableName) {
         Table myTable = null;
         // Load table from disk
         try {
@@ -252,13 +257,10 @@ public class Table implements Serializable {
             fileIn.close();
 
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return myTable;
