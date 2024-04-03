@@ -20,20 +20,21 @@ import java.util.Vector;
 import engine.DBApp;
 import engine.SQLTerm;
 import exceptions.DBAppException;
+import resources.bplustree.BTree;
 
 @SuppressWarnings("unused")
 public class Table implements Serializable {
     private String strTableName;
     private String primaryKeyName;
     private Hashtable<String, String> htblColNameType;
-    private List<String> indexedColumns;
+    private Vector<String> indexedColumns;
     private Vector<String> pagesList;
 
     public Table(String strTableName, String primaryKeyName, Hashtable<String, String> htblColNameType) {
         this.strTableName = strTableName;
         this.primaryKeyName = primaryKeyName;
         this.htblColNameType = htblColNameType;
-        this.indexedColumns = new ArrayList<String>();
+        this.indexedColumns = new Vector<String>();
         this.pagesList = new Vector<String>();
     }
 
@@ -70,7 +71,7 @@ public class Table implements Serializable {
                     indexName, indexType));
         });
 
-        writeFile("metadata.txt", contentBuilder.toString());
+        writeFile("metadata.csv", contentBuilder.toString());
     }
 
     public static void writeFile(String filePath, String content) {
@@ -205,10 +206,26 @@ public class Table implements Serializable {
         this.saveTable();
     }
 
-    public void createIndex(String strTableName,
-            String strColName,
-            String strIndexName) throws DBAppException {
+    public void createIndex(String strColName, String strIndexName) throws DBAppException {
+        if (indexedColumns.contains(strColName)) {
+            throw new DBAppException("Column already indexed");
+        }
+        indexedColumns.add(strColName);
+        String primaryKeyType = htblColNameType.get(this.primaryKeyName);
 
+        BTree<?, String> index = null; // Declare the variable outside the if statements
+
+        if (primaryKeyType.equals("java.lang.Integer")) {
+            index = new BTree<Integer, String>();
+        } else if (primaryKeyType.equals("java.lang.String")) {
+            index = new BTree<String, String>();
+        } else if (primaryKeyType.equals("java.lang.Double")) {
+            index = new BTree<Double, String>();
+        }
+
+        // Loop on table and add the values to the index
+
+        saveIndex();
     }
 
     public String toString() {
@@ -266,26 +283,12 @@ public class Table implements Serializable {
         return myTable;
     }
 
-    // public static void readFile(String filePath) {
-    // try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-    // String line;
-    // while ((line = reader.readLine()) != null) {
-    // System.out.println(line);
-    // }
-    // } catch (IOException e) {
-    // System.err.println("Error reading file: " + e.getMessage());
-    // }
-    // }
+    public void saveIndex() {
+    }
 
-    // @SuppressWarnings({ "rawtypes", "unchecked" })
-    // public static void main(String[] args) {
-    // // String strTableName = "Student";
-    // // Hashtable htblColNameType = new Hashtable();
-    // // htblColNameType.put("id", "java.lang.Integer");
-    // // htblColNameType.put("name", "java.lang.String");
-    // // htblColNameType.put("gpa", "java.lang.double");
-    // // Table myTable = new Table(strTableName, "id", htblColNameType);
-    // }
+    public BTree loadIndex() {
+        return null;
+    }
 
     public static void main(String[] args) throws DBAppException, ClassNotFoundException, IOException {
 

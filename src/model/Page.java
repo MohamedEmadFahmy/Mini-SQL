@@ -16,7 +16,7 @@ public class Page implements Serializable {
     private int maxTupleCount;
     private String primaryKeyName;
     private Hashtable<String, String> colNameType;
-    private List<String> indexedColumns;
+    private Vector<String> indexedColumns;
     private Tuple min;
     private Tuple max;
     // private static final long serialVersionUID = -4544542885377264750L;
@@ -26,7 +26,7 @@ public class Page implements Serializable {
         this.tupleCount = 0;
         this.primaryKeyName = primaryKeyName;
         this.colNameType = colNameType;
-        this.indexedColumns = new ArrayList<String>();
+        this.indexedColumns = new Vector<String>();
 
         loadMaxTuplesCount();
         min = null;
@@ -236,10 +236,8 @@ public class Page implements Serializable {
             fileOut.close();
             // System.out.println("Page Serialized");
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -255,13 +253,10 @@ public class Page implements Serializable {
             // System.out.println("Page Deserialied, tupleCount =" + page.tupleCount);
             return page;
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return null;

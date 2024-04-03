@@ -83,8 +83,43 @@ public class DBApp {
 	public void createIndex(String strTableName,
 			String strColName,
 			String strIndexName) throws DBAppException {
+
+		// Update metadata file
+		String filePath = "metadata.csv";
+		File file = new File(filePath);
+
+		// Read all lines in the file and modify them
+		try {
+			// Read all lines from the file
+			List<String> lines = Files.readAllLines(file.toPath());
+
+			// Process each line
+			for (int i = 0; i < lines.size(); i++) {
+				String line = lines.get(i);
+				String[] splittedLine = line.split(",");
+
+				// Check if the line corresponds to the given table and column
+				if (splittedLine[0].equals(strTableName) && splittedLine[1].equals(strColName)) {
+					String columnDataType = splittedLine[2];
+					String isPrimaryKey = splittedLine[3];
+
+					// Modify the line with the new index information
+					lines.set(i, strTableName + "," + strColName + "," + columnDataType + "," + isPrimaryKey
+							+ strIndexName + ",B+tree");
+					break; // No need to continue looping
+				}
+			}
+
+			// Write the modified lines back to the file
+			Files.write(file.toPath(), lines);
+		} catch (IOException e) {
+			System.err.println("Error reading/writing file: " + e.getMessage());
+			throw new DBAppException("Error reading/writing file: " + e.getMessage());
+		}
+
 		Table table = Table.loadTable(strTableName);
-		throw new DBAppException("not implemented yet");
+
+		table.createIndex(strColName, strIndexName);
 	}
 
 	// following method inserts one row only.
@@ -222,13 +257,13 @@ public class DBApp {
 			htblColNameType.put("gpa", "java.lang.double");
 			dbApp.createTable(strTableName, "id", htblColNameType);
 
-			for (int i = 1; i <= 10; i++) {
-				Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-				htblColNameValue.put("id", i);
-				htblColNameValue.put("name", "Moski no " + i);
-				htblColNameValue.put("gpa", 3.5);
-				dbApp.insertIntoTable(strTableName, htblColNameValue);
-			}
+			// for (int i = 1; i <= 10; i++) {
+			// Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+			// htblColNameValue.put("id", i);
+			// htblColNameValue.put("name", "Moski no " + i);
+			// htblColNameValue.put("gpa", 3.5);
+			// dbApp.insertIntoTable(strTableName, htblColNameValue);
+			// }
 			// System.out.println(myTable);
 
 		} catch (Exception exp) {
