@@ -178,9 +178,49 @@ public class Table implements Serializable {
     }
 
     @SuppressWarnings("rawtypes")
-    public Iterator selectTuple(SQLTerm[] arrSQLTerms, String[] strarrOperators)
-            throws DBAppException {
-        return null;
+    public Iterator selectTuple(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
+
+        // Resulting list to store selected tuples
+        Vector<Tuple> result = new Vector<Tuple>();
+
+        // Iterate through each SQLTerm
+        for (SQLTerm term : arrSQLTerms) {
+            String columnName = term.getColumnName();
+            String operator = term.getOperator();
+            Object value = term.getValue();
+            Vector<Tuple> tuples = new Vector<Tuple>();
+            if (indexedColumns.contains(columnName)) {
+                // run the select from page method on all the pages - TODO after index
+                Vector<Page> pagesInIndex = new Vector<Page>();
+                for (Page page : pagesInIndex) {
+                    Page indexPage = Page.deserializePage(page);
+                    // tuples = page.selectTuple(columnName, operator, value); //select from page
+                    // with operators
+                    page.serializePage(pageName);
+                    result.addAll(tuples);
+                }
+            } else {
+
+            }
+            // Iterate through all pages
+            for (String pageName : pagesList) {
+                Page page = Page.deserializePage(pageName);
+                // tuples = page.selectTuple(columnName, operator, value); //select from page
+                // with operators
+                page.serializePage(pageName);
+                result.addAll(tuples);
+            }
+        }
+
+        List<Tuple> finalResult = combineResults(result, arrSQLTerms, strarrOperators);
+
+        return finalResult.iterator();
+    }
+
+    private Vector<Tuple> combineResults(Vector<Tuple> result, SQLTerm[] arrSQLTerms, String[] strarrOperators) {
+        // Dummy implementation, replace with actual logic to combine results
+        // based on logical operators
+        return result;
     }
 
     public void updateTuple(String strClusteringKeyValue, Hashtable<String, Object> htblColNameValue)
