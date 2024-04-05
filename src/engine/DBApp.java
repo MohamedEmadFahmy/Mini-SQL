@@ -153,9 +153,11 @@ public class DBApp {
 
 	@SuppressWarnings("rawtypes")
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms,
-			String[] strarrOperators) throws DBAppException {
-
-		return null;
+			String[] strarrOperators) throws DBAppException, ClassNotFoundException, IOException {
+		String tableName = arrSQLTerms[0]._strTableName;// can only select from one table at a time
+		Table table = Table.loadTable(tableName);
+		Iterator iterator = table.selectTuple(arrSQLTerms, strarrOperators);
+		return iterator;
 	}
 
 	public static void main(String[] args) {
