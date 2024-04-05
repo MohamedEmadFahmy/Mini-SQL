@@ -38,7 +38,9 @@ public class BTree {
                 return o1.key.compareTo(o2.key);
             }
         };
-        return Arrays.binarySearch(dps, 0, numPairs, new DictionaryPair(t, 0), c);
+        Vector<Comparable> v = new Vector<Comparable>();
+        v.add(0);
+        return Arrays.binarySearch(dps, 0, numPairs, new DictionaryPair(t, v), c);
     }
 
     /**
@@ -592,6 +594,24 @@ public class BTree {
         }
     }
 
+    public void delete(Comparable key, Comparable value) {
+        LeafNode ln = (this.root == null) ? this.firstLeaf : findLeafNode(key);
+
+        // Perform binary search to find index of key within dictionary
+        DictionaryPair[] dps = ln.dictionary;
+        int index = binarySearch(dps, ln.numPairs, key);
+
+        // If index negative, the key doesn't exist in B+ tree
+        if (index < 0) {
+            return;
+        }
+        if (dps[index].value.size() == 1 && dps[index].value.contains(value)) {
+            delete(key);
+        } else {
+            dps[index].value.remove(value);
+        }
+    }
+
     /**
      * Given an integer key and floating point value, this method inserts a
      * dictionary pair accordingly into the B+ tree.
@@ -608,7 +628,9 @@ public class BTree {
             /* Flow of execution goes here only when first insert takes place */
 
             // Create leaf node as first node in B plus tree (root is null)
-            LeafNode ln = new LeafNode(this.m, new DictionaryPair(key, value));
+            Vector<Comparable> valuesList = new Vector<Comparable>();
+            valuesList.add(value);
+            LeafNode ln = new LeafNode(this.m, new DictionaryPair(key, valuesList));
 
             // Set as first leaf node (can be used later for in-order leaf traversal)
             this.firstLeaf = ln;
@@ -617,12 +639,15 @@ public class BTree {
 
             // Find leaf node to insert into
             LeafNode ln = (this.root == null) ? this.firstLeaf : findLeafNode(key);
+            Vector<Comparable> valuesList = new Vector<Comparable>();
+
+            valuesList.add(value);
 
             // Insert into leaf node fails if node becomes overfull
-            if (!ln.insert(new DictionaryPair(key, value))) {
+            if (!ln.insert(new DictionaryPair(key, valuesList))) {
 
                 // Sort all the dictionary pairs with the included pair to be inserted
-                ln.dictionary[ln.numPairs] = new DictionaryPair(key, value);
+                ln.dictionary[ln.numPairs] = new DictionaryPair(key, valuesList);
                 ln.numPairs++;
                 sortDictionary(ln.dictionary);
 
@@ -698,11 +723,11 @@ public class BTree {
      * @param key: the key to be searched within the B+ tree
      * @return the floating point value associated with the key within the B+ tree
      */
-    public Comparable search(Comparable key) {
+    public Vector<Comparable> search(Comparable key) {
 
         // If B+ tree is completely empty, simply return null
         if (isEmpty()) {
-            return null;
+            return new Vector<Comparable>();
         }
 
         // Find leaf node that holds the dictionary key
@@ -714,7 +739,7 @@ public class BTree {
 
         // If index negative, the key doesn't exist in B+ tree
         if (index < 0) {
-            return null;
+            return new Vector<Comparable>();
         } else {
             return dps[index].value;
         }
@@ -737,7 +762,12 @@ public class BTree {
         ArrayList<Comparable> values = new ArrayList<Comparable>();
 
         // Iterate through the doubly linked list of leaves
-        LeafNode currNode = this.firstLeaf;
+        // LeafNode currNode = this.firstLeaf;
+        LeafNode currNode = (this.root == null) ? this.firstLeaf : findLeafNode(lowerBound);
+        if (currNode == null) {
+            currNode = findLeafNode(this.getMin());
+        }
+
         while (currNode != null) {
 
             // Iterate through the dictionary of each node
@@ -753,15 +783,22 @@ public class BTree {
                 }
 
                 // Include value if its key fits within the provided range
-                if (lowerBound.compareTo(dp.key) < 0 && dp.key.compareTo(upperBound) < 0) {
-                    values.add(dp.value);
+                if (lowerBound.compareTo(upperBound) == 0) {
+                    if ((lowerInclusive || upperInclusive) && dp.key.compareTo(lowerBound) == 0) {
+                        values.addAll(dp.value);
+                    }
+                } else {
+                    if (lowerBound.compareTo(dp.key) < 0 && dp.key.compareTo(upperBound) < 0) {
+                        values.addAll(dp.value);
+                    }
+                    if (lowerInclusive && dp.key.compareTo(lowerBound) == 0) {
+                        values.addAll(dp.value);
+                    }
+                    if (upperInclusive && dp.key.compareTo(upperBound) == 0) {
+                        values.addAll(dp.value);
+                    }
                 }
-                if (lowerInclusive && dp.key.compareTo(lowerBound) == 0) {
-                    values.add(dp.value);
-                }
-                if (upperInclusive && dp.key.compareTo(upperBound) == 0) {
-                    values.add(dp.value);
-                }
+
             }
 
             /*
@@ -1028,6 +1065,13 @@ public class BTree {
          * @return a boolean indicating whether or not the insert was successful
          */
         public boolean insert(DictionaryPair dp) {
+            for (DictionaryPair pair : this.dictionary) {
+                if (pair != null && pair.key.compareTo(dp.key) == 0) {
+                    pair.value.addAll(dp.value);
+                    return true;
+                }
+            }
+
             if (this.isFull()) {
 
                 /* Flow of execution goes here when numPairs == maxNumPairs */
@@ -1129,7 +1173,7 @@ public class BTree {
      */
     public class DictionaryPair implements Comparable<DictionaryPair> {
         Comparable key;
-        Comparable value;
+        Vector<Comparable> value;
 
         /**
          * Constructor
@@ -1137,7 +1181,7 @@ public class BTree {
          * @param key:   the key of the key-value pair
          * @param value: the value of the key-value pair
          */
-        public DictionaryPair(Comparable key, Comparable value) {
+        public DictionaryPair(Comparable key, Vector<Comparable> value) {
             this.key = key;
             this.value = value;
         }
@@ -1184,21 +1228,6 @@ public class BTree {
         // System.out.println(doubletree.search(1.5));
         // System.out.println(doubletree.search(10.333));
 
-        BTree stringtree = new BTree(4);
-
-        System.out.println(stringtree.search("a"));
-        System.out.println(stringtree.search("a", "a", true, true));
-        // stringtree.insert("a", "hello");
-        // stringtree.insert("a", "hello2");
-        // stringtree.insert("a", "hello3");
-        // stringtree.insert("a", "hello4");
-        // stringtree.insert("a", "hello5");
-        // stringtree.insert("a", "hello6");
-
-        // stringtree.insert("c", "world");
-
-        // stringtree.insert("b", "world");
-
         // System.out.println(stringtree.search("a"));
         // System.out.println(stringtree.search("b"));
         // System.out.println(stringtree.search("a", "a"));
@@ -1221,5 +1250,45 @@ public class BTree {
         // System.out.println(stringtree.minHeap);
         // System.out.println(stringtree.getMin());
 
+        BTree stringtree = new BTree(4);
+
+        stringtree.insert("a", "hello");
+        stringtree.insert("a", "hello2");
+        stringtree.insert("a", "hello3");
+        stringtree.insert("a", "hello4");
+        stringtree.insert("a", "hello5");
+        stringtree.insert("a", "hello6");
+        stringtree.insert("c", "C");
+        stringtree.insert("b", "B");
+        stringtree.insert("b", "B2");
+
+        System.out.println(stringtree.search("b"));
+
+        // stringtree.delete("b", "hello4");
+        stringtree.delete("b");
+
+        System.out.println(stringtree.search("b"));
+
+        stringtree.delete("a", "hello3");
+
+        System.out.println(stringtree.search("a"));
+        // // System.out.println(stringtree.search("a", "b", true, false));
+
+        // // stringtree.delete("a");
+        // stringtree.delete("a", "hello4");
+        // stringtree.delete("a", "hello");
+        // stringtree.delete("a", "hello3");
+
+        // System.out.println(stringtree.search("a"));
+
+        // System.out.println(stringtree.search("a", "b", true, false));
+        // System.out.println(stringtree.search("b"));
+        // System.out.println(stringtree.search("a", "c", false, false));
+
+        // System.out.println(stringtree.search("c"));
+        // System.out.println(stringtree.search("b", "c", false, true));
+
+        // System.out.println(stringtree.search("e"));
+        // System.out.println(stringtree.search("f", "g", false, true));
     }
 }
