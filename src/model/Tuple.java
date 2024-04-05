@@ -71,6 +71,19 @@ public class Tuple implements Serializable {
         return true;
     }
 
+    public int compareWith(String colName, Object value) {
+        if (value instanceof String) {
+            return ((String) this.colNameVal.get(colName)).compareTo((String) value);
+        }
+        if (value instanceof Integer) {
+            return ((Integer) this.colNameVal.get(colName)).compareTo((Integer) value);
+        }
+        if (value instanceof Double) {
+            return ((Double) this.colNameVal.get(colName)).compareTo((Double) value);
+        }
+        return 404;
+    }
+
     @Override
     public String toString() {
         String result = "";

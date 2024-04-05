@@ -138,13 +138,40 @@ public class Page implements Serializable {
         return this.tuples.isEmpty();
     }
 
-    public Vector<Tuple> selectTuple(Hashtable<String, Object> x) {
+    public Vector<Tuple> selectTuple(String columnName, String operator, Object value) throws DBAppException {
         Vector<Tuple> selectedTuples = new Vector<Tuple>();
 
+        Hashtable<String, Object> colNameVal = new Hashtable<String, Object>();
+        colNameVal.put(columnName, value);
         for (Tuple currentTuple : this.tuples) {
-            if (currentTuple.matchesCriteria(x)) {
-                selectedTuples.add(currentTuple);
+            if (operator == "=") {
+                if (currentTuple.compareWith(columnName, value) == 0) {
+                    selectedTuples.add(currentTuple);
+                }
+            } else if (operator == "!=") {
+                if (!(currentTuple.compareWith(columnName, value) == 0)) {
+                    selectedTuples.add(currentTuple);
+                }
+            } else if (operator == "<") {
+                if (currentTuple.compareWith(columnName, value) == -1) {
+                    selectedTuples.add(currentTuple);
+                }
+            } else if (operator == "<=") {
+                if (currentTuple.compareWith(columnName, value) <= 0) {
+                    selectedTuples.add(currentTuple);
+                }
+            } else if (operator == ">") {
+                if (currentTuple.compareWith(columnName, value) == 1) {
+                    selectedTuples.add(currentTuple);
+                }
+            } else if (operator == ">=") {
+                if (currentTuple.compareWith(columnName, value) >= 0) {
+                    selectedTuples.add(currentTuple);
+                }
+            } else {
+                throw new DBAppException("Invalid equality Operator");
             }
+
         }
         return selectedTuples;
     }

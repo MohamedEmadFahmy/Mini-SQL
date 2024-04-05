@@ -178,49 +178,89 @@ public class Table implements Serializable {
     }
 
     @SuppressWarnings("rawtypes")
-    public Iterator selectTuple(SQLTerm[] arrSQLTerms, String[] strarrOperators) throws DBAppException {
+    public Iterator selectTuple(SQLTerm[] arrSQLTerms, String[] strarrOperators)
+            throws DBAppException, ClassNotFoundException, IOException {
 
-        // Resulting list to store selected tuples
-        Vector<Tuple> result = new Vector<Tuple>();
+        Vector<Vector<Tuple>> result = new Vector<Vector<Tuple>>();
 
-        // Iterate through each SQLTerm
-        for (SQLTerm term : arrSQLTerms) {
-            String columnName = term.getColumnName();
-            String operator = term.getOperator();
-            Object value = term.getValue();
+        for (SQLTerm term : arrSQLTerms) {// iterat on sql terms
+            String columnName = term._strColumnName;
+            String operator = term._strOperator;
+            Object value = term._objValue;
             Vector<Tuple> tuples = new Vector<Tuple>();
+            Vector<Tuple> termResult = new Vector<Tuple>();
             if (indexedColumns.contains(columnName)) {
-                // run the select from page method on all the pages - TODO after index
-                Vector<Page> pagesInIndex = new Vector<Page>();
-                for (Page page : pagesInIndex) {
-                    Page indexPage = Page.deserializePage(page);
-                    // tuples = page.selectTuple(columnName, operator, value); //select from page
-                    // with operators
-                    page.serializePage(pageName);
-                    result.addAll(tuples);
+                Vector<String> pagesInIndex = new Vector<String>();// get the pages from indexing - TODO after index
+                for (int i = 0; i < pagesInIndex.size(); i++) { // iterate search on pages
+                    Page indexPage = Page.deserializePage(pagesInIndex.get(i));
+                    tuples = indexPage.selectTuple(columnName, operator, value);
+                    termResult.addAll(tuples);
                 }
             } else {
-
+                for (int i = 0; i < pagesList.size(); i++) {// iterate search on unindexed pages
+                    Page page = Page.deserializePage(pagesList.get(i));
+                    tuples = page.selectTuple(columnName, operator, value);
+                    // -------> serialization not needed because the pages are unchanged
+                    termResult.addAll(tuples);
+                }
             }
-            // Iterate through all pages
-            for (String pageName : pagesList) {
-                Page page = Page.deserializePage(pageName);
-                // tuples = page.selectTuple(columnName, operator, value); //select from page
-                // with operators
-                page.serializePage(pageName);
-                result.addAll(tuples);
-            }
+            result.add(termResult);
+            termResult.clear();
         }
 
-        List<Tuple> finalResult = combineResults(result, arrSQLTerms, strarrOperators);
-
+        Vector<Tuple> finalResult = combineResults(result, strarrOperators);
         return finalResult.iterator();
     }
 
-    private Vector<Tuple> combineResults(Vector<Tuple> result, SQLTerm[] arrSQLTerms, String[] strarrOperators) {
-        // Dummy implementation, replace with actual logic to combine results
-        // based on logical operators
-        return result;
+    private Vector<Tuple> combineResults(Vector<Vector<Tuple>> termResults, String[] strarrOperators)
+            throws DBAppException {
+        Vector<Tuple> finalResult = new Vector<Tuple>();
+        if (termResults.size() == 1) {
+            return termResults.elementAt(0);
+        }
+        if (termResults.isEmpty()) {
+            return finalResult;
+        }
+
+        finalResult.addAll(termResults.get(0));
+        Vector<Tuple> operatorResult = new Vector<Tuple>();
+        String operator;
+
+        for (int i = 0; i < strarrOperators.length; i++) {
+            operator = strarrOperators[i];
+            Vector<Tuple> currentTermResult = termResults.get(i + 1);
+            operatorResult.clear();
+            if (operator == "AND") {
+                for (int j = 0; j < finalResult.size(); j++) {
+                    if (currentTermResult.contains(finalResult.get(j))) {
+                        operatorResult.add(finalResult.get(j));
+                    }
+                }
+            } else if (operator == "OR") {
+                operatorResult.addAll(finalResult);
+                for (int j = 0; j < currentTermResult.size(); j++) {
+                    if (!finalResult.contains(currentTermResult.get(j))) {
+                        operatorResult.add(currentTermResult.get(j));
+                    }
+                }
+            } else if (operator == "XOR") {
+                for (int j = 0; j < currentTermResult.size(); j++) {
+                    if (!finalResult.contains(currentTermResult.get(j))) {
+                        operatorResult.add(currentTermResult.get(j));
+                    }
+                }
+                for (int k = 0; k < finalResult.size(); k++) {
+                    if (!currentTermResult.contains(finalResult.get(k))) {
+                        operatorResult.add(finalResult.get(k));
+                    }
+                }
+            } else {
+                throw new DBAppException("Invalid Operator");// invalid operator
+            }
+            finalResult = operatorResult;
+        }
+
+        return finalResult;
     }
 
     public void updateTuple(String strClusteringKeyValue, Hashtable<String, Object> htblColNameValue)
