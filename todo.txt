@@ -1,20 +1,21 @@
 Table Class:
-DONE Find out what attributes should be stored in the table class
-Fix implementation of pagesList (should be referencing page names)
-Check implementation of locating page for insert (whether or not to do it linearly or using binary search and min max values)
+    DONE    Find out what attributes should be stored in the table class
+    DONE    Fix implementation of pagesList (should be referencing page names)
+    DONE    Check implementation of locating page for insert (whether or not to do it linearly or using binary 
+            search and min max values)
 
 
 Page Class: 
-DONE Review instance variables of Page class (especially strClusteringKey)
-DONE Review all of Page class
-DONE Use min and max after inserts and deletions(BIG ISSUE ON DELETIONS HERE)
+    DONE    Review instance variables of Page class (especially strClusteringKey)
+    DONE    Review all of Page class
+    DONE    Use min and max after inserts and deletions(BIG ISSUE ON DELETIONS HERE)
 
 
+B+Tree Class:
+    DONE    modify delete method in index to delete using key and value pair so we can ensure that the correct
+            tuple gets deleted (and only delete the first match in case of duplicaters)
 
-Thoughts:
-how to check if primary key is already inserted if its the last record in the page
+            Add methods to load and save index to disk
 
-
-
-Must do:
-modify delete method in index to delete using key and value pair so we can ensure that the correct tuple gets deleted (and only delete the first match in case of duplicaters)
+DBApp Class:
+            Handle metadata file either by creating a metadata class that deals with it directly or triple      hashtable method
