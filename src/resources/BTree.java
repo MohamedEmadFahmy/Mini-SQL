@@ -730,7 +730,8 @@ public class BTree {
      * @return an ArrayList<Double> that holds all values of dictionary pairs
      *         whose keys are within the specified range
      */
-    public ArrayList<Comparable> search(Comparable lowerBound, Comparable upperBound) {
+    public ArrayList<Comparable> search(Comparable lowerBound, Comparable upperBound, boolean lowerInclusive,
+            boolean upperInclusive) {
 
         // Instantiate Double array to hold values
         ArrayList<Comparable> values = new ArrayList<Comparable>();
@@ -752,7 +753,13 @@ public class BTree {
                 }
 
                 // Include value if its key fits within the provided range
-                if (lowerBound.compareTo(dp.key) <= 0 && dp.key.compareTo(upperBound) <= 0) {
+                if (lowerBound.compareTo(dp.key) < 0 && dp.key.compareTo(upperBound) < 0) {
+                    values.add(dp.value);
+                }
+                if (lowerInclusive && dp.key.compareTo(lowerBound) == 0) {
+                    values.add(dp.value);
+                }
+                if (upperInclusive && dp.key.compareTo(upperBound) == 0) {
                     values.add(dp.value);
                 }
             }
@@ -1179,16 +1186,18 @@ public class BTree {
 
         BTree stringtree = new BTree(4);
 
-        stringtree.insert("a", "hello");
-        stringtree.insert("a", "hello2");
-        stringtree.insert("a", "hello3");
-        stringtree.insert("a", "hello4");
-        stringtree.insert("a", "hello5");
-        stringtree.insert("a", "hello6");
+        System.out.println(stringtree.search("a"));
+        System.out.println(stringtree.search("a", "a", true, true));
+        // stringtree.insert("a", "hello");
+        // stringtree.insert("a", "hello2");
+        // stringtree.insert("a", "hello3");
+        // stringtree.insert("a", "hello4");
+        // stringtree.insert("a", "hello5");
+        // stringtree.insert("a", "hello6");
 
-        stringtree.insert("c", "world");
+        // stringtree.insert("c", "world");
 
-        stringtree.insert("b", "world");
+        // stringtree.insert("b", "world");
 
         // System.out.println(stringtree.search("a"));
         // System.out.println(stringtree.search("b"));
@@ -1201,16 +1210,16 @@ public class BTree {
         // stringtree.delete("c");
         // System.out.println(stringtree.maxHeap);
 
-        System.out.println(stringtree.minHeap);
-        stringtree.delete("a");
-        stringtree.delete("a");
-        stringtree.delete("a");
-        stringtree.delete("a");
-        stringtree.delete("a");
+        // System.out.println(stringtree.minHeap);
         // stringtree.delete("a");
-        stringtree.delete("c");
-        System.out.println(stringtree.minHeap);
-        System.out.println(stringtree.getMin());
+        // stringtree.delete("a");
+        // stringtree.delete("a");
+        // stringtree.delete("a");
+        // stringtree.delete("a");
+        // // stringtree.delete("a");
+        // stringtree.delete("c");
+        // System.out.println(stringtree.minHeap);
+        // System.out.println(stringtree.getMin());
 
     }
 }
