@@ -13,3 +13,8 @@ DONE Use min and max after inserts and deletions(BIG ISSUE ON DELETIONS HERE)
 
 Thoughts:
 how to check if primary key is already inserted if its the last record in the page
+
+
+
+Must do:
+modify delete method in index to delete using key and value pair so we can ensure that the correct tuple gets deleted (and only delete the first match in case of duplicaters)

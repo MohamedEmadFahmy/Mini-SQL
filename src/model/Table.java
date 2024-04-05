@@ -20,7 +20,7 @@ import java.util.Vector;
 import engine.DBApp;
 import engine.SQLTerm;
 import exceptions.DBAppException;
-import resources.bplustree.BTree;
+import resources.BTree;
 
 @SuppressWarnings("unused")
 public class Table implements Serializable {
@@ -29,6 +29,7 @@ public class Table implements Serializable {
     private Hashtable<String, String> htblColNameType;
     private Vector<String> indexedColumns;
     private Vector<String> pagesList;
+    private int currentPageID;
 
     public Table(String strTableName, String primaryKeyName, Hashtable<String, String> htblColNameType) {
         this.strTableName = strTableName;
@@ -36,6 +37,7 @@ public class Table implements Serializable {
         this.htblColNameType = htblColNameType;
         this.indexedColumns = new Vector<String>();
         this.pagesList = new Vector<String>();
+        this.currentPageID = 1;
     }
 
     public String getStrTableName() {
@@ -91,8 +93,9 @@ public class Table implements Serializable {
             Page page = new Page(htblColNameType, this.primaryKeyName);
             page.addTuple(tuple);
             // System.out.println("inserted, 0");
-            pagesList.add(this.strTableName + "" + 0);
-            page.savePage(this.strTableName + "" + 0);
+            pagesList.add(this.strTableName + "" + this.currentPageID);
+            page.savePage(this.strTableName + "" + this.currentPageID);
+            this.currentPageID++;
             this.saveTable();
             return;
         }
@@ -161,8 +164,9 @@ public class Table implements Serializable {
                 Page page = new Page(htblColNameType, this.primaryKeyName);
                 page.addTuple(OverflowTuple);
                 // System.out.println("inserted overflow, 1");
-                pagesList.add(this.strTableName + "" + (i + 1));
-                page.savePage(this.strTableName + "" + (i + 1));
+                pagesList.add(this.strTableName + "" + this.currentPageID);
+                page.savePage(this.strTableName + "" + this.currentPageID);
+                this.currentPageID++;
                 break;
             }
         }
@@ -213,14 +217,14 @@ public class Table implements Serializable {
         indexedColumns.add(strColName);
         String primaryKeyType = htblColNameType.get(this.primaryKeyName);
 
-        BTree<?, String> index = null; // Declare the variable outside the if statements
+        BTree index = null; // Declare the variable outside the if statements
 
         if (primaryKeyType.equals("java.lang.Integer")) {
-            index = new BTree<Integer, String>();
+            index = new BTree(128);
         } else if (primaryKeyType.equals("java.lang.String")) {
-            index = new BTree<String, String>();
+            index = new BTree(128);
         } else if (primaryKeyType.equals("java.lang.Double")) {
-            index = new BTree<Double, String>();
+            index = new BTree(128);
         }
 
         // Loop on table and add the values to the index
