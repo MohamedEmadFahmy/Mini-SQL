@@ -14,8 +14,9 @@ Page Class:
 B+Tree Class:
     DONE    modify delete method in index to delete using key and value pair so we can ensure that the correct
             tuple gets deleted (and only delete the first match in case of duplicaters)
-
-            Add methods to load and save index to disk
+    DONE    Add methods to load and save index to disk
+    DONE        Make the index have an attribute index name aswell so u dont have to specify the name of the index when saving it and modify the save method to use the indexname
 
 DBApp Class:
             Handle metadata file either by creating a metadata class that deals with it directly or triple      hashtable method
+

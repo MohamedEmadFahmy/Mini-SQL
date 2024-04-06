@@ -13,9 +13,13 @@ public class BTree {
     int m;
     InternalNode root;
     LeafNode firstLeaf;
-
     private PriorityQueue<Comparable> minHeap;
     private PriorityQueue<Comparable> maxHeap;
+    private String indexName;
+
+    public String getIndexName() {
+        return indexName;
+    }
 
     public Comparable getMin() {
         return minHeap.peek();
@@ -823,11 +827,12 @@ public class BTree {
      * 
      * @param m: the order (fanout) of the B+ tree
      */
-    public BTree(int m) {
+    public BTree(int m, String indexName) {
         this.m = m;
         this.root = null;
         minHeap = new PriorityQueue<Comparable>((a, b) -> a.compareTo(b));
         maxHeap = new PriorityQueue<Comparable>((a, b) -> b.compareTo(a));
+        this.indexName = indexName;
     }
 
     /**
@@ -1211,10 +1216,10 @@ public class BTree {
         }
     }
 
-    public void saveIndex(String indexName) {
+    public void saveIndex() {
         try {
             FileOutputStream fileOut = new FileOutputStream(
-                    "./src/resources/Serialized_Indices/" + indexName + ".class");
+                    "./src/resources/Serialized_Indices/" + this.indexName + ".class");
             ObjectOutputStream ObjectOut = new ObjectOutputStream(fileOut);
             ObjectOut.writeObject(this);
             ObjectOut.close();
@@ -1292,7 +1297,7 @@ public class BTree {
         // System.out.println(stringtree.minHeap);
         // System.out.println(stringtree.getMin());
 
-        BTree stringtree = new BTree(4);
+        BTree stringtree = new BTree(4, "myIndex");
 
         stringtree.insert("a", "hello");
         stringtree.insert("a", "hello2");

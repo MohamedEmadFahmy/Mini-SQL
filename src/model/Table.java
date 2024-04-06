@@ -314,7 +314,7 @@ public class Table implements Serializable {
         indexedColumns.add(strColName);
         String primaryKeyType = htblColNameType.get(this.primaryKeyName);
 
-        BTree index = new BTree(128);
+        BTree index = new BTree(128, strIndexName);
 
         // Loop on table and add the values to the index
 
@@ -328,7 +328,7 @@ public class Table implements Serializable {
 
         }
 
-        index.saveIndex(strIndexName);
+        index.saveIndex();
     }
 
     public String toString() {
