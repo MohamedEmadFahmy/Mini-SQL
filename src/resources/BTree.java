@@ -6,13 +6,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.*;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class BTree {
-    int m;
-    InternalNode root;
-    LeafNode firstLeaf;
+public class BTree implements Serializable {
+    private int m;
+    private InternalNode root;
+    private LeafNode firstLeaf;
     private PriorityQueue<Comparable> minHeap;
     private PriorityQueue<Comparable> maxHeap;
     private String indexName;
@@ -42,15 +43,16 @@ public class BTree {
      * @return index of the target value if found, else a negative value
      */
     private int binarySearch(DictionaryPair[] dps, int numPairs, Comparable t) {
-        Comparator<DictionaryPair> c = new Comparator<DictionaryPair>() {
-            @Override
-            public int compare(DictionaryPair o1, DictionaryPair o2) {
-                return o1.key.compareTo(o2.key);
-            }
-        };
+        // Comparator<DictionaryPair> c = new Comparator<DictionaryPair>() {
+        // @Override
+        // public int compare(DictionaryPair o1, DictionaryPair o2) {
+        // return o1.key.compareTo(o2.key);
+        // }
+        // };
         Vector<Comparable> v = new Vector<Comparable>();
         v.add(0);
-        return Arrays.binarySearch(dps, 0, numPairs, new DictionaryPair(t, v), c);
+        // return Arrays.binarySearch(dps, 0, numPairs, new DictionaryPair(t, v),c);
+        return Arrays.binarySearch(dps, 0, numPairs, new DictionaryPair(t, v));
     }
 
     /**
@@ -404,7 +406,7 @@ public class BTree {
         if (parent == null) {
 
             // Create new root node and add midpoComparable key and pointers
-            Comparable[] keys = new Integer[this.m];
+            Comparable[] keys = new Comparable[this.m];
             keys[0] = newParentKey;
             InternalNode newRoot = new InternalNode(this.m, keys);
             newRoot.appendChildPointer(in);
@@ -439,7 +441,7 @@ public class BTree {
      */
     private Comparable[] splitKeys(Comparable[] keys, int split) {
 
-        Comparable[] halfKeys = new Integer[this.m];
+        Comparable[] halfKeys = new Comparable[this.m];
 
         // Remove split-indexed value from keys
         keys[split] = null;
@@ -462,9 +464,16 @@ public class BTree {
      * @param key: an integer key that corresponds with an existing dictionary
      *             pair
      */
+
+    // Used to delete all instances of key
     public void delete(Comparable key) {
-        minHeap.remove(key);
-        maxHeap.remove(key);
+        while (minHeap.contains(key)) {
+            minHeap.remove(key);
+        }
+        while (maxHeap.contains(key)) {
+            maxHeap.remove(key);
+        }
+
         if (isEmpty()) {
 
             /* Flow of execution goes here when B+ tree has no dictionary pairs */
@@ -613,9 +622,15 @@ public class BTree {
 
         // If index negative, the key doesn't exist in B+ tree
         if (index < 0) {
+            System.out.println("No such key");
             return;
         }
-        if (dps[index].value.size() == 1 && dps[index].value.contains(value)) {
+        if (!dps[index].value.contains(value)) {
+            System.out.println("No such value for given key");
+            return;
+        }
+
+        if (dps[index].value.size() == 1) {
             delete(key);
         } else {
             dps[index].value.remove(value);
@@ -771,6 +786,10 @@ public class BTree {
         // Instantiate Double array to hold values
         ArrayList<Comparable> values = new ArrayList<Comparable>();
 
+        if (this.isEmpty()) {
+            return values;
+        }
+
         // Iterate through the doubly linked list of leaves
         // LeafNode currNode = this.firstLeaf;
         LeafNode currNode = (this.root == null) ? this.firstLeaf : findLeafNode(lowerBound);
@@ -822,6 +841,13 @@ public class BTree {
         return values;
     }
 
+    public class ReverseComparator implements Comparator<Comparable>, Serializable {
+        @Override
+        public int compare(Comparable a, Comparable b) {
+            return b.compareTo(a); // Compare in reverse order for max heap
+        }
+    }
+
     /**
      * Constructor
      * 
@@ -830,8 +856,8 @@ public class BTree {
     public BTree(int m, String indexName) {
         this.m = m;
         this.root = null;
-        minHeap = new PriorityQueue<Comparable>((a, b) -> a.compareTo(b));
-        maxHeap = new PriorityQueue<Comparable>((a, b) -> b.compareTo(a));
+        minHeap = new PriorityQueue<>();
+        maxHeap = new PriorityQueue<>(new ReverseComparator());
         this.indexName = indexName;
     }
 
@@ -839,7 +865,7 @@ public class BTree {
      * This class represents a general node within the B+ tree and serves as a
      * superclass of InternalNode and LeafNode.
      */
-    public class Node {
+    public class Node implements Serializable {
         InternalNode parent;
     }
 
@@ -1182,7 +1208,7 @@ public class BTree {
      * leaf nodes of the B+ tree. The class implements the Comparable interface
      * so that the DictionaryPair objects can be sorted later on.
      */
-    public class DictionaryPair implements Comparable<DictionaryPair> {
+    public class DictionaryPair implements Comparable<DictionaryPair>, Serializable {
         Comparable key;
         Vector<Comparable> value;
 
@@ -1299,6 +1325,12 @@ public class BTree {
 
         BTree stringtree = new BTree(4, "myIndex");
 
+        // System.out.println(stringtree.getMin());
+        // System.out.println(stringtree.search(stringtree.getMin(),
+        // stringtree.getMax(), true, true));
+        // System.out.println(stringtree.search("h"));
+        // System.out.println(stringtree.search("h", "h", true, true));
+
         stringtree.insert("a", "hello");
         stringtree.insert("a", "hello2");
         stringtree.insert("a", "hello3");
@@ -1309,16 +1341,70 @@ public class BTree {
         stringtree.insert("b", "B");
         stringtree.insert("b", "B2");
 
-        System.out.println(stringtree.search("b"));
+        // System.out.println(stringtree.getMin());
+        // stringtree.delete("a");
+        // System.out.println(stringtree.getMin());
+        // stringtree.delete("b");
+        // System.out.println(stringtree.getMin());
+        // stringtree.delete("c");
+        // System.out.println(stringtree.getMin());
+        // stringtree.delete("d");
+        // System.out.println(stringtree.getMin());
 
-        // stringtree.delete("b", "hello4");
-        stringtree.delete("b");
+        // System.out.println(stringtree.getMax());
+        // stringtree.delete("d");
+        // System.out.println(stringtree.getMax());
+        // stringtree.delete("c");
+        // System.out.println(stringtree.getMax());
+        // stringtree.delete("b");
+        // System.out.println(stringtree.getMax());
+        // stringtree.delete("a");
+        // System.out.println(stringtree.getMax());
 
-        System.out.println(stringtree.search("b"));
+        // System.out.println(stringtree.getMin());
+        // stringtree.delete("a", "hello");
+        // System.out.println(stringtree.getMin());
+        // stringtree.delete("a", "hello2");
+        // System.out.println(stringtree.getMin());
+        // stringtree.delete("a", "hello3");
+        // System.out.println(stringtree.getMin());
+        // stringtree.delete("a", "hello4");
+        // System.out.println(stringtree.getMin());
+        // stringtree.delete("a", "hello5");
+        // System.out.println(stringtree.getMin());
+        // stringtree.delete("a", "hello6");
+        // System.out.println(stringtree.getMin());
 
-        stringtree.delete("a", "hello3");
+        System.out.println(stringtree.getMax());
+        stringtree.delete("c", "C");
+        System.out.println(stringtree.getMax());
+        stringtree.delete("b", "B");
+        System.out.println(stringtree.getMax());
+        stringtree.delete("b", "B3");
+        System.out.println(stringtree.getMax());
+        stringtree.delete("a", "hello");
+        System.out.println(stringtree.getMax());
 
-        System.out.println(stringtree.search("a"));
+        // System.out.println(stringtree.search("b"));
+        // System.out.println(stringtree.search("b"));
+        // System.out.println(stringtree.search("a"));
+        // System.out.println(stringtree.getMin());
+        // System.out.println(stringtree.getMax());
+        // // stringtree.delete("b");
+        // // stringtree.delete("a", "hello3");
+
+        // stringtree.saveIndex();
+
+        // BTree stringtree2 = BTree.loadIndex("myIndex");
+
+        // System.out.println(stringtree2.search("b"));
+        // System.out.println(stringtree2.search("b"));
+        // System.out.println(stringtree2.search("a"));
+        // System.out.println(stringtree2.getMin());
+        // System.out.println(stringtree2.getMax());
+
+        // -------------------------------------------------
+
         // // System.out.println(stringtree.search("a", "b", true, false));
 
         // // stringtree.delete("a");
