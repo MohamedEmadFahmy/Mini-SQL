@@ -1,6 +1,7 @@
 package model;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -90,12 +91,14 @@ public class Table implements Serializable {
         Tuple tuple = new Tuple(htblColNameValue, this.primaryKeyName);
 
         if (pagesList.isEmpty()) {
-            Page page = new Page(htblColNameType, this.primaryKeyName);
-            page.addTuple(tuple);
-            // System.out.println("inserted, 0");
-            pagesList.add(this.strTableName + "" + this.currentPageID);
-            page.savePage(this.strTableName + "" + this.currentPageID);
+            String pageName = this.strTableName + "" + this.currentPageID;
             this.currentPageID++;
+
+            Page page = new Page(pageName, this.htblColNameType, this.primaryKeyName);
+            page.addTuple(tuple);
+            page.savePage();
+
+            pagesList.add(pageName);
             this.saveTable();
             return;
         }
@@ -109,13 +112,13 @@ public class Table implements Serializable {
 
             if (currentPage.isEmpty()) {
                 currentPage.addTuple(tuple);
-                currentPage.savePage(currentPageName);
+                currentPage.savePage();
                 break;
             }
 
             if (tuple.compareTo(currentPage.getMin(), primaryKeyName) == -1) {
                 OverflowTuple = currentPage.addTuple(tuple);
-                currentPage.savePage(currentPageName);
+                currentPage.savePage();
                 insertedpage = i;
                 // System.out.println("loop:" + i + ", inserted, 1");
                 break;
@@ -124,7 +127,7 @@ public class Table implements Serializable {
             if ((tuple.compareTo(currentPage.getMin(), primaryKeyName) == 1)
                     && (tuple.compareTo(currentPage.getMax(), primaryKeyName) == -1)) {
                 OverflowTuple = currentPage.addTuple(tuple);
-                currentPage.savePage(currentPageName);
+                currentPage.savePage();
                 insertedpage = i;
                 // System.out.println("loop:" + i + ", inserted, 2");
                 break;
@@ -133,7 +136,7 @@ public class Table implements Serializable {
             if (i == pagesList.size() - 1) { // @final page
                 // System.out.println("entered third insert");
                 OverflowTuple = currentPage.addTuple(tuple);
-                currentPage.savePage(currentPageName);
+                currentPage.savePage();
                 insertedpage = i;
                 // System.out.println("loop:" + i + ", inserted, 3");
                 break;
@@ -158,15 +161,19 @@ public class Table implements Serializable {
 
             OverflowTuple = currentPage.addTuple(OverflowTuple);
             // System.out.println("inserted overflow, 0");
-            currentPage.savePage(currentPageName);
+            currentPage.savePage();
 
             if ((OverflowTuple != null) && (i == pagesList.size() - 1)) {
-                Page page = new Page(htblColNameType, this.primaryKeyName);
-                page.addTuple(OverflowTuple);
-                // System.out.println("inserted overflow, 1");
-                pagesList.add(this.strTableName + "" + this.currentPageID);
-                page.savePage(this.strTableName + "" + this.currentPageID);
+                String pageName = this.strTableName + "" + this.currentPageID;
                 this.currentPageID++;
+
+                Page page = new Page(pageName, this.htblColNameType, this.primaryKeyName);
+                page.addTuple(OverflowTuple);
+                page.savePage();
+
+                pagesList.add(pageName);
+
+                // System.out.println("inserted overflow, 1");
                 break;
             }
         }
@@ -180,9 +187,19 @@ public class Table implements Serializable {
             String currentPageName = pagesList.elementAt(i);
             Page currentPage = Page.loadPage(currentPageName);
             if (currentPage.deleteTuple(htblColNameValue)) {
-                pagesList.remove(i); // delete serialized file
+                pagesList.remove(currentPageName);
+
+                // delete serialized file
+                File currentPageFile = new File(".//src//resources//Serialized_Pages//" + currentPageName + ".class");
+                if (currentPageFile.exists()) {
+                    currentPageFile.delete();
+                } else {
+                    throw new DBAppException("Page file not found: " + currentPageName);
+                }
+            } else {
+
+                currentPage.savePage();
             }
-            currentPage.savePage(currentPageName);
         }
         this.saveTable();
     }
@@ -283,7 +300,7 @@ public class Table implements Serializable {
                     && tuple.compareTo(currentPage.getMin(),
                             tuple.getPrimaryKeyName()) <= 1) {
                 currentPage.updateTuple(strClusteringKeyValue, htblColNameValue);
-                currentPage.savePage(currentPageName);
+                currentPage.savePage();
                 return;
             }
         }
@@ -297,19 +314,21 @@ public class Table implements Serializable {
         indexedColumns.add(strColName);
         String primaryKeyType = htblColNameType.get(this.primaryKeyName);
 
-        BTree index = null; // Declare the variable outside the if statements
-
-        if (primaryKeyType.equals("java.lang.Integer")) {
-            index = new BTree(128);
-        } else if (primaryKeyType.equals("java.lang.String")) {
-            index = new BTree(128);
-        } else if (primaryKeyType.equals("java.lang.Double")) {
-            index = new BTree(128);
-        }
+        BTree index = new BTree(128);
 
         // Loop on table and add the values to the index
 
-        saveIndex();
+        for (String pageName : pagesList) {
+            try {
+                Page page = Page.loadPage(pageName);
+                page.addAllToIndex(index, strColName);
+            } catch (Exception e) {
+
+            }
+
+        }
+
+        index.saveIndex(strIndexName);
     }
 
     public String toString() {
@@ -365,13 +384,6 @@ public class Table implements Serializable {
             e.printStackTrace();
         }
         return myTable;
-    }
-
-    public void saveIndex() {
-    }
-
-    public BTree loadIndex() {
-        return null;
     }
 
     public static void main(String[] args) throws DBAppException, ClassNotFoundException, IOException {

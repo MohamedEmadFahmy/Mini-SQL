@@ -8,9 +8,11 @@ import java.util.Map;
 import java.util.Vector;
 
 import exceptions.DBAppException;
+import resources.BTree;
 
 @SuppressWarnings("unused")
 public class Page implements Serializable {
+    private String pageName;
     private Vector<Tuple> tuples;
     private int tupleCount;
     private int maxTupleCount;
@@ -21,7 +23,8 @@ public class Page implements Serializable {
     private Tuple max;
     // private static final long serialVersionUID = -4544542885377264750L;
 
-    public Page(Hashtable<String, String> colNameType, String primaryKeyName) {
+    public Page(String pageName, Hashtable<String, String> colNameType, String primaryKeyName) {
+        this.pageName = pageName;
         this.tuples = new Vector<Tuple>();
         this.tupleCount = 0;
         this.primaryKeyName = primaryKeyName;
@@ -253,10 +256,10 @@ public class Page implements Serializable {
     // return low;
     // }
 
-    public void savePage(String pageName) throws IOException {
+    public void savePage() throws IOException {
         try {
             FileOutputStream fileOut = new FileOutputStream(
-                    ".//src//resources//Serialized_Pages//" + pageName + ".class");
+                    ".//src//resources//Serialized_Pages//" + this.pageName + ".class");
             ObjectOutputStream ObjectOut = new ObjectOutputStream(fileOut);
             ObjectOut.writeObject(this);
             ObjectOut.close();
@@ -289,6 +292,14 @@ public class Page implements Serializable {
         return null;
     }
 
+    @SuppressWarnings("rawtypes")
+    public void addAllToIndex(BTree index, String colName) {
+        for (Tuple tuple : this.tuples) {
+            index.insert((Comparable) tuple.colNameVal.get(colName), this.pageName);
+        }
+
+    }
+
     public static void main(String[] args) throws DBAppException, IOException, ClassNotFoundException {
         // Hashtable<Integer, String> ht = new Hashtable<>();
         // ht.put(1, "Mohamed");
@@ -312,14 +323,14 @@ public class Page implements Serializable {
         htblColNameValue.put("name", "Ahmed Noor");
         htblColNameValue.put("gpa", 0.95);
 
-        Page page = new Page(htblColNameType, "id");
+        Page page = new Page("page1", htblColNameType, "id");
         Tuple tuple = new Tuple(htblColNameValue, "id");
         page.addTuple(tuple);
         // System.out.println(page);
         // System.out.println(page.size());
 
         // System.out.println(page.tupleCount);
-        page.savePage("page1");
+        page.savePage();
 
         Page page1 = null;
         page1 = Page.loadPage("page1");

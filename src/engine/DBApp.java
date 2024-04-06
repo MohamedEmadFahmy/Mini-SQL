@@ -113,7 +113,7 @@ public class DBApp {
 			// Write the modified lines back to the file
 			Files.write(file.toPath(), lines);
 		} catch (IOException e) {
-			System.err.println("Error reading/writing file: " + e.getMessage());
+			// System.err.println("Error reading/writing file: " + e.getMessage());
 			throw new DBAppException("Error reading/writing file: " + e.getMessage());
 		}
 

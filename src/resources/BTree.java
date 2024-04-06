@@ -1,5 +1,11 @@
 package resources;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.*;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -1203,6 +1209,42 @@ public class BTree {
                 return -1;
             }
         }
+    }
+
+    public void saveIndex(String indexName) {
+        try {
+            FileOutputStream fileOut = new FileOutputStream(
+                    "./src/resources/Serialized_Indices/" + indexName + ".class");
+            ObjectOutputStream ObjectOut = new ObjectOutputStream(fileOut);
+            ObjectOut.writeObject(this);
+            ObjectOut.close();
+            fileOut.close();
+            // System.out.println("Index Serialized");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static BTree loadIndex(String indexName) {
+        try {
+            FileInputStream fileIn = new FileInputStream("./src/resources/Serialized_Indices/" + indexName + ".class");
+            ObjectInputStream ObjectIn = new ObjectInputStream(fileIn);
+            BTree index = null;
+            index = (BTree) ObjectIn.readObject();
+            ObjectIn.close();
+            fileIn.close();
+            // System.out.println("index Deserialied, tupleCount =" + index.tupleCount);
+            return index;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static void main(String[] args) {

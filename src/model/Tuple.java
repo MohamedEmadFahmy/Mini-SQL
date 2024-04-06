@@ -7,12 +7,11 @@ import java.util.Map;
 public class Tuple implements Serializable {
     Hashtable<String, Object> colNameVal;
     private String primaryKeyName;
+    private Object primaryKey;
 
     public String getPrimaryKeyName() {
         return primaryKeyName;
     }
-
-    private Object primaryKey;
 
     public Tuple(Hashtable<String, Object> colNameVal, String primaryKeyName) {
         this.colNameVal = colNameVal;
