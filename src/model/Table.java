@@ -288,7 +288,7 @@ public class Table implements Serializable {
     }
 
     @SuppressWarnings("rawtypes")
-    public Iterator selectTuple(SQLTerm[] arrSQLTerms, String[] strarrOperators)// TODO binary search for select
+    public Iterator selectTuple(SQLTerm[] arrSQLTerms, String[] strarrOperators)
             throws DBAppException, ClassNotFoundException, IOException {
 
         Vector<Vector<Tuple>> result = new Vector<Vector<Tuple>>();
@@ -315,10 +315,11 @@ public class Table implements Serializable {
                 }
             }
             result.add(termResult);
-            termResult.clear();
         }
-
+        // System.out.println(result.get(0).get(0).equals(result.get(1).get(0)));
+        System.out.println(result + "  " + Arrays.toString(strarrOperators));
         Vector<Tuple> finalResult = combineResults(result, strarrOperators);
+        System.out.println(finalResult);
         return finalResult.iterator();
     }
 
@@ -332,31 +333,35 @@ public class Table implements Serializable {
             return finalResult;
         }
 
+        Vector<String> strVOperators = new Vector<String>();
+        for (int i = 0; i < strarrOperators.length; i++) {
+            strVOperators.add(strarrOperators[i]);
+        }
+
         finalResult.addAll(termResults.get(0));
         Vector<Tuple> operatorResult = new Vector<Tuple>();
         String operator;
-        // Vector<Vector<Tuple>> newTermResults=new Vector<Vector<Tuple>>();
+        Vector<Vector<Tuple>> newTermResults = new Vector<Vector<Tuple>>();
 
-        for (int i = 0; i < strarrOperators.length; i++) {
-            operator = strarrOperators[i];
+        for (int i = 0; i < strVOperators.size(); i++) {
+            operator = strVOperators.get(i);
             Vector<Tuple> currentTermResult = termResults.get(i);
             Vector<Tuple> nextTermResult = termResults.get(i + 1);
             if (operator == "AND") {
                 for (int j = 0; j < nextTermResult.size(); j++) {
-                    if (currentTermResult.contains(nextTermResult.get(i))) {
+                    if (currentTermResult.contains(nextTermResult.get(j))) {
                         operatorResult.add(nextTermResult.get(j));
                     }
                 }
                 termResults.add(i, operatorResult);
                 termResults.remove(i + 1);
+                strVOperators.remove(i);
                 i -= 1;
             }
         }
 
-        strarrOperators = removeOperator(strarrOperators, "AND");
-
-        for (int i = 0; i < strarrOperators.length; i++) {
-            operator = strarrOperators[i];
+        for (int i = 0; i < strVOperators.size(); i++) {
+            operator = strVOperators.get(i);
             Vector<Tuple> currentTermResult = termResults.get(i);
             Vector<Tuple> nextTermResult = termResults.get(i + 1);
             if (operator == "XOR") {
@@ -372,14 +377,13 @@ public class Table implements Serializable {
                 }
                 termResults.add(i, operatorResult);
                 termResults.remove(i + 1);
+                strVOperators.remove(i);
                 i -= 1;
             }
         }
 
-        strarrOperators = removeOperator(strarrOperators, "XOR");
-
-        for (int i = 0; i < strarrOperators.length; i++) {
-            operator = strarrOperators[i];
+        for (int i = 0; i < strVOperators.size(); i++) {
+            operator = strVOperators.get(i);
             Vector<Tuple> currentTermResult = termResults.get(i);
             Vector<Tuple> nextTermResult = termResults.get(i + 1);
             if (operator == "OR") {
@@ -391,6 +395,7 @@ public class Table implements Serializable {
                 }
                 termResults.add(i, operatorResult);
                 termResults.remove(i + 1);
+                strVOperators.remove(i);
                 i -= 1;
             } else {
                 throw new DBAppException("invalid Operator");
@@ -554,29 +559,54 @@ public class Table implements Serializable {
         // Integer y = 5;
         // System.out.println(x.compareTo(y));
 
-        // String strTableName = "Student";
-        // Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
-        // htblColNameType.put("id", "java.lang.Integer");
-        // htblColNameType.put("name", "java.lang.String");
-        // htblColNameType.put("gpa", "java.lang.double");
-        // Table myTable = new Table(strTableName, "id", htblColNameType);
+        String strTableName = "Student";
+        Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
+        htblColNameType.put("id", "java.lang.Integer");
+        htblColNameType.put("name", "java.lang.String");
+        htblColNameType.put("gpa", "java.lang.double");
+        Table myTable = new Table(strTableName, "id", htblColNameType);
 
-        // for (int i = 1; i <= 10; i++) {
-        // if (i != 5) {
-        // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-        // htblColNameValue.put("id", i);
-        // htblColNameValue.put("name", "Moski no " + i);
-        // htblColNameValue.put("gpa", 3.5);
-        // myTable.insertTupleBinary(htblColNameValue);
-        // }
-        // }
+        for (int i = 1; i <= 10; i++) {
+
+            Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+            htblColNameValue.put("id", i);
+            htblColNameValue.put("name", "Moski no " + i);
+            htblColNameValue.put("gpa", 3.5);
+            myTable.insertTupleBinary(htblColNameValue);
+
+        }
         // System.out.println(myTable);
-        // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-        // htblColNameValue.put("id", 5);
-        // htblColNameValue.put("name", "Moski no " + 5);
-        // htblColNameValue.put("gpa", 3.5);
-        // myTable.insertTupleBinary(htblColNameValue);
-        // System.out.println(myTable);
+        SQLTerm A = new SQLTerm();
+        SQLTerm B = new SQLTerm();
+        A._strTableName = "Student";
+        A._strColumnName = "id";
+        A._objValue = 6;
+        A._strOperator = ">";
+        B._strTableName = "Student";
+        B._strColumnName = "id";
+        B._objValue = 7;
+        B._strOperator = "=";
+        SQLTerm[] arr = { A, B };
+        String[] ops = { "AND" };
+        // Page page = Page.loadPage("Student2");
+        // System.out.println(page);
+        // Vector<Tuple> Vec1 = page.selectTuple("id", "=", 7);
+        // Vector<Tuple> Vec2 = page.selectTuple("id", ">", 6);
+        // System.out.println(Vec1);
+        // System.out.println(Vec2);
+        // Vector<Vector<Tuple>> VecVec = new Vector<>();
+        // VecVec.add(Vec2);
+        // VecVec.add(Vec1);
+        // System.out.println("vecvec " + VecVec);
+        // System.out.println(myTable.combineResults(VecVec, ops));
+
+        // System.out.println(myTable.selectTuple(arr, ops));
+
+        Iterator<Tuple> iterator = myTable.selectTuple(arr, ops);
+
+        // while (iterator.hasNext()) {
+        // System.out.println(iterator.next());
+        // }
 
         // --------------DOESNT WORK--------------
         // for (int i = 10; i >= 1; i--) {
