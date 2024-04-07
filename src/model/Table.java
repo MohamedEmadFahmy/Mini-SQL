@@ -181,6 +181,89 @@ public class Table implements Serializable {
 
     }
 
+    public void insertTupleBinary(Hashtable<String, Object> htblColNameValue)
+            throws DBAppException, IOException, ClassNotFoundException {
+
+        Tuple tuple = new Tuple(htblColNameValue, this.primaryKeyName);
+
+        if (pagesList.isEmpty()) {
+            String pageName = this.strTableName + "" + this.currentPageID;
+            this.currentPageID++;
+
+            Page page = new Page(pageName, this.htblColNameType, this.primaryKeyName);
+            page.addTuple(tuple);
+            page.savePage();
+
+            pagesList.add(pageName);
+            this.saveTable();
+            return;
+        }
+
+        int low = 0;
+        int high = pagesList.size() - 1;
+        int insertedPage = -1;
+        Tuple overflowTuple = null;
+
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            String currentPageName = pagesList.elementAt(mid);
+            Page currentPage = Page.loadPage(currentPageName);
+            // System.out.println("mid is :" + mid);
+            // System.out.println("low is :" + low);
+            // System.out.println("high is :" + high);
+            // System.out.println("min is :" + currentPage.getMin());
+            // System.out.println("max is :" + currentPage.getMax());
+
+            if ((tuple.compareTo(currentPage.getMin(), primaryKeyName) == 1)
+                    && (tuple.compareTo(currentPage.getMax(), primaryKeyName) == -1)) {
+                overflowTuple = currentPage.addTuple(tuple);
+                currentPage.savePage();
+                insertedPage = mid;
+                System.out.println("1, inserted @ " + mid);
+                break;
+            } else if (mid == pagesList.size() - 1 && tuple.compareTo(currentPage.getMax(), primaryKeyName) == 1) {
+                overflowTuple = currentPage.addTuple(tuple);
+                currentPage.savePage();
+                insertedPage = mid;
+                System.out.println("2, inserted @ " + mid);
+                break;
+            } else if (mid == 0 && tuple.compareTo(currentPage.getMin(), primaryKeyName) == -1) {
+                overflowTuple = currentPage.addTuple(tuple);
+                currentPage.savePage();
+                insertedPage = mid;
+                System.out.println("3, inserted @ " + mid);
+                break;
+            } else if (tuple.compareTo(currentPage.getMax(), primaryKeyName) == 1) {
+                low = mid + 1;
+            } else if (tuple.compareTo(currentPage.getMin(), primaryKeyName) == -1) {
+                high = mid - 1;
+            } else {
+                System.out.println("error");
+            }
+        }
+
+        for (int i = insertedPage; i < pagesList.size(); i++) {
+            if (overflowTuple == null) {
+                break;
+            }
+            String currentPageName = pagesList.elementAt(i);
+            Page currentPage = Page.loadPage(currentPageName);
+            overflowTuple = currentPage.addTuple(overflowTuple);
+            currentPage.savePage();
+            if ((overflowTuple != null) && (i == pagesList.size() - 1)) {
+                String pageName = this.strTableName + "" + this.currentPageID;
+                this.currentPageID++;
+                Page page = new Page(pageName, this.htblColNameType, this.primaryKeyName);
+                page.addTuple(overflowTuple);
+                page.savePage();
+                pagesList.add(pageName);
+                break;
+            }
+        }
+
+        this.saveTable();
+    }
+
     public void deleteTuple(String strTableName, Hashtable<String, Object> htblColNameValue)
             throws DBAppException, ClassNotFoundException, IOException {
         for (int i = 0; i < pagesList.size(); i++) {
@@ -399,48 +482,57 @@ public class Table implements Serializable {
         htblColNameType.put("gpa", "java.lang.double");
         Table myTable = new Table(strTableName, "id", htblColNameType);
 
-        // for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= 10; i++) {
+            if (i != 5) {
+                Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+                htblColNameValue.put("id", i);
+                htblColNameValue.put("name", "Moski no " + i);
+                htblColNameValue.put("gpa", 3.5);
+                myTable.insertTupleBinary(htblColNameValue);
+            }
+        }
+        System.out.println(myTable);
+        Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+        htblColNameValue.put("id", 5);
+        htblColNameValue.put("name", "Moski no " + 5);
+        htblColNameValue.put("gpa", 3.5);
+        myTable.insertTupleBinary(htblColNameValue);
+        System.out.println(myTable);
+
+        // --------------DOESNT WORK--------------
+        // for (int i = 10; i >= 1; i--) {
         // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
         // htblColNameValue.put("id", i);
         // htblColNameValue.put("name", "Moski no " + i);
         // htblColNameValue.put("gpa", 3.5);
-        // myTable.insertTupleAttempt(htblColNameValue);
+        // myTable.insertTupleBinary(htblColNameValue);
         // }
         // System.out.println(myTable);
 
-        // --------------DOESNT WORK--------------
-        // for (int i = 50; i >= 1; i--) {
-        // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-        // htblColNameValue.put("id", i);
-        // htblColNameValue.put("name", "Moski no " + i);
-        // htblColNameValue.put("gpa", 3.5);
-        // myTable.insertTupleAttempt(htblColNameValue);
+        // int x = 50;
+        // Integer[] array = new Integer[x];
+
+        // for (int i = 0; i < x; i++) {
+        // array[i] = i + 1;
         // }
+        // List<Integer> list = Arrays.asList(array);
 
-        int x = 50;
-        Integer[] array = new Integer[x];
+        // // Shuffle the list
+        // Collections.shuffle(list);
 
-        for (int i = 0; i < x; i++) {
-            array[i] = i + 1;
-        }
-        List<Integer> list = Arrays.asList(array);
+        // // Convert back to array if necessary
+        // list.toArray(array);
+        // // System.out.println(Arrays.toString(array));
 
-        // Shuffle the list
-        Collections.shuffle(list);
-
-        // Convert back to array if necessary
-        list.toArray(array);
-        // System.out.println(Arrays.toString(array));
-
-        for (int i = 0; i < array.length; i++) {
-            int num = array[i];
-            Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-            htblColNameValue.put("id", num);
-            htblColNameValue.put("name", "Moski no " + num);
-            htblColNameValue.put("gpa", 3.5);
-            myTable.insertTuple(htblColNameValue);
-        }
-        System.out.println(myTable);
+        // for (int i = 0; i < array.length; i++) {
+        // int num = array[i];
+        // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+        // htblColNameValue.put("id", num);
+        // htblColNameValue.put("name", "Moski no " + num);
+        // htblColNameValue.put("gpa", 3.5);
+        // myTable.insertTupleBinary(htblColNameValue);
+        // }
+        // System.out.println(myTable);
 
         // Page firstPage = myTable.pagesList.firstElement();
 
