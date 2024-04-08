@@ -317,7 +317,7 @@ public class Table implements Serializable {
             result.add(termResult);
         }
         // System.out.println(result.get(0).get(0).equals(result.get(1).get(0)));
-        System.out.println(result + "  " + Arrays.toString(strarrOperators));
+        // System.out.println(result + " " + Arrays.toString(strarrOperators));
         Vector<Tuple> finalResult = combineResults(result, strarrOperators);
         System.out.println(finalResult);
         return finalResult.iterator();
@@ -341,20 +341,35 @@ public class Table implements Serializable {
         finalResult.addAll(termResults.get(0));
         Vector<Tuple> operatorResult = new Vector<Tuple>();
         String operator;
-        Vector<Vector<Tuple>> newTermResults = new Vector<Vector<Tuple>>();
+        System.out.println("termResults at beginning " + termResults);
 
         for (int i = 0; i < strVOperators.size(); i++) {
             operator = strVOperators.get(i);
             Vector<Tuple> currentTermResult = termResults.get(i);
             Vector<Tuple> nextTermResult = termResults.get(i + 1);
-            if (operator == "AND") {
+            if (operator.equals("AND")) {
                 for (int j = 0; j < nextTermResult.size(); j++) {
-                    if (currentTermResult.contains(nextTermResult.get(j))) {
+                    // System.out.println("entered operator loop, operator: " + operator + "
+                    // currentTermRes: "
+                    // + currentTermResult + " nextTermRes(j): " + nextTermResult.get(j));
+                    // System.out.println("j= " + j);
+                    // System.out.println(currentTermResult.contains(nextTermResult.get(j)));
+                    // System.out.println(Contains(currentTermResult, nextTermResult.get(j)));
+                    // System.out.println(currentTermResult.get(j));
+                    // System.out.println(currentTermResult.get(0).equals(nextTermResult.get(0)));
+                    if (Contains(currentTermResult, nextTermResult.get(j))) {
                         operatorResult.add(nextTermResult.get(j));
+                        // System.out.println("added to operator result: " + nextTermResult.get(j));
                     }
                 }
+                // System.out.println("Operator Result " + operatorResult);
+                // System.out.println("termResults before insert " + termResults + "i =" + i);
+                termResults.remove(i);
                 termResults.add(i, operatorResult);
+                // System.out.println("termResults after insert,before delete " + termResults +
+                // "i =" + i);
                 termResults.remove(i + 1);
+                // System.out.println("termResults after delete " + termResults + "i =" + i);
                 strVOperators.remove(i);
                 i -= 1;
             }
@@ -364,17 +379,18 @@ public class Table implements Serializable {
             operator = strVOperators.get(i);
             Vector<Tuple> currentTermResult = termResults.get(i);
             Vector<Tuple> nextTermResult = termResults.get(i + 1);
-            if (operator == "XOR") {
+            if (operator.equals("XOR")) {
                 for (int j = 0; j < currentTermResult.size(); j++) {
-                    if (!nextTermResult.contains(currentTermResult.get(j))) {
+                    if (!Contains(nextTermResult, currentTermResult.get(j))) {
                         operatorResult.add(currentTermResult.get(j));
                     }
                 }
                 for (int k = 0; k < nextTermResult.size(); k++) {
-                    if (!currentTermResult.contains(nextTermResult.get(k))) {
+                    if (!Contains(currentTermResult, nextTermResult.get(k))) {
                         operatorResult.add(nextTermResult.get(k));
                     }
                 }
+                termResults.remove(i);
                 termResults.add(i, operatorResult);
                 termResults.remove(i + 1);
                 strVOperators.remove(i);
@@ -386,13 +402,18 @@ public class Table implements Serializable {
             operator = strVOperators.get(i);
             Vector<Tuple> currentTermResult = termResults.get(i);
             Vector<Tuple> nextTermResult = termResults.get(i + 1);
-            if (operator == "OR") {
+            if (operator.equals("OR")) {
                 operatorResult.addAll(currentTermResult);
                 for (int j = 0; j < nextTermResult.size(); j++) {
-                    if (!currentTermResult.contains(nextTermResult.get(j))) {
+                    // System.out.println("entered operator loop, operator: " + operator + "
+                    // currentTermRes: "
+                    // + currentTermResult + " nextTermRes(j): " + nextTermResult.get(j));
+                    // System.out.println(!currentTermResult.contains(nextTermResult.get(j)));
+                    if (!Contains(currentTermResult, nextTermResult.get(j))) {
                         operatorResult.add(nextTermResult.get(j));
                     }
                 }
+                termResults.remove(i);
                 termResults.add(i, operatorResult);
                 termResults.remove(i + 1);
                 strVOperators.remove(i);
@@ -402,42 +423,18 @@ public class Table implements Serializable {
             }
         }
         finalResult = termResults.get(0);
-
-        // for (int i = 0; i < strarrOperators.length; i++) {
-        // operator = strarrOperators[i];
-        // Vector<Tuple> currentTermResult = termResults.get(i + 1);
-        // operatorResult.clear();
-        // if (operator == "AND") {
-        // for (int j = 0; j < finalResult.size(); j++) {
-        // if (currentTermResult.contains(finalResult.get(j))) {
-        // operatorResult.add(finalResult.get(j));
-        // }
-        // }
-        // } else if (operator == "OR") {
-        // operatorResult.addAll(finalResult);
-        // for (int j = 0; j < currentTermResult.size(); j++) {
-        // if (!finalResult.contains(currentTermResult.get(j))) {
-        // operatorResult.add(currentTermResult.get(j));
-        // }
-        // }
-        // } else if (operator == "XOR") {
-        // for (int j = 0; j < currentTermResult.size(); j++) {
-        // if (!finalResult.contains(currentTermResult.get(j))) {
-        // operatorResult.add(currentTermResult.get(j));
-        // }
-        // }
-        // for (int k = 0; k < finalResult.size(); k++) {
-        // if (!currentTermResult.contains(finalResult.get(k))) {
-        // operatorResult.add(finalResult.get(k));
-        // }
-        // }
-        // } else {
-        // throw new DBAppException("Invalid Operator");// invalid operator
-        // }
-        // finalResult = operatorResult;
-        // }
-
+        // finalResult.addAll(termResults.get(1));
+        System.out.println("Final term results " + termResults);
         return finalResult;
+    }
+
+    public static boolean Contains(Vector<Tuple> vec, Tuple tuple) {
+        for (int i = 0; i < vec.size(); i++) {
+            if (vec.get(i).equals(tuple)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static String[] removeOperator(String[] array, String operatorToRemove) {
@@ -588,15 +585,18 @@ public class Table implements Serializable {
         B._strOperator = "=";
         SQLTerm[] arr = { A, B };
         String[] ops = { "AND" };
-        // Page page = Page.loadPage("Student2");
-        // System.out.println(page);
-        // Vector<Tuple> Vec1 = page.selectTuple("id", "=", 7);
-        // Vector<Tuple> Vec2 = page.selectTuple("id", ">", 6);
-        // System.out.println(Vec1);
-        // System.out.println(Vec2);
-        // Vector<Vector<Tuple>> VecVec = new Vector<>();
-        // VecVec.add(Vec2);
-        // VecVec.add(Vec1);
+        Page page = Page.loadPage("Student2");
+        System.out.println(page);
+        Vector<Tuple> Vec1 = page.selectTuple("id", "=", 7);
+        Vector<Tuple> Vec2 = page.selectTuple("id", ">", 6);
+        System.out.println("vec1 " + Vec1);
+        System.out.println("vec2 " + Vec2);
+        // System.out.println(Vec2.contains(Vec1.get(0)));
+        Vector<Vector<Tuple>> VecVec = new Vector<>();
+        VecVec.add(Vec2);
+        VecVec.add(Vec1);
+
+        // System.out.println(Contains(Vec2, Vec1.get(0)));
         // System.out.println("vecvec " + VecVec);
         // System.out.println(myTable.combineResults(VecVec, ops));
 
