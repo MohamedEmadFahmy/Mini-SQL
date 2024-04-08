@@ -140,6 +140,89 @@ public class Table implements Serializable {
 
     }
 
+    public void insertTupleBinary(Hashtable<String, Object> htblColNameValue)
+            throws DBAppException {
+
+        Tuple tuple = new Tuple(htblColNameValue, this.primaryKeyName);
+
+        if (pagesList.isEmpty()) {
+            String pageName = this.strTableName + "" + this.currentPageID;
+            this.currentPageID++;
+
+            Page page = new Page(strTableName, pageName, this.htblColNameType, this.primaryKeyName);
+            page.addTuple(tuple);
+            page.savePage();
+
+            pagesList.add(pageName);
+            this.saveTable();
+            return;
+        }
+
+        int low = 0;
+        int high = pagesList.size() - 1;
+        int insertedPage = -1;
+        Tuple overflowTuple = null;
+
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            String currentPageName = pagesList.elementAt(mid);
+            Page currentPage = Page.loadPage(currentPageName);
+            // System.out.println("mid is :" + mid);
+            // System.out.println("low is :" + low);
+            // System.out.println("high is :" + high);
+            // System.out.println("min is :" + currentPage.getMin());
+            // System.out.println("max is :" + currentPage.getMax());
+
+            if ((tuple.compareTo(currentPage.getMin(), primaryKeyName) == 1)
+                    && (tuple.compareTo(currentPage.getMax(), primaryKeyName) == -1)) {
+                overflowTuple = currentPage.addTuple(tuple);
+                currentPage.savePage();
+                insertedPage = mid;
+                System.out.println("1, inserted @ " + mid);
+                break;
+            } else if (mid == pagesList.size() - 1 && tuple.compareTo(currentPage.getMax(), primaryKeyName) == 1) {
+                overflowTuple = currentPage.addTuple(tuple);
+                currentPage.savePage();
+                insertedPage = mid;
+                System.out.println("2, inserted @ " + mid);
+                break;
+            } else if (mid == 0 && tuple.compareTo(currentPage.getMin(), primaryKeyName) == -1) {
+                overflowTuple = currentPage.addTuple(tuple);
+                currentPage.savePage();
+                insertedPage = mid;
+                System.out.println("3, inserted @ " + mid);
+                break;
+            } else if (tuple.compareTo(currentPage.getMax(), primaryKeyName) == 1) {
+                low = mid + 1;
+            } else if (tuple.compareTo(currentPage.getMin(), primaryKeyName) == -1) {
+                high = mid - 1;
+            } else {
+                System.out.println("error");
+            }
+        }
+
+        for (int i = insertedPage; i < pagesList.size(); i++) {
+            if (overflowTuple == null) {
+                break;
+            }
+            String currentPageName = pagesList.elementAt(i);
+            Page currentPage = Page.loadPage(currentPageName);
+            overflowTuple = currentPage.addTuple(overflowTuple);
+            currentPage.savePage();
+            if ((overflowTuple != null) && (i == pagesList.size() - 1)) {
+                String pageName = this.strTableName + "" + this.currentPageID;
+                this.currentPageID++;
+                Page page = new Page(strTableName, pageName, this.htblColNameType, this.primaryKeyName);
+                page.addTuple(overflowTuple);
+                page.savePage();
+                pagesList.add(pageName);
+                break;
+            }
+        }
+
+        this.saveTable();
+    }
+
     public void delete(String strTableName, Hashtable<String, Object> htblColNameValue)
             throws DBAppException {
         for (int i = 0; i < pagesList.size(); i++) {
@@ -192,15 +275,16 @@ public class Table implements Serializable {
                 }
             }
             result.add(termResult);
-            termResult.clear();
         }
-
+        // System.out.println(result.get(0).get(0).equals(result.get(1).get(0)));
+        // System.out.println(result + " " + Arrays.toString(strarrOperators));
         Vector<Tuple> finalResult = combineResults(result, strarrOperators);
+        System.out.println(finalResult);
         return finalResult.iterator();
     }
 
     private Vector<Tuple> combineResults(Vector<Vector<Tuple>> termResults, String[] strarrOperators)
-            throws DBAppException {
+            throws DBAppException {// editd to combine results with operator presidence in mind
         Vector<Tuple> finalResult = new Vector<Tuple>();
         if (termResults.size() == 1) {
             return termResults.elementAt(0);
@@ -209,45 +293,125 @@ public class Table implements Serializable {
             return finalResult;
         }
 
+        Vector<String> strVOperators = new Vector<String>();
+        for (int i = 0; i < strarrOperators.length; i++) {
+            strVOperators.add(strarrOperators[i]);
+        }
+
         finalResult.addAll(termResults.get(0));
         Vector<Tuple> operatorResult = new Vector<Tuple>();
         String operator;
+        System.out.println("termResults at beginning " + termResults);
 
-        for (int i = 0; i < strarrOperators.length; i++) {
-            operator = strarrOperators[i];
-            Vector<Tuple> currentTermResult = termResults.get(i + 1);
-            operatorResult.clear();
-            if (operator == "AND") {
-                for (int j = 0; j < finalResult.size(); j++) {
-                    if (currentTermResult.contains(finalResult.get(j))) {
-                        operatorResult.add(finalResult.get(j));
+        for (int i = 0; i < strVOperators.size(); i++) {
+            operator = strVOperators.get(i);
+            Vector<Tuple> currentTermResult = termResults.get(i);
+            Vector<Tuple> nextTermResult = termResults.get(i + 1);
+            if (operator.equals("AND")) {
+                for (int j = 0; j < nextTermResult.size(); j++) {
+                    // System.out.println("entered operator loop, operator: " + operator + "
+                    // currentTermRes: "
+                    // + currentTermResult + " nextTermRes(j): " + nextTermResult.get(j));
+                    // System.out.println("j= " + j);
+                    // System.out.println(currentTermResult.contains(nextTermResult.get(j)));
+                    // System.out.println(Contains(currentTermResult, nextTermResult.get(j)));
+                    // System.out.println(currentTermResult.get(j));
+                    // System.out.println(currentTermResult.get(0).equals(nextTermResult.get(0)));
+                    if (Contains(currentTermResult, nextTermResult.get(j))) {
+                        operatorResult.add(nextTermResult.get(j));
+                        // System.out.println("added to operator result: " + nextTermResult.get(j));
                     }
                 }
-            } else if (operator == "OR") {
-                operatorResult.addAll(finalResult);
-                for (int j = 0; j < currentTermResult.size(); j++) {
-                    if (!finalResult.contains(currentTermResult.get(j))) {
-                        operatorResult.add(currentTermResult.get(j));
-                    }
-                }
-            } else if (operator == "XOR") {
-                for (int j = 0; j < currentTermResult.size(); j++) {
-                    if (!finalResult.contains(currentTermResult.get(j))) {
-                        operatorResult.add(currentTermResult.get(j));
-                    }
-                }
-                for (int k = 0; k < finalResult.size(); k++) {
-                    if (!currentTermResult.contains(finalResult.get(k))) {
-                        operatorResult.add(finalResult.get(k));
-                    }
-                }
-            } else {
-                throw new DBAppException("Invalid Operator");// invalid operator
+                // System.out.println("Operator Result " + operatorResult);
+                // System.out.println("termResults before insert " + termResults + "i =" + i);
+                termResults.remove(i);
+                termResults.add(i, operatorResult);
+                // System.out.println("termResults after insert,before delete " + termResults +
+                // "i =" + i);
+                termResults.remove(i + 1);
+                // System.out.println("termResults after delete " + termResults + "i =" + i);
+                strVOperators.remove(i);
+                i -= 1;
             }
-            finalResult = operatorResult;
         }
 
+        for (int i = 0; i < strVOperators.size(); i++) {
+            operator = strVOperators.get(i);
+            Vector<Tuple> currentTermResult = termResults.get(i);
+            Vector<Tuple> nextTermResult = termResults.get(i + 1);
+            if (operator.equals("XOR")) {
+                for (int j = 0; j < currentTermResult.size(); j++) {
+                    if (!Contains(nextTermResult, currentTermResult.get(j))) {
+                        operatorResult.add(currentTermResult.get(j));
+                    }
+                }
+                for (int k = 0; k < nextTermResult.size(); k++) {
+                    if (!Contains(currentTermResult, nextTermResult.get(k))) {
+                        operatorResult.add(nextTermResult.get(k));
+                    }
+                }
+                termResults.remove(i);
+                termResults.add(i, operatorResult);
+                termResults.remove(i + 1);
+                strVOperators.remove(i);
+                i -= 1;
+            }
+        }
+
+        for (int i = 0; i < strVOperators.size(); i++) {
+            operator = strVOperators.get(i);
+            Vector<Tuple> currentTermResult = termResults.get(i);
+            Vector<Tuple> nextTermResult = termResults.get(i + 1);
+            if (operator.equals("OR")) {
+                operatorResult.addAll(currentTermResult);
+                for (int j = 0; j < nextTermResult.size(); j++) {
+                    // System.out.println("entered operator loop, operator: " + operator + "
+                    // currentTermRes: "
+                    // + currentTermResult + " nextTermRes(j): " + nextTermResult.get(j));
+                    // System.out.println(!currentTermResult.contains(nextTermResult.get(j)));
+                    if (!Contains(currentTermResult, nextTermResult.get(j))) {
+                        operatorResult.add(nextTermResult.get(j));
+                    }
+                }
+                termResults.remove(i);
+                termResults.add(i, operatorResult);
+                termResults.remove(i + 1);
+                strVOperators.remove(i);
+                i -= 1;
+            } else {
+                throw new DBAppException("invalid Operator");
+            }
+        }
+        finalResult = termResults.get(0);
+        // finalResult.addAll(termResults.get(1));
+        System.out.println("Final term results " + termResults);
         return finalResult;
+    }
+
+    public static boolean Contains(Vector<Tuple> vec, Tuple tuple) {
+        for (int i = 0; i < vec.size(); i++) {
+            if (vec.get(i).equals(tuple)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String[] removeOperator(String[] array, String operatorToRemove) {
+        int count = 0;
+        for (String str : array) {
+            if (str.equals(operatorToRemove)) {
+                count++;
+            }
+        }
+        String[] newArray = new String[array.length - count];
+        int index = 0;
+        for (String str : array) {
+            if (!str.equals(operatorToRemove)) {
+                newArray[index++] = str;
+            }
+        }
+        return newArray;
     }
 
     public void updateTuple(String strClusteringKeyValue, Hashtable<String, Object> htblColNameValue)
@@ -350,48 +514,85 @@ public class Table implements Serializable {
         htblColNameType.put("gpa", "java.lang.double");
         Table myTable = new Table(strTableName, "id", htblColNameType);
 
-        // for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= 10; i++) {
+
+            Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+            htblColNameValue.put("id", i);
+            htblColNameValue.put("name", "Moski no " + i);
+            htblColNameValue.put("gpa", 3.5);
+            myTable.insertTupleBinary(htblColNameValue);
+
+        }
+        // System.out.println(myTable);
+        SQLTerm A = new SQLTerm();
+        SQLTerm B = new SQLTerm();
+        A._strTableName = "Student";
+        A._strColumnName = "id";
+        A._objValue = 6;
+        A._strOperator = ">";
+        B._strTableName = "Student";
+        B._strColumnName = "id";
+        B._objValue = 7;
+        B._strOperator = "=";
+        SQLTerm[] arr = { A, B };
+        String[] ops = { "AND" };
+        Page page = Page.loadPage("Student2");
+        System.out.println(page);
+        Vector<Tuple> Vec1 = page.selectTuple("id", "=", 7);
+        Vector<Tuple> Vec2 = page.selectTuple("id", ">", 6);
+        System.out.println("vec1 " + Vec1);
+        System.out.println("vec2 " + Vec2);
+        // System.out.println(Vec2.contains(Vec1.get(0)));
+        Vector<Vector<Tuple>> VecVec = new Vector<>();
+        VecVec.add(Vec2);
+        VecVec.add(Vec1);
+
+        // System.out.println(Contains(Vec2, Vec1.get(0)));
+        // System.out.println("vecvec " + VecVec);
+        // System.out.println(myTable.combineResults(VecVec, ops));
+
+        // System.out.println(myTable.selectTuple(arr, ops));
+
+        Iterator<Tuple> iterator = myTable.selectTuple(arr, ops);
+
+        // while (iterator.hasNext()) {
+        // System.out.println(iterator.next());
+        // }
+
+        // --------------DOESNT WORK--------------
+        // for (int i = 10; i >= 1; i--) {
         // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
         // htblColNameValue.put("id", i);
         // htblColNameValue.put("name", "Moski no " + i);
         // htblColNameValue.put("gpa", 3.5);
-        // myTable.insertAttempt(htblColNameValue);
+        // myTable.insertTupleBinary(htblColNameValue);
         // }
         // System.out.println(myTable);
 
-        // --------------DOESNT WORK--------------
-        // for (int i = 50; i >= 1; i--) {
-        // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-        // htblColNameValue.put("id", i);
-        // htblColNameValue.put("name", "Moski no " + i);
-        // htblColNameValue.put("gpa", 3.5);
-        // myTable.insertAttempt(htblColNameValue);
+        // int x = 50;
+        // Integer[] array = new Integer[x];
+
+        // for (int i = 0; i < x; i++) {
+        // array[i] = i + 1;
         // }
+        // List<Integer> list = Arrays.asList(array);
 
-        int x = 50;
-        Integer[] array = new Integer[x];
+        // // Shuffle the list
+        // Collections.shuffle(list);
 
-        for (int i = 0; i < x; i++) {
-            array[i] = i + 1;
-        }
-        List<Integer> list = Arrays.asList(array);
+        // // Convert back to array if necessary
+        // list.toArray(array);
+        // // System.out.println(Arrays.toString(array));
 
-        // Shuffle the list
-        Collections.shuffle(list);
-
-        // Convert back to array if necessary
-        list.toArray(array);
-        // System.out.println(Arrays.toString(array));
-
-        for (int i = 0; i < array.length; i++) {
-            int num = array[i];
-            Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-            htblColNameValue.put("id", num);
-            htblColNameValue.put("name", "Moski no " + num);
-            htblColNameValue.put("gpa", 3.5);
-            myTable.insert(htblColNameValue);
-        }
-        System.out.println(myTable);
+        // for (int i = 0; i < array.length; i++) {
+        // int num = array[i];
+        // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+        // htblColNameValue.put("id", num);
+        // htblColNameValue.put("name", "Moski no " + num);
+        // htblColNameValue.put("gpa", 3.5);
+        // myTable.insertTupleBinary(htblColNameValue);
+        // }
+        // System.out.println(myTable);
 
         // Page firstPage = myTable.pagesList.firstElement();
 
