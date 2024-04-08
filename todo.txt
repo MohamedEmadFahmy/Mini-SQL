@@ -19,4 +19,6 @@ B+Tree Class:
 
 DBApp Class:
             Handle metadata file either by creating a metadata class that deals with it directly or triple      hashtable method
+            Priority of AND, XOR, OR  should be this order but the TA said AND, OR, XOR
 
+Metadata stuff
