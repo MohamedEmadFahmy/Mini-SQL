@@ -9,6 +9,7 @@ Page Class:
     DONE    Review instance variables of Page class (especially strClusteringKey)
     DONE    Review all of Page class
     DONE    Use min and max after inserts and deletions(BIG ISSUE ON DELETIONS HERE)
+    DONE    Fix toString() of Page
 
 
 B+Tree Class:
@@ -21,7 +22,9 @@ DBApp Class:
             Handle metadata file either by creating a metadata class that deals with it directly or triple      hashtable method
             Priority of AND, XOR, OR  should be this order but the TA said AND, OR, XOR
 
-Metadata stuff
+Metadata:
+    DONE
 
-Fix toString() of Page
+
 Fix updateTuple it takes string value not object and we dont handle that
+Handle changes to index when inserting, updating, deleting, and overflow
