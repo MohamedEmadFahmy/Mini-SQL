@@ -7,8 +7,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Vector;
 
 import exceptions.DBAppException;
+import resources.BTree;
 
 public class Metadata {
     private static Hashtable<String, Hashtable<String, Hashtable<String, String>>> ht = new Hashtable<String, Hashtable<String, Hashtable<String, String>>>();
@@ -28,6 +30,7 @@ public class Metadata {
      * getColumnType
      * compatibleOperation
      * indexExists
+     * getIndicesOnTable
      * 
      *
      * 
@@ -239,6 +242,18 @@ public class Metadata {
         ht.get(strTableName).get(strColName).put("indexName", strIndexName);
         ht.get(strTableName).get(strColName).put("indexType", "B+tree");
         saveMetadata();
+    }
+
+    public static Vector<BTree> getIndicesOnTable(String strTableName) {
+        readMetadata();
+        Vector<BTree> indices = new Vector<BTree>();
+        for (Map.Entry<String, Hashtable<String, String>> entry : ht.get(strTableName).entrySet()) {
+            String indexName = entry.getValue().get("indexName");
+            if (!indexName.equals("null")) {
+                indices.add(BTree.loadIndex(indexName));
+            }
+        }
+        return indices;
     }
 
     public static void main(String[] args) throws DBAppException {

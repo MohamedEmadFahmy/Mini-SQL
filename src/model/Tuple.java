@@ -5,7 +5,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 public class Tuple implements Serializable {
-    Hashtable<String, Object> colNameVal;
+    private Hashtable<String, Object> colNameVal;
     private String primaryKeyName;
     private Object primaryKey;
 
@@ -23,13 +23,17 @@ public class Tuple implements Serializable {
             String key = entry.getKey();
 
             if (key.equals(primaryKeyName)) {
-                primaryKey = entry.getValue();
+                this.primaryKey = entry.getValue();
             }
         }
     }
 
     public Object getPrimaryKey() {
-        return primaryKey;
+        return this.primaryKey;
+    }
+
+    public Hashtable<String, Object> getColNameVal() {
+        return this.colNameVal;
     }
 
     public int compareTo(Tuple o, String columnName) {
@@ -86,7 +90,7 @@ public class Tuple implements Serializable {
     @Override
     public String toString() {
         String result = "";
-        result += primaryKey;
+        result += this.primaryKey;
 
         for (Map.Entry<String, Object> entry : colNameVal.entrySet()) {
             String key = entry.getKey();

@@ -12,6 +12,7 @@ import resources.BTree;
 
 @SuppressWarnings("unused")
 public class Page implements Serializable {
+    private String strTableName;
     private String pageName;
     private Vector<Tuple> tuples;
     private int tupleCount;
@@ -22,7 +23,8 @@ public class Page implements Serializable {
     private Tuple max;
     // private static final long serialVersionUID = -4544542885377264750L;
 
-    public Page(String pageName, Hashtable<String, String> colNameType, String primaryKeyName) {
+    public Page(String strTableName, String pageName, Hashtable<String, String> colNameType, String primaryKeyName) {
+        this.strTableName = strTableName;
         this.pageName = pageName;
         this.tuples = new Vector<Tuple>();
         this.tupleCount = 0;
@@ -61,18 +63,19 @@ public class Page implements Serializable {
         }
     }
 
+    @SuppressWarnings("rawtypes")
     public Tuple addTuple(Tuple tuple) throws DBAppException {
         // returns overflow tuple, null if no overflow
 
         Object primaryKey = null;
 
         // To be moved to DBApp using metadata or table class
-        if (tuple.colNameVal.containsKey(this.primaryKeyName)) {
-            primaryKey = tuple.colNameVal.get(this.primaryKeyName);
+        if (tuple.getColNameVal().containsKey(this.primaryKeyName)) {
+            primaryKey = tuple.getColNameVal().get(this.primaryKeyName);
         }
 
         for (Tuple currentTuple : this.tuples) {
-            if (currentTuple.colNameVal.get(primaryKeyName).equals(primaryKey)) {
+            if (currentTuple.getColNameVal().get(primaryKeyName).equals(primaryKey)) {
                 throw new DBAppException("Primary Key already in use");
             }
         }
@@ -84,9 +87,22 @@ public class Page implements Serializable {
 
         Tuple overflow = null;
 
+        Vector<BTree> indices = Metadata.getIndicesOnTable(this.strTableName);
+        for (String colName : tuple.getColNameVal().keySet()) {
+            Comparable value = (Comparable) tuple.getColNameVal().get(colName);
+            if (Metadata.tableHasIndexOnColumn(this.strTableName, colName)) {
+                String indexName = Metadata.getIndexName(this.strTableName, colName);
+                BTree BTreeIndex = BTree.loadIndex(indexName);
+                BTreeIndex.insert(value, this.pageName);
+                BTreeIndex.saveIndex();
+            }
+
+        }
+
         if (this.tupleCount > this.maxTupleCount) {
             this.tupleCount -= 1;
             overflow = tuples.remove(this.maxTupleCount);
+
             // System.out.println("Overflow: " + overflow.toString());
             // returns the last tuple
             // (not intended behavior, but it's the closest thing to an overflow tuple)
@@ -180,7 +196,7 @@ public class Page implements Serializable {
     public void updateTuple(String oldPrimaryKey, Hashtable<String, Object> newValues)
             throws DBAppException {
         for (int i = 0; i < tuples.size(); i++) {
-            Hashtable<String, Object> tuple = this.tuples.get(i).colNameVal;
+            Hashtable<String, Object> tuple = this.tuples.get(i).getColNameVal();
 
             if (tuple.contains(oldPrimaryKey) && tuple.get(oldPrimaryKey).equals(oldPrimaryKey)) {
                 for (String colName : newValues.keySet()) {
@@ -289,7 +305,7 @@ public class Page implements Serializable {
     @SuppressWarnings("rawtypes")
     public void addAllToIndex(BTree index, String colName) {
         for (Tuple tuple : this.tuples) {
-            index.insert((Comparable) tuple.colNameVal.get(colName), this.pageName);
+            index.insert((Comparable) tuple.getColNameVal().get(colName), this.pageName);
         }
 
     }
@@ -317,7 +333,7 @@ public class Page implements Serializable {
         htblColNameValue.put("name", "Ahmed Noor");
         htblColNameValue.put("gpa", 0.95);
 
-        Page page = new Page("page1", htblColNameType, "id");
+        Page page = new Page("Student", "page1", htblColNameType, "id");
         Tuple tuple = new Tuple(htblColNameValue, "id");
         page.addTuple(tuple);
         // System.out.println(page);

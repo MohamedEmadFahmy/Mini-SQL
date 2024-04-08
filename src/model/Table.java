@@ -53,7 +53,7 @@ public class Table implements Serializable {
             String pageName = this.strTableName + "" + this.currentPageID;
             this.currentPageID++;
 
-            Page page = new Page(pageName, this.htblColNameType, this.primaryKeyName);
+            Page page = new Page(this.strTableName, pageName, this.htblColNameType, this.primaryKeyName);
             page.addTuple(tuple);
             page.savePage();
 
@@ -126,7 +126,7 @@ public class Table implements Serializable {
                 String pageName = this.strTableName + "" + this.currentPageID;
                 this.currentPageID++;
 
-                Page page = new Page(pageName, this.htblColNameType, this.primaryKeyName);
+                Page page = new Page(this.strTableName, pageName, this.htblColNameType, this.primaryKeyName);
                 page.addTuple(OverflowTuple);
                 page.savePage();
 
