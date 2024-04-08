@@ -22,3 +22,6 @@ DBApp Class:
             Priority of AND, XOR, OR  should be this order but the TA said AND, OR, XOR
 
 Metadata stuff
+
+Fix toString() of Page
+Fix updateTuple it takes string value not object and we dont handle that

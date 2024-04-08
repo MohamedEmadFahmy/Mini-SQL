@@ -18,7 +18,6 @@ public class Page implements Serializable {
     private int maxTupleCount;
     private String primaryKeyName;
     private Hashtable<String, String> colNameType;
-    private Vector<String> indexedColumns;
     private Tuple min;
     private Tuple max;
     // private static final long serialVersionUID = -4544542885377264750L;
@@ -29,7 +28,6 @@ public class Page implements Serializable {
         this.tupleCount = 0;
         this.primaryKeyName = primaryKeyName;
         this.colNameType = colNameType;
-        this.indexedColumns = new Vector<String>();
 
         loadMaxTuplesCount();
         min = null;
@@ -123,7 +121,7 @@ public class Page implements Serializable {
         return low;
     }
 
-    public boolean deleteTuple(Hashtable<String, Object> x) {
+    public boolean delete(Hashtable<String, Object> x) {
         // deletes any tuple that matches the given criteria
         // returns true if the page is empty after deletion
         // updates the min and max tuples
@@ -208,7 +206,7 @@ public class Page implements Serializable {
 
     @Override
     public String toString() {
-        String result = "    ";
+        String result = "  ";
 
         result += primaryKeyName;
 
@@ -217,7 +215,7 @@ public class Page implements Serializable {
             // Object value = entry.getValue();
 
             if (!key.equals(primaryKeyName)) {
-                result += "    " + key;
+                result += "  " + key;
             }
         }
 
@@ -227,9 +225,6 @@ public class Page implements Serializable {
             Tuple currentTuple = this.tuples.get(i);
             // result += (i + 1) + " " + currentTuple.toString();
             result += currentTuple.toString();
-            if (i != this.tuples.size() - 1) {
-                result += ",";
-            }
             result += "\n";
         }
 
@@ -256,7 +251,7 @@ public class Page implements Serializable {
     // return low;
     // }
 
-    public void savePage() throws IOException {
+    public void savePage() throws DBAppException {
         try {
             FileOutputStream fileOut = new FileOutputStream(
                     ".//src//resources//Serialized_Pages//" + this.pageName + ".class");
@@ -266,13 +261,13 @@ public class Page implements Serializable {
             fileOut.close();
             // System.out.println("Page Serialized");
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            throw new DBAppException("File not found");
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new DBAppException("Error occured while saving page");
         }
     }
 
-    public static Page loadPage(String pageName) throws IOException, ClassNotFoundException {
+    public static Page loadPage(String pageName) throws DBAppException {
         try {
             FileInputStream fileIn = new FileInputStream(".//src//resources//Serialized_Pages//" + pageName + ".class");
             ObjectInputStream ObjectIn = new ObjectInputStream(fileIn);
@@ -283,13 +278,12 @@ public class Page implements Serializable {
             // System.out.println("Page Deserialied, tupleCount =" + page.tupleCount);
             return page;
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            throw new DBAppException("File not found");
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new DBAppException("Error occured while saving page");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            throw new DBAppException("Class \"Page\" not found");
         }
-        return null;
     }
 
     @SuppressWarnings("rawtypes")
@@ -300,7 +294,7 @@ public class Page implements Serializable {
 
     }
 
-    public static void main(String[] args) throws DBAppException, IOException, ClassNotFoundException {
+    public static void main(String[] args) throws DBAppException {
         // Hashtable<Integer, String> ht = new Hashtable<>();
         // ht.put(1, "Mohamed");
         // System.out.println(ht.get(2));

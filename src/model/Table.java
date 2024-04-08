@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.security.spec.ECGenParameterSpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,7 +29,6 @@ public class Table implements Serializable {
     private String strTableName;
     private String primaryKeyName;
     private Hashtable<String, String> htblColNameType;
-    private Vector<String> indexedColumns;
     private Vector<String> pagesList;
     private int currentPageID;
 
@@ -36,7 +36,6 @@ public class Table implements Serializable {
         this.strTableName = strTableName;
         this.primaryKeyName = primaryKeyName;
         this.htblColNameType = htblColNameType;
-        this.indexedColumns = new Vector<String>();
         this.pagesList = new Vector<String>();
         this.currentPageID = 1;
     }
@@ -45,49 +44,9 @@ public class Table implements Serializable {
         return strTableName;
     }
 
-    public static void addTable(String strTableName, String primaryKeyName,
-            Hashtable<String, String> htblColNameType) {
-
-        addMetaData(strTableName, primaryKeyName, htblColNameType);
-
-        // Update table names arraylist with table names from metadata file
-        DBApp.updateMetaDataFile();
-    }
-
-    private static void addMetaData(String strTableName, String primaryKeyName,
-            Hashtable<String, String> htblColNameType) {
-        StringBuilder contentBuilder = new StringBuilder();
-
-        htblColNameType.forEach((key, value) -> {
-            String tableName = strTableName;
-            String colName = key;
-            String colDataType = value;
-            String isClusteringKey = key.equals(primaryKeyName) ? "True" : "False";
-            String indexName = "null";
-            String indexType = "null";
-
-            // System.out.println(String.format("%s,%s,%s,%s,%s,%s\n", tableName, colName,
-            // colDataType, isClusteringKey,
-            // indexName, indexType));
-
-            contentBuilder.append(String.format("%s,%s,%s,%s,%s,%s\n", tableName, colName, colDataType, isClusteringKey,
-                    indexName, indexType));
-        });
-
-        writeFile("metadata.csv", contentBuilder.toString());
-    }
-
-    public static void writeFile(String filePath, String content) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
-            writer.write(content);
-        } catch (IOException e) {
-            System.err.println("Error writing to file: " + e.getMessage());
-        }
-    }
-
     // plan is on figma
-    public void insertTuple(Hashtable<String, Object> htblColNameValue)
-            throws DBAppException, IOException, ClassNotFoundException {
+    public void insert(Hashtable<String, Object> htblColNameValue)
+            throws DBAppException {
         Tuple tuple = new Tuple(htblColNameValue, this.primaryKeyName);
 
         if (pagesList.isEmpty()) {
@@ -181,32 +140,33 @@ public class Table implements Serializable {
 
     }
 
-    public void deleteTuple(String strTableName, Hashtable<String, Object> htblColNameValue)
-            throws DBAppException, ClassNotFoundException, IOException {
+    public void delete(String strTableName, Hashtable<String, Object> htblColNameValue)
+            throws DBAppException {
         for (int i = 0; i < pagesList.size(); i++) {
             String currentPageName = pagesList.elementAt(i);
             Page currentPage = Page.loadPage(currentPageName);
-            if (currentPage.deleteTuple(htblColNameValue)) {
+            if (currentPage.delete(htblColNameValue)) {
                 pagesList.remove(currentPageName);
 
                 // delete serialized file
-                File currentPageFile = new File(".//src//resources//Serialized_Pages//" + currentPageName + ".class");
-                if (currentPageFile.exists()) {
+                try {
+                    File currentPageFile = new File(
+                            ".//src//resources//Serialized_Pages//" + currentPageName + ".class");
                     currentPageFile.delete();
-                } else {
-                    throw new DBAppException("Page file not found: " + currentPageName);
+                } catch (Exception e) {
+                    throw new DBAppException("Couldnt delete Page:  " + currentPageName);
                 }
             } else {
-
                 currentPage.savePage();
             }
         }
         this.saveTable();
+
     }
 
     @SuppressWarnings("rawtypes")
     public Iterator selectTuple(SQLTerm[] arrSQLTerms, String[] strarrOperators)
-            throws DBAppException, ClassNotFoundException, IOException {
+            throws DBAppException {
 
         Vector<Vector<Tuple>> result = new Vector<Vector<Tuple>>();
 
@@ -216,7 +176,7 @@ public class Table implements Serializable {
             Object value = term._objValue;
             Vector<Tuple> tuples = new Vector<Tuple>();
             Vector<Tuple> termResult = new Vector<Tuple>();
-            if (indexedColumns.contains(columnName)) {
+            if (Metadata.tableHasIndexOnColumn(strTableName, columnName)) {
                 Vector<String> pagesInIndex = new Vector<String>();// get the pages from indexing - TODO after index
                 for (int i = 0; i < pagesInIndex.size(); i++) { // iterate search on pages
                     Page indexPage = Page.loadPage(pagesInIndex.get(i));
@@ -291,7 +251,8 @@ public class Table implements Serializable {
     }
 
     public void updateTuple(String strClusteringKeyValue, Hashtable<String, Object> htblColNameValue)
-            throws DBAppException, ClassNotFoundException, IOException {
+            throws DBAppException {
+        // TODO given is the clustering key value not the name
         Tuple tuple = new Tuple(htblColNameValue, strClusteringKeyValue);
         for (int i = 0; i < pagesList.size(); i++) {
             String currentPageName = pagesList.elementAt(i);
@@ -304,28 +265,18 @@ public class Table implements Serializable {
                 return;
             }
         }
-        this.saveTable();
+        // this.saveTable();
     }
 
     public void createIndex(String strColName, String strIndexName) throws DBAppException {
-        if (indexedColumns.contains(strColName)) {
-            throw new DBAppException("Column already indexed");
-        }
-        indexedColumns.add(strColName);
-        String primaryKeyType = htblColNameType.get(this.primaryKeyName);
 
         BTree index = new BTree(128, strIndexName);
 
         // Loop on table and add the values to the index
 
         for (String pageName : pagesList) {
-            try {
-                Page page = Page.loadPage(pageName);
-                page.addAllToIndex(index, strColName);
-            } catch (Exception e) {
-
-            }
-
+            Page page = Page.loadPage(pageName);
+            page.addAllToIndex(index, strColName);
         }
 
         index.saveIndex();
@@ -340,11 +291,11 @@ public class Table implements Serializable {
             Page currentPage = null;
             try {
                 currentPage = Page.loadPage(pagesList.elementAt(i));
-            } catch (ClassNotFoundException | IOException e) {
+                result += currentPage.toString() + "\n";
+            } catch (DBAppException e) {
 
                 result += "Error reading page at index + " + i + "\n";
             }
-            result += currentPage.toString() + "\n";
             result += "-------------------------------\n";
         }
 
@@ -386,7 +337,7 @@ public class Table implements Serializable {
         return myTable;
     }
 
-    public static void main(String[] args) throws DBAppException, ClassNotFoundException, IOException {
+    public static void main(String[] args) throws DBAppException {
 
         // Integer x = 3;
         // Integer y = 5;
@@ -404,7 +355,7 @@ public class Table implements Serializable {
         // htblColNameValue.put("id", i);
         // htblColNameValue.put("name", "Moski no " + i);
         // htblColNameValue.put("gpa", 3.5);
-        // myTable.insertTupleAttempt(htblColNameValue);
+        // myTable.insertAttempt(htblColNameValue);
         // }
         // System.out.println(myTable);
 
@@ -414,7 +365,7 @@ public class Table implements Serializable {
         // htblColNameValue.put("id", i);
         // htblColNameValue.put("name", "Moski no " + i);
         // htblColNameValue.put("gpa", 3.5);
-        // myTable.insertTupleAttempt(htblColNameValue);
+        // myTable.insertAttempt(htblColNameValue);
         // }
 
         int x = 50;
@@ -438,7 +389,7 @@ public class Table implements Serializable {
             htblColNameValue.put("id", num);
             htblColNameValue.put("name", "Moski no " + num);
             htblColNameValue.put("gpa", 3.5);
-            myTable.insertTuple(htblColNameValue);
+            myTable.insert(htblColNameValue);
         }
         System.out.println(myTable);
 

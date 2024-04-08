@@ -7,7 +7,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Vector;
 
 import exceptions.DBAppException;
 
@@ -20,23 +19,25 @@ public class Metadata {
      * 
      * DONE:
      * addTable
+     * addIndex
      * tableExists
      * tableHasColumn
      * tableHasIndexOnColumn
      * getIndexName
+     * getPrimaryKeyName
+     * getColumnType
+     * compatibleOperation
+     * indexExists
      * 
      *
      * 
-     * TODO:
-     * compatibleInsert
-     * compatibleDelete
-     * compatibleUpdate
+     * still:
      */
 
     public static void addTable(String strTableName, String primaryKeyName,
             Hashtable<String, String> htblColNameType) {
 
-        // readMetadata();
+        readMetadata();
 
         Hashtable<String, Hashtable<String, String>> table = new Hashtable<String, Hashtable<String, String>>();
 
@@ -54,10 +55,11 @@ public class Metadata {
         }
 
         ht.put(strTableName, table);
-        // saveMetadata();
+        saveMetadata();
     }
 
     public static boolean tableExists(String tableName) {
+        readMetadata();
         return ht.containsKey(tableName);
     }
 
@@ -152,77 +154,115 @@ public class Metadata {
     }
 
     public static boolean tableHasColumn(String tableName, String columnName) {
+        readMetadata();
         return ht.get(tableName).containsKey(columnName);
     }
 
     public static boolean tableHasIndexOnColumn(String tableName, String columnName) {
+        readMetadata();
         return !ht.get(tableName).get(columnName).get("indexType").equals("null");
     }
 
     public static String getIndexName(String tableName, String columnName) {
+        readMetadata();
         return ht.get(tableName).get(columnName).get("indexName");
     }
 
-    public static void main(String[] args) throws DBAppException {
-        // Hashtable<String, String> idAttributes = new Hashtable<>();
-        // idAttributes.put("columnType", "java.lang.Integer");
-        // idAttributes.put("clusteringKey", "True");
-        // idAttributes.put("indexName", "IDIndex");
-        // idAttributes.put("indexType", "B+Tree");
-
-        // Hashtable<String, String> nameAttributes = new Hashtable<>();
-        // nameAttributes.put("columnType", "java.lang.String");
-        // nameAttributes.put("clusteringKey", "False");
-        // nameAttributes.put("indexName", "null");
-        // nameAttributes.put("indexType", "null");
-
-        // Hashtable<String, String> numberAttributes = new Hashtable<>();
-        // numberAttributes.put("columnType", "java.lang.Integer");
-        // numberAttributes.put("clusteringKey", "False");
-        // numberAttributes.put("indexName", "NumberIndex");
-        // numberAttributes.put("indexType", "B+Tree");
-
-        // Hashtable<String, String> specializationAttributes = new Hashtable<>();
-        // specializationAttributes.put("columnType", "java.lang.String");
-        // specializationAttributes.put("clusteringKey", "False");
-        // specializationAttributes.put("indexName", "SpecIndex");
-        // specializationAttributes.put("indexType", "B+Tree");
-
-        // Hashtable<String, String> addressAttributes = new Hashtable<>();
-        // addressAttributes.put("columnType", "java.lang.String");
-        // addressAttributes.put("clusteringKey", "False");
-        // addressAttributes.put("indexName", "AddrIndex");
-        // addressAttributes.put("indexType", "B+Tree");
-
-        // Hashtable<String, Hashtable<String, String>> studentColumns = new
-        // Hashtable<>();
-        // studentColumns.put("id", idAttributes);
-        // studentColumns.put("name", nameAttributes);
-        // studentColumns.put("number", numberAttributes);
-        // studentColumns.put("specialization", specializationAttributes);
-        // studentColumns.put("address", addressAttributes);
-        // Metadata.ht.put("CityShop", studentColumns);
-
-        // readMetadata();
-
-        // saveMetadata();
-
-        // String strTableName = "Student";
-        // Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
-        // htblColNameType.put("id", "java.lang.Integer");
-        // htblColNameType.put("name", "java.lang.String");
-        // htblColNameType.put("gpa", "java.lang.Double");
-
+    public static String getColumnType(String tableName, String columnName) {
         readMetadata();
-        // if (tableExists(strTableName)) {
-        // throw new DBAppException("Table " + strTableName + " already exists");
-        // }
-        // addTable(strTableName, "id", htblColNameType);
+        return ht.get(tableName).get(columnName).get("columnType");
+    }
 
-        // System.out.println(tableHasColumn("Student", "name"));
-        // System.out.println(tableHasColumn("Student", "moski"));
+    public static String getPrimaryKeyName(String tableName) {
+        readMetadata();
+        for (Map.Entry<String, Hashtable<String, String>> entry : ht.get(tableName).entrySet()) {
+            if (entry.getValue().get("clusteringKey").equals("True")) {
+                return entry.getKey();
+            }
+        }
+        return "";
+    }
 
-        System.out.println(tableHasIndexOnColumn("Student", "id"));
-        System.out.println(tableHasIndexOnColumn("Student", "age"));
+    // Used in:
+    // DBAPP.insert
+
+    public static boolean validInsert(String strTableName,
+            Hashtable<String, Object> htblColNameValue) {
+        readMetadata();
+        if (htblColNameValue.size() != ht.get(strTableName).size()) {
+            return false;
+        }
+        return compatibleTypes(strTableName, htblColNameValue);
+    }
+
+    // Used in:
+    // DBAPP.delete
+    // DBAPP.update
+    // DBAPP.selectFromTable
+    public static boolean compatibleTypes(String strTableName,
+            Hashtable<String, Object> htblColNameValue) {
+        readMetadata();
+        for (Map.Entry<String, Object> entry : htblColNameValue.entrySet()) {
+            String columnName = entry.getKey();
+            Object columnValue = entry.getValue();
+
+            if (!tableHasColumn(strTableName, columnName)) {
+                return false;
+            }
+
+            String columnType = ht.get(strTableName).get(columnName).get("columnType");
+            if (columnType.equals("java.lang.Integer")) {
+                return columnValue instanceof Integer;
+            } else if (columnType.equals("java.lang.Double")) {
+                return columnValue instanceof Double;
+            } else if (columnType.equals("java.util.String")) {
+                return columnValue instanceof String && ((String) columnValue).trim().length() > 0;
+            }
+        }
+        return true;
+    }
+
+    public static boolean indexExists(String strIndexName) {
+        readMetadata();
+        for (Map.Entry<String, Hashtable<String, Hashtable<String, String>>> tableEntry : ht.entrySet()) {
+            for (Map.Entry<String, Hashtable<String, String>> columnEntry : tableEntry.getValue().entrySet()) {
+                if (columnEntry.getValue().get("indexName").equals(strIndexName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static void addIndex(String strTableName, String strColName, String strIndexName) {
+        readMetadata();
+        ht.get(strTableName).get(strColName).put("indexName", strIndexName);
+        ht.get(strTableName).get(strColName).put("indexType", "B+tree");
+        saveMetadata();
+    }
+
+    public static void main(String[] args) throws DBAppException {
+
+        // // System.out.println(tableHasColumn("Student", "name"));
+        // // System.out.println(tableHasColumn("Student", "moski"));
+
+        // System.out.println(tableHasIndexOnColumn("Student", "id"));
+        // System.out.println(tableHasIndexOnColumn("Student", "age"));
+
+        long startTime = System.nanoTime();
+
+        // Call the method you want to time
+
+        for (int i = 0; i < 10000; i++) {
+            // readMetadata();
+            saveMetadata();
+        }
+
+        long endTime = System.nanoTime();
+
+        // Calculate the elapsed time in milliseconds
+        long elapsedTimeInMillis = (endTime - startTime) / 1_000_000;
+
+        System.out.println("Elapsed time: " + elapsedTimeInMillis + " milliseconds");
     }
 }

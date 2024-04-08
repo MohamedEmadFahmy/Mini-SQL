@@ -3,23 +3,16 @@ package engine;
 /** * @author Wael Abouelsaadat */
 
 import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
+import model.Metadata;
 import model.Table;
 import exceptions.DBAppException;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.util.HashSet;
 import java.util.Hashtable;
 
 public class DBApp {
-	static Set<String> tableNames;
 
 	public DBApp() {
-		tableNames = new HashSet<String>();
 		init();
 	}
 
@@ -27,37 +20,6 @@ public class DBApp {
 	// or leave it empty if there is no code you want to
 	// execute at application startup
 	public void init() {
-
-		updateMetaDataFile();
-
-		// deleteMetaDataFile();
-		// System.out.println(tableNames);
-	}
-
-	public static void updateMetaDataFile() {
-		tableNames = new HashSet<String>();
-		String filePath = "metadata.csv";
-		File file = new File(filePath);
-
-		if (file.exists()) {
-			// Read all table names in metadata file
-			try {
-				// Read all lines from the file
-				List<String> lines = Files.readAllLines(file.toPath());
-
-				// Process each line
-				for (String line : lines) {
-					// Do something with each line
-					String[] splittedLine = line.split(",");
-					// System.out.println(splittedLine[0]);
-					tableNames.add(splittedLine[0]);
-				}
-			} catch (IOException e) {
-				System.err.println("Error reading file: " + e.getMessage());
-			}
-		} else {
-			System.out.println("File does not exist.");
-		}
 	}
 
 	// following method creates one table only
@@ -68,15 +30,10 @@ public class DBApp {
 	// type as value
 	public void createTable(String strTableName, String strClusteringKeyColumn,
 			Hashtable<String, String> htblColNameType) throws DBAppException {
-		if (tableNames.contains(strTableName)) {
-			throw new DBAppException("Table " + strTableName + " already exists!");
-		} else {
-			@SuppressWarnings("unused")
-			Table myTable = new Table(strTableName, strClusteringKeyColumn, htblColNameType);
-			Table.addTable(strTableName, strClusteringKeyColumn, htblColNameType);
-		}
 
-		// throw new DBAppException("not implemented yet");
+		Table myTable = new Table(strTableName, strClusteringKeyColumn, htblColNameType);
+		myTable.saveTable();
+		Metadata.addTable(strTableName, strClusteringKeyColumn, htblColNameType);
 	}
 
 	// following method creates a B+tree index
@@ -84,38 +41,22 @@ public class DBApp {
 			String strColName,
 			String strIndexName) throws DBAppException {
 
-		// Update metadata file
-		String filePath = "metadata.csv";
-		File file = new File(filePath);
+		if (!Metadata.tableExists(strTableName)) {
+			throw new DBAppException("Table " + strTableName + " does not exist!");
 
-		// Read all lines in the file and modify them
-		try {
-			// Read all lines from the file
-			List<String> lines = Files.readAllLines(file.toPath());
-
-			// Process each line
-			for (int i = 0; i < lines.size(); i++) {
-				String line = lines.get(i);
-				String[] splittedLine = line.split(",");
-
-				// Check if the line corresponds to the given table and column
-				if (splittedLine[0].equals(strTableName) && splittedLine[1].equals(strColName)) {
-					String columnDataType = splittedLine[2];
-					String isPrimaryKey = splittedLine[3];
-
-					// Modify the line with the new index information
-					lines.set(i, strTableName + "," + strColName + "," + columnDataType + "," + isPrimaryKey
-							+ strIndexName + ",B+tree");
-					break; // No need to continue looping
-				}
-			}
-
-			// Write the modified lines back to the file
-			Files.write(file.toPath(), lines);
-		} catch (IOException e) {
-			// System.err.println("Error reading/writing file: " + e.getMessage());
-			throw new DBAppException("Error reading/writing file: " + e.getMessage());
 		}
+		if (!Metadata.tableHasColumn(strTableName, strColName)) {
+			throw new DBAppException("Column " + strColName + " does not exist in table " + strTableName);
+		}
+		if (!Metadata.tableHasIndexOnColumn(strTableName, strColName)) {
+			throw new DBAppException("Column " + strColName + " is already indexed in table " + strTableName);
+
+		}
+		if (!Metadata.indexExists(strIndexName)) {
+			throw new DBAppException("Index " + strIndexName + " already exists in Database ");
+		}
+
+		Metadata.addIndex(strTableName, strColName, strIndexName);
 
 		Table table = Table.loadTable(strTableName);
 
@@ -124,37 +65,113 @@ public class DBApp {
 
 	// following method inserts one row only.
 	// htblColNameValue must include a value for the primary key
+	// DONE
 	public void insertIntoTable(String strTableName,
 			Hashtable<String, Object> htblColNameValue) throws DBAppException {
 
-		throw new DBAppException("not implemented yet");
+		if (!Metadata.tableExists(strTableName)) {
+			throw new DBAppException("Table " + strTableName + " does not exist!");
+		}
+		if (!Metadata.validInsert(strTableName, htblColNameValue)) {
+			throw new DBAppException("Incompatible data types for values");
+		}
+
+		Table table = Table.loadTable(strTableName);
+		table.insert(htblColNameValue);
 	}
 
 	// following method updates one row only
 	// htblColNameValue holds the key and new value
 	// htblColNameValue will not include clustering key as column name
 	// strClusteringKeyValue is the value to look for to find the row to update.
+	// DONE
 	public void updateTable(String strTableName,
 			String strClusteringKeyValue,
 			Hashtable<String, Object> htblColNameValue) throws DBAppException {
 
-		throw new DBAppException("not implemented yet");
+		if (!Metadata.tableExists(strTableName)) {
+			throw new DBAppException("Table " + strTableName + " does not exist!");
+		}
+
+		// Check if primary key value violates metadata
+		String primaryKeyName = Metadata.getPrimaryKeyName(strTableName);
+		String primaryKeyType = Metadata.getColumnType(strTableName, primaryKeyName);
+
+		switch (primaryKeyType) {
+			case "java.lang.Integer":
+				try {
+					Integer.parseInt(strClusteringKeyValue);
+				} catch (NumberFormatException e) {
+					throw new DBAppException("Primary key value must be an integer");
+				}
+				break;
+			case "java.lang.Double":
+				try {
+					Double.parseDouble(strClusteringKeyValue);
+				} catch (NumberFormatException e) {
+					throw new DBAppException("Primary key value must be a double");
+				}
+				break;
+			case "java.lang.String":
+				if (strClusteringKeyValue.trim().length() == 0) {
+					throw new DBAppException("Primary key value must be a non-empty string");
+				}
+				break;
+
+			default:
+				throw new DBAppException("Primary key value must be an integer, double, or string");
+		}
+
+		if (!Metadata.compatibleTypes(strTableName, htblColNameValue)) {
+			throw new DBAppException("Incompatible data types for values");
+		}
+
+		Table table = Table.loadTable(strTableName);
+
+		table.updateTuple(strClusteringKeyValue, htblColNameValue);
 	}
 
 	// following method could be used to delete one or more rows.
 	// htblColNameValue holds the key and value. This will be used in search
 	// to identify which rows/tuples to delete.
 	// htblColNameValue enteries are ANDED together
+	// DONE
 	public void deleteFromTable(String strTableName,
 			Hashtable<String, Object> htblColNameValue) throws DBAppException {
+		if (!Metadata.tableExists(strTableName)) {
+			throw new DBAppException("Table " + strTableName + " does not exist!");
+		}
 
-		throw new DBAppException("not implemented yet");
+		if (!Metadata.compatibleTypes(strTableName, htblColNameValue)) {
+			throw new DBAppException("Incompatible data types for values");
+		}
+
+		Table table = Table.loadTable(strTableName);
+		table.delete(strTableName, htblColNameValue);
 	}
 
+	// DONE
 	@SuppressWarnings("rawtypes")
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms,
 			String[] strarrOperators) throws DBAppException, ClassNotFoundException, IOException {
-		String tableName = arrSQLTerms[0]._strTableName;// can only select from one table at a time
+		// can only select from one table at a time
+		String tableName = arrSQLTerms[0]._strTableName;
+
+		if (!Metadata.tableExists(tableName)) {
+			throw new DBAppException("Table " + tableName + " does not exist!");
+
+		}
+
+		Hashtable<String, Object> htblColNameValue = new Hashtable<String, Object>();
+
+		for (SQLTerm sqlTerm : arrSQLTerms) {
+			htblColNameValue.put(sqlTerm._strColumnName, sqlTerm._objValue);
+		}
+
+		if (!Metadata.compatibleTypes(tableName, htblColNameValue)) {
+			throw new DBAppException("Incompatible data types for values");
+		}
+
 		Table table = Table.loadTable(tableName);
 		Iterator iterator = table.selectTuple(arrSQLTerms, strarrOperators);
 		return iterator;
