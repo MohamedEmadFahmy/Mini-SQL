@@ -4,6 +4,7 @@ Table Class:
     DONE    Check implementation of locating page for insert (whether or not to do it linearly or using binary 
             search and min max values)
     DONE    Fix updateTuple it takes string value not object and we dont handle that
+    DONE    binary search for updateTuple method in Page
 
 
 Page Class: 
@@ -32,7 +33,6 @@ Metadata:
 
 
 
-binary search for updateTuple method in Page
 handle index changes in update, delete, overflow, insert by creating 2 methods in tupleclass
 addDataToAvailableIndices(String tableName, String pageName)
 deleteDataFromAvailableIndices(String tableName, String pageName)
