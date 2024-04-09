@@ -7,10 +7,12 @@ import java.util.Vector;
 
 import model.Metadata;
 import model.Table;
+import resources.utility;
 import exceptions.DBAppException;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Hashtable;
 
 public class DBApp {
@@ -33,10 +35,14 @@ public class DBApp {
 	// type as value
 	public void createTable(String strTableName, String strClusteringKeyColumn,
 			Hashtable<String, String> htblColNameType) throws DBAppException {
+		if (Metadata.tableExists(strTableName)) {
+			throw new DBAppException("Table " + strTableName + " already exists!");
+		}
 
 		Table myTable = new Table(strTableName, strClusteringKeyColumn, htblColNameType);
 		myTable.saveTable();
 		Metadata.addTable(strTableName, strClusteringKeyColumn, htblColNameType);
+		System.out.println("Created Table: " + strTableName);
 	}
 
 	// following method creates a B+tree index
@@ -193,10 +199,16 @@ public class DBApp {
 		return iterator;
 	}
 
+	public static void printTable(String strTableName) {
+		Table myTable = Table.loadTable(strTableName);
+		System.out.println(myTable);
+	}
+
 	public static void main(String[] args) {
 
 		try {
 			DBApp dbApp = new DBApp();
+			utility.clearDatabaseSystem();
 
 			// ---------------------Employee Table--------------------------
 			// String strTableName = "Employee";
@@ -207,98 +219,42 @@ public class DBApp {
 			// dbApp.createTable(strTableName, "id", htblColNameType);
 			// -------------------------------------------------------------
 
-			// ---------------------Student Table--------------------------
-			// String strTableName = "Student";
-			// Hashtable htblColNameType = new Hashtable();
-			// htblColNameType.put("id", "java.lang.Integer");
-			// htblColNameType.put("name", "java.lang.String");
-			// htblColNameType.put("gpa", "java.lang.double");
-			// dbApp.createTable(strTableName, "id", htblColNameType);
-			// ------------------------------------------------------------
-
-			// dbApp.createIndex(strTableName, "gpa", "gpaIndex");
-
-			// Hashtable htblColNameValue = new Hashtable();
-			// htblColNameValue.put("id", new Integer(2343432));
-			// htblColNameValue.put("name", new String("Ahmed Noor"));
-			// htblColNameValue.put("gpa", new Double(0.95));
-			// dbApp.insertIntoTable(strTableName, htblColNameValue);
-
-			// htblColNameValue.clear();
-			// htblColNameValue.put("id", new Integer(453455));
-			// htblColNameValue.put("name", new String("Ahmed Noor"));
-			// htblColNameValue.put("gpa", new Double(0.95));
-			// dbApp.insertIntoTable(strTableName, htblColNameValue);
-
-			// htblColNameValue.clear();
-			// htblColNameValue.put("id", new Integer(5674567));
-			// htblColNameValue.put("name", new String("Dalia Noor"));
-			// htblColNameValue.put("gpa", new Double(1.25));
-			// dbApp.insertIntoTable(strTableName, htblColNameValue);
-
-			// htblColNameValue.clear();
-			// htblColNameValue.put("id", new Integer(23498));
-			// htblColNameValue.put("name", new String("John Noor"));
-			// htblColNameValue.put("gpa", new Double(1.5));
-			// dbApp.insertIntoTable(strTableName, htblColNameValue);
-
-			// htblColNameValue.clear();
-			// htblColNameValue.put("id", new Integer(78452));
-			// htblColNameValue.put("name", new String("Zaky Noor"));
-			// htblColNameValue.put("gpa", new Double(0.88));
-			// dbApp.insertIntoTable(strTableName, htblColNameValue);
-
-			// SQLTerm[] arrSQLTerms;
-			// arrSQLTerms = new SQLTerm[2];
-			// arrSQLTerms[0]._strTableName = "Student";
-			// arrSQLTerms[0]._strColumnName = "name";
-			// arrSQLTerms[0]._strOperator = "=";
-			// arrSQLTerms[0]._objValue = "John Noor";
-
-			// arrSQLTerms[1]._strTableName = "Student";
-			// arrSQLTerms[1]._strColumnName = "gpa";
-			// arrSQLTerms[1]._strOperator = "=";
-			// arrSQLTerms[1]._objValue = new Double(1.5);
-
-			// String[] strarrOperators = new String[1];
-			// strarrOperators[0] = "OR";
-			// // select * from Student where name = "John Noor" or gpa = 1.5;
-			// Iterator resultSet = dbApp.selectFromTable(arrSQLTerms, strarrOperators);
-
-			// MOSKI SHIT
-			// String strTableName = "Employee";
-			// Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
-			// htblColNameType.put("id", "java.lang.Integer");
-			// htblColNameType.put("name", "java.lang.String");
-			// htblColNameType.put("gpa", "java.lang.double");
-
-			// Table table = new Table(strTableName, "id", htblColNameType);
-
-			// System.out.println(table);
-			// System.out.println(table.getStrTableName());
-
-			// table.serializeTable();
-
-			// System.out.println("---------------");
-
-			// Table deserialized = Table.loadTable("Employee");
-			// System.out.println(deserialized);
-			// System.out.println(deserialized.getStrTableName());
-
 			String strTableName = "Student";
+
 			Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
 			htblColNameType.put("id", "java.lang.Integer");
 			htblColNameType.put("name", "java.lang.String");
 			htblColNameType.put("gpa", "java.lang.double");
 			dbApp.createTable(strTableName, "id", htblColNameType);
 
-			// for (int i = 1; i <= 10; i++) {
+			// for (int i = 2; i <= 11; i++) {
 			// Hashtable<String, Object> htblColNameValue = new Hashtable<>();
 			// htblColNameValue.put("id", i);
 			// htblColNameValue.put("name", "Moski no " + i);
 			// htblColNameValue.put("gpa", 3.5);
 			// dbApp.insertIntoTable(strTableName, htblColNameValue);
+			// System.out.println("Inserted id " + i);
+			// break;
 			// }
+			int n = 50;
+			Vector<Integer> nums = new Vector<>();
+			for (int i = 1; i <= n; i++) {
+				nums.add(i);
+
+			}
+			Collections.shuffle(nums);
+
+			printTable("Student");
+			for (int i : nums) {
+				Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+				htblColNameValue.put("id", i);
+				htblColNameValue.put("name", "Moski no " + i);
+				htblColNameValue.put("gpa", 3.5);
+				dbApp.insertIntoTable(strTableName, htblColNameValue);
+				// System.out.println("Inserted id " + i);
+			}
+			printTable("Student");
+
 			// System.out.println(myTable);
 
 		} catch (Exception exp) {

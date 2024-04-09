@@ -67,15 +67,15 @@ public class Page implements Serializable {
     public Tuple addTuple(Tuple tuple) throws DBAppException {
         // returns overflow tuple, null if no overflow
 
-        Object primaryKey = null;
+        Object primaryKeyValue = null;
 
         // To be moved to DBApp using metadata or table class
         if (tuple.getColNameVal().containsKey(this.primaryKeyName)) {
-            primaryKey = tuple.getColNameVal().get(this.primaryKeyName);
+            primaryKeyValue = tuple.getColNameVal().get(this.primaryKeyName);
         }
 
         for (Tuple currentTuple : this.tuples) {
-            if (currentTuple.getColNameVal().get(primaryKeyName).equals(primaryKey)) {
+            if (currentTuple.getColNameVal().get(primaryKeyName).equals(primaryKeyValue)) {
                 throw new DBAppException("Primary Key already in use");
             }
         }
@@ -98,6 +98,8 @@ public class Page implements Serializable {
             // returns the last tuple
             // (not intended behavior, but it's the closest thing to an overflow tuple)
         }
+
+        // System.out.println(this.tuples);
 
         min = this.tuples.firstElement();
         max = this.tuples.lastElement();

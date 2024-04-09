@@ -213,13 +213,20 @@ public class Metadata {
                 return false;
             }
 
-            String columnType = ht.get(strTableName).get(columnName).get("columnType");
+            String columnType = getColumnType(strTableName, columnName);
+            // System.out.println(columnType + " " + columnValue.getClass().getName());
             if (columnType.equals("java.lang.Integer")) {
-                return columnValue instanceof Integer;
-            } else if (columnType.equals("java.lang.Double")) {
-                return columnValue instanceof Double;
+                if (!(columnValue instanceof Integer)) {
+                    return false;
+                }
+            } else if (columnType.equals("java.lang.double")) {
+                if (!(columnValue instanceof Double)) {
+                    return false;
+                }
             } else if (columnType.equals("java.util.String")) {
-                return columnValue instanceof String && ((String) columnValue).trim().length() > 0;
+                if (!(columnValue instanceof String && ((String) columnValue).trim().length() > 0)) {
+                    return false;
+                }
             }
         }
         return true;

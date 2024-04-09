@@ -15,6 +15,7 @@ public class utility {
         Path indicesFolder = Paths.get("./src/resources/Serialized_Indices");
         deleteAndRecreateFolder(indicesFolder);
         recreateMetaDataFile();
+        System.out.println("Database Cleared");
     }
 
     public static void deleteAndRecreateFolder(Path folderPath) {
