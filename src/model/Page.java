@@ -63,7 +63,7 @@ public class Page implements Serializable {
         }
     }
 
-    @SuppressWarnings("rawtypes")
+    // @SuppressWarnings("rawtypes")
     public Tuple addTuple(Tuple tuple) throws DBAppException {
         // returns overflow tuple, null if no overflow
 
@@ -190,10 +190,13 @@ public class Page implements Serializable {
             Hashtable<String, Object> ht = this.tuples.get(i).getColNameVal();
             System.out.println("Current Primary Key: " + ht.get(this.primaryKeyName) + ", ");
             if (ht.get(this.primaryKeyName).equals(oldPrimaryKeyValue)) {
+                this.tuples.get(i).deleteDataFromAvailableIndices(this.strTableName, this.pageName);
                 for (String colName : newValues.keySet()) {
+                    System.out.println(
+                            "changed value from " + ht.get(colName) + "to " + newValues.get(colName));
                     ht.put(colName, newValues.get(colName));
-                    System.out.println("changed value");
                 }
+                this.tuples.get(i).addDataToAvailableIndices(this.strTableName, this.pageName);
                 return;
             }
         }
