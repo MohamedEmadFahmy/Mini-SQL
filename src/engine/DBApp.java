@@ -86,7 +86,8 @@ public class DBApp {
 		}
 
 		Table table = Table.loadTable(strTableName);
-		table.insert(htblColNameValue);
+		// table.insert(htblColNameValue);
+		table.insertTuple(htblColNameValue);
 	}
 
 	// following method updates one row only

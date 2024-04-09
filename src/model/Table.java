@@ -45,6 +45,102 @@ public class Table implements Serializable {
         return strTableName;
     }
 
+    // plan is on figma
+    public void insertTuple(Hashtable<String, Object> htblColNameValue)
+            throws DBAppException {
+        Tuple tuple = new Tuple(htblColNameValue, this.primaryKeyName);
+
+        if (pagesList.isEmpty()) {
+            String pageName = this.strTableName + "" + this.currentPageID;
+            this.currentPageID++;
+
+            Page page = new Page(this.strTableName, pageName, this.htblColNameType, this.primaryKeyName);
+            page.addTuple(tuple);
+            page.savePage();
+
+            pagesList.add(pageName);
+            this.saveTable();
+            return;
+        }
+
+        int insertedpage = 0;
+        Tuple OverflowTuple = null;
+        for (int i = 0; i < pagesList.size(); i++) {
+            // System.out.println("insert loop: " + i);
+            String currentPageName = pagesList.elementAt(i);
+            Page currentPage = Page.loadPage(currentPageName);
+
+            if (currentPage.isEmpty()) {
+                currentPage.addTuple(tuple);
+                currentPage.savePage();
+                break;
+            }
+
+            if (tuple.compareTo(currentPage.getMin(), primaryKeyName) == -1) {
+                OverflowTuple = currentPage.addTuple(tuple);
+                currentPage.savePage();
+                insertedpage = i;
+                // System.out.println("loop:" + i + ", inserted, 1");
+                break;
+            }
+
+            if ((tuple.compareTo(currentPage.getMin(), primaryKeyName) == 1)
+                    && (tuple.compareTo(currentPage.getMax(), primaryKeyName) == -1)) {
+                OverflowTuple = currentPage.addTuple(tuple);
+                currentPage.savePage();
+                insertedpage = i;
+                // System.out.println("loop:" + i + ", inserted, 2");
+                break;
+            }
+
+            if (i == pagesList.size() - 1) { // @final page
+                // System.out.println("entered third insert");
+                OverflowTuple = currentPage.addTuple(tuple);
+                currentPage.savePage();
+                insertedpage = i;
+                // System.out.println("loop:" + i + ", inserted, 3");
+                break;
+            }
+            // System.out.println("loop:" + i + ",No insert, next page");
+        }
+
+        this.saveTable();
+
+        // System.out.println("page size: " + pagesList.size());
+        // System.out.println("reached Overflow loop, i= " + insertedpage);
+        for (int i = insertedpage; i < pagesList.size(); i++) {
+            // System.out.println("Overflow loop: " + i);
+
+            if (OverflowTuple == null) {
+                // System.out.println("No overflow");
+                break;
+            }
+
+            String currentPageName = pagesList.elementAt(i);
+            Page currentPage = Page.loadPage(currentPageName);
+
+            OverflowTuple = currentPage.addTuple(OverflowTuple);
+            // System.out.println("inserted overflow, 0");
+            currentPage.savePage();
+
+            if ((OverflowTuple != null) && (i == pagesList.size() - 1)) {
+                String pageName = this.strTableName + "" + this.currentPageID;
+                this.currentPageID++;
+
+                Page page = new Page(this.strTableName, pageName, this.htblColNameType, this.primaryKeyName);
+                page.addTuple(OverflowTuple);
+                page.savePage();
+
+                pagesList.add(pageName);
+
+                // System.out.println("inserted overflow, 1");
+                break;
+            }
+        }
+        this.saveTable();
+
+    }
+
     public void insert(Hashtable<String, Object> htblColNameValue)
             throws DBAppException {
 
