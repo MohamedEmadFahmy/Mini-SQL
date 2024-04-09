@@ -244,7 +244,8 @@ public class DBApp {
 			}
 			Collections.shuffle(nums);
 
-			printTable("Student");
+			System.out.println(nums);
+
 			for (int i : nums) {
 				Hashtable<String, Object> htblColNameValue = new Hashtable<>();
 				htblColNameValue.put("id", i);
