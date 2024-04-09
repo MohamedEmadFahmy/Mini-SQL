@@ -167,16 +167,26 @@ public class Table implements Serializable {
         Tuple overflowTuple = null;
 
         while (low <= high) {
-            // int mid = (low + high) / 2;
-            int mid = low + (high - low) / 2;
+            int mid = (low + high) / 2;
+            // int mid = low + (high - low) / 2;
             String currentPageName = pagesList.elementAt(mid);
             Page currentPage = Page.loadPage(currentPageName);
+            Page nextPage = null;
+            Page prevPage = null;
+            if (mid > 0) {
+                String prevPageName = pagesList.elementAt(mid - 1);
+                prevPage = Page.loadPage(prevPageName);
+            }
+            if (mid < pagesList.size() - 1) {
+                String nextPageName = pagesList.elementAt(mid + 1);
+                nextPage = Page.loadPage(nextPageName);
+            }
             // System.out.println("mid is :" + mid);
             // System.out.println("low is :" + low);
             // System.out.println("high is :" + high);
             // System.out.println("min is :" + currentPage.getMin());
             // System.out.println("max is :" + currentPage.getMax());
-
+            // System.out.println("Looping");
             if ((tuple.compareTo(currentPage.getMin(), primaryKeyName) == 1)
                     && (tuple.compareTo(currentPage.getMax(), primaryKeyName) == -1)) {
                 overflowTuple = currentPage.addTuple(tuple);
@@ -186,34 +196,54 @@ public class Table implements Serializable {
                 insertedPage = mid;
                 // System.out.println("1, inserted @ " + mid);
                 break;
-            } else if (mid == pagesList.size() - 1 && tuple.compareTo(currentPage.getMax(), primaryKeyName) == 1) {
-                overflowTuple = currentPage.addTuple(tuple);
-                System.out.println("Succesfully inserted " + tuple.getPrimaryKey() + " into " + this.strTableName
-                        + " Page: " + currentPageName);
-                currentPage.savePage();
-                insertedPage = mid;
-                // System.out.println("2, inserted @ " + mid);
-                break;
-            } else if (mid == 0 && tuple.compareTo(currentPage.getMin(), primaryKeyName) == -1) {
-                overflowTuple = currentPage.addTuple(tuple);
-                System.out.println("Succesfully inserted " + tuple.getPrimaryKey() + " into " + this.strTableName
-                        + " Page: " + currentPageName);
-                currentPage.savePage();
-                insertedPage = mid;
-                // System.out.println("3, inserted @ " + mid);
-                break;
             } else if (tuple.compareTo(currentPage.getMax(), primaryKeyName) == 1) {
+
+                if (mid == pagesList.size() - 1) {
+                    overflowTuple = currentPage.addTuple(tuple);
+                    System.out.println("Succesfully inserted " + tuple.getPrimaryKey() + " into " + this.strTableName
+                            + " Page: " + currentPageName);
+                    currentPage.savePage();
+                    insertedPage = mid;
+                    // System.out.println("2, inserted @ " + mid);
+                    break;
+                }
+
+                if (tuple.compareTo(nextPage.getMin(), primaryKeyName) == -1) {
+                    overflowTuple = currentPage.addTuple(tuple);
+                    currentPage.savePage();
+                    insertedPage = mid;
+                    break;
+                }
                 low = mid + 1;
                 System.out.println("3rd");
             } else if (tuple.compareTo(currentPage.getMin(), primaryKeyName) == -1) {
+
+                if (mid == 0) {
+                    overflowTuple = currentPage.addTuple(tuple);
+                    System.out.println("Succesfully inserted " + tuple.getPrimaryKey() + " into " + this.strTableName
+                            + " Page: " + currentPageName);
+                    currentPage.savePage();
+                    insertedPage = mid;
+                    // System.out.println("3, inserted @ " + mid);
+                    break;
+                }
+
+                if (tuple.compareTo(prevPage.getMax(), primaryKeyName) == 1) {
+                    overflowTuple = currentPage.addTuple(tuple);
+                    currentPage.savePage();
+                    insertedPage = mid;
+                    break;
+                }
                 high = mid - 1;
                 System.out.println("4th");
             } else {
                 throw new DBAppException("Primary key already exists");
             }
         }
+        System.out.println("exited loop");
 
         for (int i = insertedPage; i < pagesList.size(); i++) {
+            System.out.println("entred Overflow");
             if (overflowTuple == null) {
                 break;
             }
