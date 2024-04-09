@@ -71,6 +71,7 @@ public class Table implements Serializable {
         Tuple overflowTuple = null;
 
         while (low <= high) {
+            // int mid = (low + high) / 2;
             int mid = low + (high - low) / 2;
             String currentPageName = pagesList.elementAt(mid);
             Page currentPage = Page.loadPage(currentPageName);
