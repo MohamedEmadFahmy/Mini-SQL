@@ -368,8 +368,10 @@ public class Table implements Serializable {
         for (int i = 0; i < pagesList.size(); i++) {
             String currentPageName = pagesList.get(i);
             Page currentPage = Page.loadPage(currentPageName);
-            if (tuple.compareTo(currentPage.getMin(), tuple.getPrimaryKeyName()) >= -1
-                    && tuple.compareTo(currentPage.getMax(), tuple.getPrimaryKeyName()) <= 1) {
+            System.out.println("current page Min: " + currentPage.getMin() + "   ");
+            System.out.println("current page Max: " + currentPage.getMax() + "   ");
+            if (tuple.compareTo(currentPage.getMin(), tuple.getPrimaryKeyName()) > -1
+                    && tuple.compareTo(currentPage.getMax(), tuple.getPrimaryKeyName()) < 1) {
                 System.out.println("entered range, update running on Page: " + currentPageName);
                 currentPage.updateTuple(strClusteringKeyValue, htblColNameValue);
                 currentPage.savePage();
