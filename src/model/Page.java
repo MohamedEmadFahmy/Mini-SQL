@@ -87,21 +87,12 @@ public class Page implements Serializable {
 
         Tuple overflow = null;
 
-        Vector<BTree> indices = Metadata.getIndicesOnTable(this.strTableName);
-        for (String colName : tuple.getColNameVal().keySet()) {
-            Comparable value = (Comparable) tuple.getColNameVal().get(colName);
-            if (Metadata.tableHasIndexOnColumn(this.strTableName, colName)) {
-                String indexName = Metadata.getIndexName(this.strTableName, colName);
-                BTree BTreeIndex = BTree.loadIndex(indexName);
-                BTreeIndex.insert(value, this.pageName);
-                BTreeIndex.saveIndex();
-            }
-
-        }
+        tuple.addDataToAvailableIndices(this.strTableName, this.pageName);
 
         if (this.tupleCount > this.maxTupleCount) {
             this.tupleCount -= 1;
             overflow = tuples.remove(this.maxTupleCount);
+            tuple.deleteDataFromAvailableIndices(this.strTableName, this.pageName);
 
             // System.out.println("Overflow: " + overflow.toString());
             // returns the last tuple
@@ -145,6 +136,7 @@ public class Page implements Serializable {
         for (Tuple currentTuple : this.tuples) {
             if (currentTuple.matchesCriteria(x)) {
                 this.tuples.remove(currentTuple);
+                currentTuple.deleteDataFromAvailableIndices(this.strTableName, this.pageName);
                 this.tupleCount -= 1;
             }
         }
