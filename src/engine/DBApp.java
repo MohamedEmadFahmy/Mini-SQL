@@ -3,11 +3,14 @@ package engine;
 /** * @author Wael Abouelsaadat */
 
 import java.util.Iterator;
+import java.util.Vector;
+
 import model.Metadata;
 import model.Table;
 import exceptions.DBAppException;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Hashtable;
 
 public class DBApp {
@@ -92,22 +95,27 @@ public class DBApp {
 		if (!Metadata.tableExists(strTableName)) {
 			throw new DBAppException("Table " + strTableName + " does not exist!");
 		}
+		if (htblColNameValue.contains(Metadata.getPrimaryKeyName(strTableName))) {
+			throw new DBAppException("Primary key cannot be updated");
+		}
 
 		// Check if primary key value violates metadata
 		String primaryKeyName = Metadata.getPrimaryKeyName(strTableName);
 		String primaryKeyType = Metadata.getColumnType(strTableName, primaryKeyName);
 
+		Object primaryKeyValue = null;
+
 		switch (primaryKeyType) {
 			case "java.lang.Integer":
 				try {
-					Integer.parseInt(strClusteringKeyValue);
+					primaryKeyValue = Integer.parseInt(strClusteringKeyValue);
 				} catch (NumberFormatException e) {
 					throw new DBAppException("Primary key value must be an integer");
 				}
 				break;
 			case "java.lang.Double":
 				try {
-					Double.parseDouble(strClusteringKeyValue);
+					primaryKeyValue = Double.parseDouble(strClusteringKeyValue);
 				} catch (NumberFormatException e) {
 					throw new DBAppException("Primary key value must be a double");
 				}
@@ -116,6 +124,7 @@ public class DBApp {
 				if (strClusteringKeyValue.trim().length() == 0) {
 					throw new DBAppException("Primary key value must be a non-empty string");
 				}
+				primaryKeyValue = strClusteringKeyValue;
 				break;
 
 			default:
@@ -128,7 +137,7 @@ public class DBApp {
 
 		Table table = Table.loadTable(strTableName);
 
-		table.updateTuple(strClusteringKeyValue, htblColNameValue);
+		table.updateTuple(primaryKeyValue, htblColNameValue);
 	}
 
 	// following method could be used to delete one or more rows.
@@ -163,9 +172,16 @@ public class DBApp {
 		}
 
 		Hashtable<String, Object> htblColNameValue = new Hashtable<String, Object>();
+		String[] operators = { "=", "!=", "<", "<=", ">", ">=" };
+
+		// Convert the array to a Vector
+		Vector<String> validOperators = new Vector<>(Arrays.asList(operators));
 
 		for (SQLTerm sqlTerm : arrSQLTerms) {
 			htblColNameValue.put(sqlTerm._strColumnName, sqlTerm._objValue);
+			if (!validOperators.contains(sqlTerm._strOperator)) {
+				throw new DBAppException("Invalid operator: " + sqlTerm._strOperator);
+			}
 		}
 
 		if (!Metadata.compatibleTypes(tableName, htblColNameValue)) {

@@ -49,8 +49,8 @@ public class BTree implements Serializable {
         // return o1.key.compareTo(o2.key);
         // }
         // };
-        Vector<Comparable> v = new Vector<Comparable>();
-        v.add(0);
+        Vector<String> v = new Vector<String>();
+        v.add("");
         // return Arrays.binarySearch(dps, 0, numPairs, new DictionaryPair(t, v),c);
         return Arrays.binarySearch(dps, 0, numPairs, new DictionaryPair(t, v));
     }
@@ -613,7 +613,7 @@ public class BTree implements Serializable {
         }
     }
 
-    public void delete(Comparable key, Comparable value) {
+    public void delete(Comparable key, String value) {
         LeafNode ln = (this.root == null) ? this.firstLeaf : findLeafNode(key);
 
         // Perform binary search to find index of key within dictionary
@@ -644,7 +644,7 @@ public class BTree implements Serializable {
      * @param key:   an integer key to be used in the dictionary pair
      * @param value: a floating point number to be used in the dictionary pair
      */
-    public void insert(Comparable key, Comparable value) {
+    public void insert(Comparable key, String value) {
         minHeap.add(key);
         maxHeap.add(key);
 
@@ -653,7 +653,7 @@ public class BTree implements Serializable {
             /* Flow of execution goes here only when first insert takes place */
 
             // Create leaf node as first node in B plus tree (root is null)
-            Vector<Comparable> valuesList = new Vector<Comparable>();
+            Vector<String> valuesList = new Vector<String>();
             valuesList.add(value);
             LeafNode ln = new LeafNode(this.m, new DictionaryPair(key, valuesList));
 
@@ -664,7 +664,7 @@ public class BTree implements Serializable {
 
             // Find leaf node to insert into
             LeafNode ln = (this.root == null) ? this.firstLeaf : findLeafNode(key);
-            Vector<Comparable> valuesList = new Vector<Comparable>();
+            Vector<String> valuesList = new Vector<String>();
 
             valuesList.add(value);
 
@@ -748,11 +748,11 @@ public class BTree implements Serializable {
      * @param key: the key to be searched within the B+ tree
      * @return the floating point value associated with the key within the B+ tree
      */
-    public Vector<Comparable> search(Comparable key) {
+    public Vector<String> search(Comparable key) {
 
         // If B+ tree is completely empty, simply return null
         if (isEmpty()) {
-            return new Vector<Comparable>();
+            return new Vector<String>();
         }
 
         // Find leaf node that holds the dictionary key
@@ -764,7 +764,7 @@ public class BTree implements Serializable {
 
         // If index negative, the key doesn't exist in B+ tree
         if (index < 0) {
-            return new Vector<Comparable>();
+            return new Vector<String>();
         } else {
             return dps[index].value;
         }
@@ -777,14 +777,14 @@ public class BTree implements Serializable {
      * 
      * @param lowerBound: (int) the lower bound of the range
      * @param upperBound: (int) the upper bound of the range
-     * @return an ArrayList<Double> that holds all values of dictionary pairs
+     * @return an Vector<Double> that holds all values of dictionary pairs
      *         whose keys are within the specified range
      */
-    public ArrayList<Comparable> search(Comparable lowerBound, Comparable upperBound, boolean lowerInclusive,
+    public Vector<String> search(Comparable lowerBound, Comparable upperBound, boolean lowerInclusive,
             boolean upperInclusive) {
 
         // Instantiate Double array to hold values
-        ArrayList<Comparable> values = new ArrayList<Comparable>();
+        Vector<String> values = new Vector<String>();
 
         if (this.isEmpty()) {
             return values;
@@ -814,17 +814,33 @@ public class BTree implements Serializable {
                 // Include value if its key fits within the provided range
                 if (lowerBound.compareTo(upperBound) == 0) {
                     if ((lowerInclusive || upperInclusive) && dp.key.compareTo(lowerBound) == 0) {
-                        values.addAll(dp.value);
+                        for (String value : dp.value) {
+                            if (!values.contains(value)) {
+                                values.add(value);
+                            }
+                        }
                     }
                 } else {
                     if (lowerBound.compareTo(dp.key) < 0 && dp.key.compareTo(upperBound) < 0) {
-                        values.addAll(dp.value);
+                        for (String value : dp.value) {
+                            if (!values.contains(value)) {
+                                values.add(value);
+                            }
+                        }
                     }
                     if (lowerInclusive && dp.key.compareTo(lowerBound) == 0) {
-                        values.addAll(dp.value);
+                        for (String value : dp.value) {
+                            if (!values.contains(value)) {
+                                values.add(value);
+                            }
+                        }
                     }
                     if (upperInclusive && dp.key.compareTo(upperBound) == 0) {
-                        values.addAll(dp.value);
+                        for (String value : dp.value) {
+                            if (!values.contains(value)) {
+                                values.add(value);
+                            }
+                        }
                     }
                 }
 
@@ -1210,7 +1226,7 @@ public class BTree implements Serializable {
      */
     public class DictionaryPair implements Comparable<DictionaryPair>, Serializable {
         Comparable key;
-        Vector<Comparable> value;
+        Vector<String> value;
 
         /**
          * Constructor
@@ -1218,7 +1234,7 @@ public class BTree implements Serializable {
          * @param key:   the key of the key-value pair
          * @param value: the value of the key-value pair
          */
-        public DictionaryPair(Comparable key, Vector<Comparable> value) {
+        public DictionaryPair(Comparable key, Vector<String> value) {
             this.key = key;
             this.value = value;
         }
@@ -1338,8 +1354,12 @@ public class BTree implements Serializable {
         stringtree.insert("a", "hello5");
         stringtree.insert("a", "hello6");
         stringtree.insert("c", "C");
+        stringtree.insert("c", "hello");
         stringtree.insert("b", "B");
         stringtree.insert("b", "B2");
+        stringtree.insert("b", "hello");
+
+        System.out.println(stringtree.search("a", "c", true, true));
 
         // System.out.println(stringtree.getMin());
         // stringtree.delete("a");
@@ -1375,15 +1395,15 @@ public class BTree implements Serializable {
         // stringtree.delete("a", "hello6");
         // System.out.println(stringtree.getMin());
 
-        System.out.println(stringtree.getMax());
-        stringtree.delete("c", "C");
-        System.out.println(stringtree.getMax());
-        stringtree.delete("b", "B");
-        System.out.println(stringtree.getMax());
-        stringtree.delete("b", "B3");
-        System.out.println(stringtree.getMax());
-        stringtree.delete("a", "hello");
-        System.out.println(stringtree.getMax());
+        // System.out.println(stringtree.getMax());
+        // stringtree.delete("c", "C");
+        // System.out.println(stringtree.getMax());
+        // stringtree.delete("b", "B");
+        // System.out.println(stringtree.getMax());
+        // stringtree.delete("b", "B3");
+        // System.out.println(stringtree.getMax());
+        // stringtree.delete("a", "hello");
+        // System.out.println(stringtree.getMax());
 
         // System.out.println(stringtree.search("b"));
         // System.out.println(stringtree.search("b"));

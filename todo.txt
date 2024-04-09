@@ -3,6 +3,7 @@ Table Class:
     DONE    Fix implementation of pagesList (should be referencing page names)
     DONE    Check implementation of locating page for insert (whether or not to do it linearly or using binary 
             search and min max values)
+    DONE    Fix updateTuple it takes string value not object and we dont handle that
 
 
 Page Class: 
@@ -10,21 +11,26 @@ Page Class:
     DONE    Review all of Page class
     DONE    Use min and max after inserts and deletions(BIG ISSUE ON DELETIONS HERE)
     DONE    Fix toString() of Page
+    DONE    Fix updateTuple it takes string value not object and we dont handle that
 
 
 B+Tree Class:
     DONE    modify delete method in index to delete using key and value pair so we can ensure that the correct
             tuple gets deleted (and only delete the first match in case of duplicaters)
     DONE    Add methods to load and save index to disk
-    DONE        Make the index have an attribute index name aswell so u dont have to specify the name of the index when saving it and modify the save method to use the indexname
+    DONE        Make the index have an attribute index name aswell so u dont have to specify the name of the
+                index when saving it and modify the save method to use the indexname
 
 DBApp Class:
-            Handle metadata file either by creating a metadata class that deals with it directly or triple      hashtable method
-            Priority of AND, XOR, OR  should be this order but the TA said AND, OR, XOR
+    DONE       Handle metadata file either by creating a metadata class that deals with it directly or
+               triple hashtable method
+    DONE     Priority of AND, XOR, OR  should be this order but the TA said AND, OR, XOR
 
 Metadata:
     DONE
 
 
-Fix updateTuple it takes string value not object and we dont handle that
-Handle changes to index when inserting, updating, deleting, and overflow
+
+
+binary search for updateTuple method in Page
+handle index changes in update, delete, overflow, insert

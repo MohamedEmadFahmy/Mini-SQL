@@ -23,6 +23,7 @@ import engine.DBApp;
 import engine.SQLTerm;
 import exceptions.DBAppException;
 import resources.BTree;
+import resources.utility;
 
 @SuppressWarnings("unused")
 public class Table implements Serializable {
@@ -44,9 +45,9 @@ public class Table implements Serializable {
         return strTableName;
     }
 
-    // plan is on figma
     public void insert(Hashtable<String, Object> htblColNameValue)
             throws DBAppException {
+
         Tuple tuple = new Tuple(htblColNameValue, this.primaryKeyName);
 
         if (pagesList.isEmpty()) {
@@ -54,102 +55,6 @@ public class Table implements Serializable {
             this.currentPageID++;
 
             Page page = new Page(this.strTableName, pageName, this.htblColNameType, this.primaryKeyName);
-            page.addTuple(tuple);
-            page.savePage();
-
-            pagesList.add(pageName);
-            this.saveTable();
-            return;
-        }
-
-        int insertedpage = 0;
-        Tuple OverflowTuple = null;
-        for (int i = 0; i < pagesList.size(); i++) {
-            // System.out.println("insert loop: " + i);
-            String currentPageName = pagesList.elementAt(i);
-            Page currentPage = Page.loadPage(currentPageName);
-
-            if (currentPage.isEmpty()) {
-                currentPage.addTuple(tuple);
-                currentPage.savePage();
-                break;
-            }
-
-            if (tuple.compareTo(currentPage.getMin(), primaryKeyName) == -1) {
-                OverflowTuple = currentPage.addTuple(tuple);
-                currentPage.savePage();
-                insertedpage = i;
-                // System.out.println("loop:" + i + ", inserted, 1");
-                break;
-            }
-
-            if ((tuple.compareTo(currentPage.getMin(), primaryKeyName) == 1)
-                    && (tuple.compareTo(currentPage.getMax(), primaryKeyName) == -1)) {
-                OverflowTuple = currentPage.addTuple(tuple);
-                currentPage.savePage();
-                insertedpage = i;
-                // System.out.println("loop:" + i + ", inserted, 2");
-                break;
-            }
-
-            if (i == pagesList.size() - 1) { // @final page
-                // System.out.println("entered third insert");
-                OverflowTuple = currentPage.addTuple(tuple);
-                currentPage.savePage();
-                insertedpage = i;
-                // System.out.println("loop:" + i + ", inserted, 3");
-                break;
-            }
-            // System.out.println("loop:" + i + ",No insert, next page");
-        }
-
-        this.saveTable();
-
-        // System.out.println("page size: " + pagesList.size());
-        // System.out.println("reached Overflow loop, i= " + insertedpage);
-        for (int i = insertedpage; i < pagesList.size(); i++) {
-            // System.out.println("Overflow loop: " + i);
-
-            if (OverflowTuple == null) {
-                // System.out.println("No overflow");
-                break;
-            }
-
-            String currentPageName = pagesList.elementAt(i);
-            Page currentPage = Page.loadPage(currentPageName);
-
-            OverflowTuple = currentPage.addTuple(OverflowTuple);
-            // System.out.println("inserted overflow, 0");
-            currentPage.savePage();
-
-            if ((OverflowTuple != null) && (i == pagesList.size() - 1)) {
-                String pageName = this.strTableName + "" + this.currentPageID;
-                this.currentPageID++;
-
-                Page page = new Page(this.strTableName, pageName, this.htblColNameType, this.primaryKeyName);
-                page.addTuple(OverflowTuple);
-                page.savePage();
-
-                pagesList.add(pageName);
-
-                // System.out.println("inserted overflow, 1");
-                break;
-            }
-        }
-        this.saveTable();
-
-    }
-
-    public void insertTupleBinary(Hashtable<String, Object> htblColNameValue)
-            throws DBAppException {
-
-        Tuple tuple = new Tuple(htblColNameValue, this.primaryKeyName);
-
-        if (pagesList.isEmpty()) {
-            String pageName = this.strTableName + "" + this.currentPageID;
-            this.currentPageID++;
-
-            Page page = new Page(strTableName, pageName, this.htblColNameType, this.primaryKeyName);
             page.addTuple(tuple);
             page.savePage();
 
@@ -178,26 +83,26 @@ public class Table implements Serializable {
                 overflowTuple = currentPage.addTuple(tuple);
                 currentPage.savePage();
                 insertedPage = mid;
-                System.out.println("1, inserted @ " + mid);
+                // System.out.println("1, inserted @ " + mid);
                 break;
             } else if (mid == pagesList.size() - 1 && tuple.compareTo(currentPage.getMax(), primaryKeyName) == 1) {
                 overflowTuple = currentPage.addTuple(tuple);
                 currentPage.savePage();
                 insertedPage = mid;
-                System.out.println("2, inserted @ " + mid);
+                // System.out.println("2, inserted @ " + mid);
                 break;
             } else if (mid == 0 && tuple.compareTo(currentPage.getMin(), primaryKeyName) == -1) {
                 overflowTuple = currentPage.addTuple(tuple);
                 currentPage.savePage();
                 insertedPage = mid;
-                System.out.println("3, inserted @ " + mid);
+                // System.out.println("3, inserted @ " + mid);
                 break;
             } else if (tuple.compareTo(currentPage.getMax(), primaryKeyName) == 1) {
                 low = mid + 1;
             } else if (tuple.compareTo(currentPage.getMin(), primaryKeyName) == -1) {
                 high = mid - 1;
             } else {
-                System.out.println("error");
+                throw new DBAppException("error");
             }
         }
 
@@ -223,13 +128,30 @@ public class Table implements Serializable {
         this.saveTable();
     }
 
+    @SuppressWarnings("rawtypes")
     public void delete(String strTableName, Hashtable<String, Object> htblColNameValue)
             throws DBAppException {
-        for (int i = 0; i < pagesList.size(); i++) {
-            String currentPageName = pagesList.elementAt(i);
+
+        Vector<String> pagesToDelete = new Vector<String>();
+        pagesToDelete.addAll(pagesList);
+
+        for (String colName : htblColNameValue.keySet()) {
+            if (Metadata.tableHasIndexOnColumn(strTableName, colName)) {
+                BTree index = BTree.loadIndex(Metadata.getIndexName(strTableName, colName));
+                Vector<String> pagesInIndex = index.search((Comparable) htblColNameValue.get(colName));
+                for (String currentPage : pagesToDelete) {
+                    if (!pagesInIndex.contains(currentPage)) {
+                        pagesToDelete.remove(currentPage);
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < pagesToDelete.size(); i++) {
+            String currentPageName = pagesToDelete.elementAt(i);
             Page currentPage = Page.loadPage(currentPageName);
             if (currentPage.delete(htblColNameValue)) {
-                pagesList.remove(currentPageName);
+                pagesToDelete.remove(currentPageName);
 
                 // delete serialized file
                 try {
@@ -259,27 +181,50 @@ public class Table implements Serializable {
             Object value = term._objValue;
             Vector<Tuple> tuples = new Vector<Tuple>();
             Vector<Tuple> termResult = new Vector<Tuple>();
+
+            Vector<String> pagesToSearch = new Vector<String>();
+
             if (Metadata.tableHasIndexOnColumn(strTableName, columnName)) {
-                Vector<String> pagesInIndex = new Vector<String>();// get the pages from indexing - TODO after index
-                for (int i = 0; i < pagesInIndex.size(); i++) { // iterate search on pages
-                    Page indexPage = Page.loadPage(pagesInIndex.get(i));
-                    tuples = indexPage.selectTuple(columnName, operator, value);
-                    termResult.addAll(tuples);
+                // get the pages from indexing
+                BTree index = BTree.loadIndex(Metadata.getIndexName(strTableName, columnName));
+                switch (operator) {
+                    case "=":
+                        pagesToSearch.addAll(index.search((Comparable) value));
+                        break;
+                    case "!=":
+                        pagesToSearch.addAll(this.pagesList);
+                        break;
+                    case "<":
+                        pagesToSearch.addAll(index.search(index.getMin(), (Comparable) value, true, false));
+                        break;
+                    case "<=":
+                        pagesToSearch.addAll(index.search(index.getMin(), (Comparable) value, true, true));
+                        break;
+                    case ">":
+                        pagesToSearch.addAll(index.search((Comparable) value, index.getMax(), false, true));
+                        break;
+                    case ">=":
+                        pagesToSearch.addAll(index.search((Comparable) value, index.getMax(), true, true));
+                        break;
                 }
+
             } else {
-                for (int i = 0; i < pagesList.size(); i++) {// iterate search on unindexed pages
-                    Page page = Page.loadPage(pagesList.get(i));
-                    tuples = page.selectTuple(columnName, operator, value);
-                    // -------> serialization not needed because the pages are unchanged
-                    termResult.addAll(tuples);
-                }
+                pagesToSearch.addAll(this.pagesList);
             }
+
+            for (int i = 0; i < pagesToSearch.size(); i++) {// iterate search on unindexed pages
+                Page page = Page.loadPage(pagesToSearch.get(i));
+                tuples = page.selectTuple(columnName, operator, value);
+                // -------> serialization not needed because the pages are unchanged
+                termResult.addAll(tuples);
+            }
+
             result.add(termResult);
         }
         // System.out.println(result.get(0).get(0).equals(result.get(1).get(0)));
         // System.out.println(result + " " + Arrays.toString(strarrOperators));
         Vector<Tuple> finalResult = combineResults(result, strarrOperators);
-        System.out.println(finalResult);
+        // System.out.println(finalResult);
         return finalResult.iterator();
     }
 
@@ -301,7 +246,7 @@ public class Table implements Serializable {
         finalResult.addAll(termResults.get(0));
         Vector<Tuple> operatorResult = new Vector<Tuple>();
         String operator;
-        System.out.println("termResults at beginning " + termResults);
+        // System.out.println("termResults at beginning " + termResults);
 
         for (int i = 0; i < strVOperators.size(); i++) {
             operator = strVOperators.get(i);
@@ -384,7 +329,7 @@ public class Table implements Serializable {
         }
         finalResult = termResults.get(0);
         // finalResult.addAll(termResults.get(1));
-        System.out.println("Final term results " + termResults);
+        // System.out.println("Final term results " + termResults);
         return finalResult;
     }
 
@@ -414,16 +359,17 @@ public class Table implements Serializable {
         return newArray;
     }
 
-    public void updateTuple(String strClusteringKeyValue, Hashtable<String, Object> htblColNameValue)
+    public void updateTuple(Object strClusteringKeyValue, Hashtable<String, Object> htblColNameValue)
             throws DBAppException {
-        // TODO given is the clustering key value not the name
-        Tuple tuple = new Tuple(htblColNameValue, strClusteringKeyValue);
+        Hashtable<String, Object> tempHashtable = new Hashtable<String, Object>();
+        tempHashtable.put(this.primaryKeyName, strClusteringKeyValue);
+        Tuple tuple = new Tuple(htblColNameValue, this.primaryKeyName);
+
         for (int i = 0; i < pagesList.size(); i++) {
             String currentPageName = pagesList.elementAt(i);
             Page currentPage = Page.loadPage(currentPageName);
             if (tuple.compareTo(currentPage.getMin(), tuple.getPrimaryKeyName()) >= -1
-                    && tuple.compareTo(currentPage.getMin(),
-                            tuple.getPrimaryKeyName()) <= 1) {
+                    && tuple.compareTo(currentPage.getMin(), tuple.getPrimaryKeyName()) <= 1) {
                 currentPage.updateTuple(strClusteringKeyValue, htblColNameValue);
                 currentPage.savePage();
                 return;
@@ -501,8 +447,8 @@ public class Table implements Serializable {
         return myTable;
     }
 
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) throws DBAppException {
-
         // Integer x = 3;
         // Integer y = 5;
         // System.out.println(x.compareTo(y));
@@ -513,6 +459,8 @@ public class Table implements Serializable {
         htblColNameType.put("name", "java.lang.String");
         htblColNameType.put("gpa", "java.lang.double");
         Table myTable = new Table(strTableName, "id", htblColNameType);
+        myTable.saveTable();
+        Metadata.addTable(strTableName, strTableName, htblColNameType);
 
         for (int i = 1; i <= 10; i++) {
 
@@ -520,7 +468,7 @@ public class Table implements Serializable {
             htblColNameValue.put("id", i);
             htblColNameValue.put("name", "Moski no " + i);
             htblColNameValue.put("gpa", 3.5);
-            myTable.insertTupleBinary(htblColNameValue);
+            myTable.insert(htblColNameValue);
 
         }
         // System.out.println(myTable);
@@ -536,16 +484,16 @@ public class Table implements Serializable {
         B._strOperator = "=";
         SQLTerm[] arr = { A, B };
         String[] ops = { "AND" };
-        Page page = Page.loadPage("Student2");
-        System.out.println(page);
-        Vector<Tuple> Vec1 = page.selectTuple("id", "=", 7);
-        Vector<Tuple> Vec2 = page.selectTuple("id", ">", 6);
-        System.out.println("vec1 " + Vec1);
-        System.out.println("vec2 " + Vec2);
-        // System.out.println(Vec2.contains(Vec1.get(0)));
-        Vector<Vector<Tuple>> VecVec = new Vector<>();
-        VecVec.add(Vec2);
-        VecVec.add(Vec1);
+        // Page page = Page.loadPage("Student2");
+        // System.out.println(page);
+        // Vector<Tuple> Vec1 = page.selectTuple("id", "=", 7);
+        // Vector<Tuple> Vec2 = page.selectTuple("id", ">", 6);
+        // System.out.println("vec1 " + Vec1);
+        // System.out.println("vec2 " + Vec2);
+        // // System.out.println(Vec2.contains(Vec1.get(0)));
+        // Vector<Vector<Tuple>> VecVec = new Vector<>();
+        // VecVec.add(Vec2);
+        // VecVec.add(Vec1);
 
         // System.out.println(Contains(Vec2, Vec1.get(0)));
         // System.out.println("vecvec " + VecVec);
@@ -555,9 +503,30 @@ public class Table implements Serializable {
 
         Iterator<Tuple> iterator = myTable.selectTuple(arr, ops);
 
-        // while (iterator.hasNext()) {
-        // System.out.println(iterator.next());
-        // }
+        while (iterator.hasNext()) {
+            System.out.println(iterator.next());
+        }
+
+        System.out.println("-------------------------------------------------");
+
+        SQLTerm A2 = new SQLTerm();
+        SQLTerm B2 = new SQLTerm();
+        A2._strTableName = "Student";
+        A2._strColumnName = "id";
+        A2._objValue = 6;
+        A2._strOperator = ">=";
+        B2._strTableName = "Student";
+        B2._strColumnName = "gpa";
+        B2._objValue = 3.5;
+        B2._strOperator = ">";
+        SQLTerm[] arr2 = { A2, B2 };
+        String[] ops2 = { "OR" };
+
+        Iterator<Tuple> iterator2 = myTable.selectTuple(arr2, ops2);
+
+        while (iterator2.hasNext()) {
+            System.out.println(iterator2.next());
+        }
 
         // --------------DOESNT WORK--------------
         // for (int i = 10; i >= 1; i--) {
@@ -565,7 +534,7 @@ public class Table implements Serializable {
         // htblColNameValue.put("id", i);
         // htblColNameValue.put("name", "Moski no " + i);
         // htblColNameValue.put("gpa", 3.5);
-        // myTable.insertTupleBinary(htblColNameValue);
+        // myTable.insert(htblColNameValue);
         // }
         // System.out.println(myTable);
 
@@ -590,7 +559,7 @@ public class Table implements Serializable {
         // htblColNameValue.put("id", num);
         // htblColNameValue.put("name", "Moski no " + num);
         // htblColNameValue.put("gpa", 3.5);
-        // myTable.insertTupleBinary(htblColNameValue);
+        // myTable.insert(htblColNameValue);
         // }
         // System.out.println(myTable);
 

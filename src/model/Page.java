@@ -166,7 +166,7 @@ public class Page implements Serializable {
                     selectedTuples.add(currentTuple);
                 }
             } else if (operator == "!=") {
-                if (!(currentTuple.compareWith(columnName, value) == 0)) {
+                if (currentTuple.compareWith(columnName, value) != 0) {
                     selectedTuples.add(currentTuple);
                 }
             } else if (operator == "<") {
@@ -185,22 +185,20 @@ public class Page implements Serializable {
                 if (currentTuple.compareWith(columnName, value) >= 0) {
                     selectedTuples.add(currentTuple);
                 }
-            } else {
-                throw new DBAppException("Invalid equality Operator");
             }
 
         }
         return selectedTuples;
     }
 
-    public void updateTuple(String oldPrimaryKey, Hashtable<String, Object> newValues)
+    public void updateTuple(Object oldPrimaryKeyValue, Hashtable<String, Object> newValues)
             throws DBAppException {
         for (int i = 0; i < tuples.size(); i++) {
-            Hashtable<String, Object> tuple = this.tuples.get(i).getColNameVal();
+            Hashtable<String, Object> ht = this.tuples.get(i).getColNameVal();
 
-            if (tuple.contains(oldPrimaryKey) && tuple.get(oldPrimaryKey).equals(oldPrimaryKey)) {
+            if (ht.get(this.primaryKeyName).equals(oldPrimaryKeyValue)) {
                 for (String colName : newValues.keySet()) {
-                    tuple.put(colName, newValues.get(colName));
+                    ht.put(colName, newValues.get(colName));
                 }
                 return;
             }
@@ -285,7 +283,7 @@ public class Page implements Serializable {
 
     public static Page loadPage(String pageName) throws DBAppException {
         try {
-            FileInputStream fileIn = new FileInputStream(".//src//resources//Serialized_Pages//" + pageName + ".class");
+            FileInputStream fileIn = new FileInputStream("./src/resources/Serialized_Pages/" + pageName + ".class");
             ObjectInputStream ObjectIn = new ObjectInputStream(fileIn);
             Page page = null;
             page = (Page) ObjectIn.readObject();
