@@ -33,4 +33,6 @@ Metadata:
 
 
 binary search for updateTuple method in Page
-handle index changes in update, delete, overflow, insert
+handle index changes in update, delete, overflow, insert by creating 2 methods in tupleclass
+addDataToAvailableIndices(String tableName, String pageName)
+deleteDataFromAvailableIndices(String tableName, String pageName)
