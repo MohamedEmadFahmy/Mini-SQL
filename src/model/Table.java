@@ -143,7 +143,7 @@ public class Table implements Serializable {
 
     public void insert(Hashtable<String, Object> htblColNameValue)
             throws DBAppException {
-
+        System.out.println("Attempting to insert: " + htblColNameValue);
         Tuple tuple = new Tuple(htblColNameValue, this.primaryKeyName);
 
         if (pagesList.isEmpty()) {
@@ -604,21 +604,21 @@ public class Table implements Serializable {
         myTable.saveTable();
         Metadata.addTable(strTableName, strTableName, htblColNameType);
 
-        for (int i = 1; i <= 10; i++) {
+        // for (int i = 1; i <= 10; i++) {
 
-            Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-            htblColNameValue.put("id", i);
-            htblColNameValue.put("name", "Moski no " + i);
-            htblColNameValue.put("gpa", 3.5);
-            myTable.insert(htblColNameValue);
+        // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+        // htblColNameValue.put("id", i);
+        // htblColNameValue.put("name", "Moski no " + i);
+        // htblColNameValue.put("gpa", 3.5);
+        // myTable.insert(htblColNameValue);
 
-        }
-        Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-        htblColNameValue.put("name", "7aramy no " + 6);
-        htblColNameValue.put("gpa", 3.5);
+        // }
+        // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+        // htblColNameValue.put("name", "7aramy no " + 6);
+        // htblColNameValue.put("gpa", 3.5);
         // System.out.println(myTable);
-        myTable.updateTuple(1, htblColNameValue);
-        System.out.println(myTable);
+        // myTable.updateTuple(1, htblColNameValue);
+        // System.out.println(myTable);
         // SQLTerm A = new SQLTerm();
         // SQLTerm B = new SQLTerm();
         // A._strTableName = "Student";
@@ -675,7 +675,7 @@ public class Table implements Serializable {
         // System.out.println(iterator2.next());
         // }
 
-        // --------------DOESNT WORK--------------
+        // --------------WORK--------------
         // for (int i = 10; i >= 1; i--) {
         // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
         // htblColNameValue.put("id", i);
@@ -685,30 +685,31 @@ public class Table implements Serializable {
         // }
         // System.out.println(myTable);
 
-        // int x = 50;
-        // Integer[] array = new Integer[x];
+        int x = 20;
+        Integer[] array = new Integer[x];
 
-        // for (int i = 0; i < x; i++) {
-        // array[i] = i + 1;
-        // }
-        // List<Integer> list = Arrays.asList(array);
+        for (int i = 0; i < x; i++) {
+            array[i] = i + 1;
+        }
+        List<Integer> list = Arrays.asList(array);
 
-        // // Shuffle the list
-        // Collections.shuffle(list);
+        // Shuffle the list
+        Collections.shuffle(list);
 
-        // // Convert back to array if necessary
-        // list.toArray(array);
-        // // System.out.println(Arrays.toString(array));
+        // Convert back to array if necessary
+        list.toArray(array);
+        System.out.println(Arrays.toString(array));
 
-        // for (int i = 0; i < array.length; i++) {
-        // int num = array[i];
-        // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-        // htblColNameValue.put("id", num);
-        // htblColNameValue.put("name", "Moski no " + num);
-        // htblColNameValue.put("gpa", 3.5);
-        // myTable.insert(htblColNameValue);
-        // }
-        // System.out.println(myTable);
+        for (int i = 0; i < array.length; i++) {
+            int num = array[i];
+            Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+            htblColNameValue.put("id", num);
+            htblColNameValue.put("name", "Moski no " + num);
+            htblColNameValue.put("gpa", 3.5);
+            System.out.println("inserting element no: " + i);
+            myTable.insert(htblColNameValue);
+        }
+        System.out.println(myTable);
 
         // Page firstPage = myTable.pagesList.firstElement();
 
