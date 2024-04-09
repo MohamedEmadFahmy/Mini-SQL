@@ -193,12 +193,14 @@ public class Page implements Serializable {
 
     public void updateTuple(Object oldPrimaryKeyValue, Hashtable<String, Object> newValues)
             throws DBAppException {
+        System.out.println("Primary key to update: " + oldPrimaryKeyValue);
         for (int i = 0; i < tuples.size(); i++) {
             Hashtable<String, Object> ht = this.tuples.get(i).getColNameVal();
-
+            System.out.println("Current Primary Key: " + ht.get(this.primaryKeyName) + ", ");
             if (ht.get(this.primaryKeyName).equals(oldPrimaryKeyValue)) {
                 for (String colName : newValues.keySet()) {
                     ht.put(colName, newValues.get(colName));
+                    System.out.println("changed value");
                 }
                 return;
             }

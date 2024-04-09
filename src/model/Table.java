@@ -363,13 +363,14 @@ public class Table implements Serializable {
             throws DBAppException {
         Hashtable<String, Object> tempHashtable = new Hashtable<String, Object>();
         tempHashtable.put(this.primaryKeyName, strClusteringKeyValue);
-        Tuple tuple = new Tuple(htblColNameValue, this.primaryKeyName);
+        Tuple tuple = new Tuple(tempHashtable, this.primaryKeyName);
 
         for (int i = 0; i < pagesList.size(); i++) {
-            String currentPageName = pagesList.elementAt(i);
+            String currentPageName = pagesList.get(i);
             Page currentPage = Page.loadPage(currentPageName);
             if (tuple.compareTo(currentPage.getMin(), tuple.getPrimaryKeyName()) >= -1
-                    && tuple.compareTo(currentPage.getMin(), tuple.getPrimaryKeyName()) <= 1) {
+                    && tuple.compareTo(currentPage.getMax(), tuple.getPrimaryKeyName()) <= 1) {
+                System.out.println("entered range, update running on Page: " + currentPageName);
                 currentPage.updateTuple(strClusteringKeyValue, htblColNameValue);
                 currentPage.savePage();
                 return;
@@ -471,19 +472,24 @@ public class Table implements Serializable {
             myTable.insert(htblColNameValue);
 
         }
+        Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+        htblColNameValue.put("name", "7aramy no " + 6);
+        htblColNameValue.put("gpa", 3.5);
         // System.out.println(myTable);
-        SQLTerm A = new SQLTerm();
-        SQLTerm B = new SQLTerm();
-        A._strTableName = "Student";
-        A._strColumnName = "id";
-        A._objValue = 6;
-        A._strOperator = ">";
-        B._strTableName = "Student";
-        B._strColumnName = "id";
-        B._objValue = 7;
-        B._strOperator = "=";
-        SQLTerm[] arr = { A, B };
-        String[] ops = { "AND" };
+        myTable.updateTuple(6, htblColNameValue);
+        System.out.println(myTable);
+        // SQLTerm A = new SQLTerm();
+        // SQLTerm B = new SQLTerm();
+        // A._strTableName = "Student";
+        // A._strColumnName = "id";
+        // A._objValue = 6;
+        // A._strOperator = ">";
+        // B._strTableName = "Student";
+        // B._strColumnName = "id";
+        // B._objValue = 7;
+        // B._strOperator = "=";
+        // SQLTerm[] arr = { A, B };
+        // String[] ops = { "AND" };
         // Page page = Page.loadPage("Student2");
         // System.out.println(page);
         // Vector<Tuple> Vec1 = page.selectTuple("id", "=", 7);
@@ -501,32 +507,32 @@ public class Table implements Serializable {
 
         // System.out.println(myTable.selectTuple(arr, ops));
 
-        Iterator<Tuple> iterator = myTable.selectTuple(arr, ops);
+        // Iterator<Tuple> iterator = myTable.selectTuple(arr, ops);
 
-        while (iterator.hasNext()) {
-            System.out.println(iterator.next());
-        }
+        // while (iterator.hasNext()) {
+        // System.out.println(iterator.next());
+        // }
 
         System.out.println("-------------------------------------------------");
 
-        SQLTerm A2 = new SQLTerm();
-        SQLTerm B2 = new SQLTerm();
-        A2._strTableName = "Student";
-        A2._strColumnName = "id";
-        A2._objValue = 6;
-        A2._strOperator = ">=";
-        B2._strTableName = "Student";
-        B2._strColumnName = "gpa";
-        B2._objValue = 3.5;
-        B2._strOperator = ">";
-        SQLTerm[] arr2 = { A2, B2 };
-        String[] ops2 = { "OR" };
+        // SQLTerm A2 = new SQLTerm();
+        // SQLTerm B2 = new SQLTerm();
+        // A2._strTableName = "Student";
+        // A2._strColumnName = "id";
+        // A2._objValue = 6;
+        // A2._strOperator = ">=";
+        // B2._strTableName = "Student";
+        // B2._strColumnName = "gpa";
+        // B2._objValue = 3.5;
+        // B2._strOperator = ">";
+        // SQLTerm[] arr2 = { A2, B2 };
+        // String[] ops2 = { "OR" };
 
-        Iterator<Tuple> iterator2 = myTable.selectTuple(arr2, ops2);
+        // Iterator<Tuple> iterator2 = myTable.selectTuple(arr2, ops2);
 
-        while (iterator2.hasNext()) {
-            System.out.println(iterator2.next());
-        }
+        // while (iterator2.hasNext()) {
+        // System.out.println(iterator2.next());
+        // }
 
         // --------------DOESNT WORK--------------
         // for (int i = 10; i >= 1; i--) {
