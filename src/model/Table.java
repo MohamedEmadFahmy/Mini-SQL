@@ -204,8 +204,10 @@ public class Table implements Serializable {
                 break;
             } else if (tuple.compareTo(currentPage.getMax(), primaryKeyName) == 1) {
                 low = mid + 1;
+                System.out.println("3rd");
             } else if (tuple.compareTo(currentPage.getMin(), primaryKeyName) == -1) {
                 high = mid - 1;
+                System.out.println("4th");
             } else {
                 throw new DBAppException("Primary key already exists");
             }

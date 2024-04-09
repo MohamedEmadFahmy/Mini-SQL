@@ -86,8 +86,8 @@ public class DBApp {
 		}
 
 		Table table = Table.loadTable(strTableName);
-		// table.insert(htblColNameValue);
-		table.insertTuple(htblColNameValue);
+		table.insert(htblColNameValue);
+		// table.insertTuple(htblColNameValue);
 	}
 
 	// following method updates one row only
@@ -252,8 +252,8 @@ public class DBApp {
 				htblColNameValue.put("id", i);
 				htblColNameValue.put("name", "Moski no " + i);
 				htblColNameValue.put("gpa", 3.5);
+				System.out.println("Before inserting" + htblColNameValue);
 				dbApp.insertIntoTable(strTableName, htblColNameValue);
-				// System.out.println("Inserted id " + i);
 			}
 			printTable("Student");
 
