@@ -33,6 +33,8 @@ Metadata:
 
 
 
-handle index changes in update, delete, overflow, insert by creating 2 methods in tupleclass
-addDataToAvailableIndices(String tableName, String pageName)
-deleteDataFromAvailableIndices(String tableName, String pageName)
+DONE handle index changes in update, delete, overflow, insert by creating 2 methods in tupleclass
+DONE addDataToAvailableIndices(String tableName, String pageName)
+DONE deleteDataFromAvailableIndices(String tableName, String pageName)
+
+FIX: selectFromTable should throw exception if u insert one column with wrong type but then insert it again in another sqlterm with right type as we check using a hashmap so the id is overriden

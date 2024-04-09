@@ -7,12 +7,9 @@ import java.util.Vector;
 
 import model.Metadata;
 import model.Table;
-import resources.utility;
 import exceptions.DBAppException;
 
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Hashtable;
 
 public class DBApp {
@@ -82,12 +79,12 @@ public class DBApp {
 			throw new DBAppException("Table " + strTableName + " does not exist!");
 		}
 		if (!Metadata.validInsert(strTableName, htblColNameValue)) {
-			throw new DBAppException("Incompatible data types for values");
+			throw new DBAppException("Not the correct format for insert!");
 		}
 
 		Table table = Table.loadTable(strTableName);
-		table.insert(htblColNameValue);
-		// table.insertTuple(htblColNameValue);
+		// table.insert(htblColNameValue);
+		table.insertTuple(htblColNameValue);
 	}
 
 	// following method updates one row only
@@ -138,8 +135,8 @@ public class DBApp {
 				throw new DBAppException("Primary key value must be an integer, double, or string");
 		}
 
-		if (!Metadata.compatibleTypes(strTableName, htblColNameValue)) {
-			throw new DBAppException("Incompatible data types for values");
+		if (!Metadata.validColumnNamesAndTypes(strTableName, htblColNameValue)) {
+			throw new DBAppException("Invalid column names or types!");
 		}
 
 		Table table = Table.loadTable(strTableName);
@@ -158,8 +155,8 @@ public class DBApp {
 			throw new DBAppException("Table " + strTableName + " does not exist!");
 		}
 
-		if (!Metadata.compatibleTypes(strTableName, htblColNameValue)) {
-			throw new DBAppException("Incompatible data types for values");
+		if (!Metadata.validColumnNamesAndTypes(strTableName, htblColNameValue)) {
+			throw new DBAppException("Invalid column names or types!");
 		}
 
 		Table table = Table.loadTable(strTableName);
@@ -169,31 +166,35 @@ public class DBApp {
 	// DONE
 	@SuppressWarnings("rawtypes")
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms,
-			String[] strarrOperators) throws DBAppException, ClassNotFoundException, IOException {
+			String[] strarrOperators) throws DBAppException {
 		// can only select from one table at a time
 		String tableName = arrSQLTerms[0]._strTableName;
 
 		if (!Metadata.tableExists(tableName)) {
 			throw new DBAppException("Table " + tableName + " does not exist!");
-
+		}
+		if (arrSQLTerms.length != strarrOperators.length + 1) {
+			throw new DBAppException("Invalid number of operators");
 		}
 
-		Hashtable<String, Object> htblColNameValue = new Hashtable<String, Object>();
 		String[] operators = { "=", "!=", "<", "<=", ">", ">=" };
 
 		// Convert the array to a Vector
 		Vector<String> validOperators = new Vector<>(Arrays.asList(operators));
 
 		for (SQLTerm sqlTerm : arrSQLTerms) {
+			Hashtable<String, Object> htblColNameValue = new Hashtable<String, Object>();
 			htblColNameValue.put(sqlTerm._strColumnName, sqlTerm._objValue);
+			if (!Metadata.validColumnNamesAndTypes(tableName, htblColNameValue)) {
+				throw new DBAppException("Invalid column name or type!");
+			}
 			if (!validOperators.contains(sqlTerm._strOperator)) {
 				throw new DBAppException("Invalid operator: " + sqlTerm._strOperator);
 			}
 		}
-
-		if (!Metadata.compatibleTypes(tableName, htblColNameValue)) {
-			throw new DBAppException("Incompatible data types for values");
-		}
+		// System.out.println(htblColNameValue);
+		// System.out.println(Metadata.validColumnNamesAndTypes(tableName,
+		// htblColNameValue));
 
 		Table table = Table.loadTable(tableName);
 		Iterator iterator = table.selectTuple(arrSQLTerms, strarrOperators);
@@ -201,32 +202,37 @@ public class DBApp {
 	}
 
 	public static void printTable(String strTableName) {
+		if (!Metadata.tableExists(strTableName)) {
+			System.out.println("Table " + strTableName + " does not exist!");
+			return;
+		}
 		Table myTable = Table.loadTable(strTableName);
 		System.out.println(myTable);
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static void main(String[] args) {
 
 		try {
 			DBApp dbApp = new DBApp();
-			utility.clearDatabaseSystem();
+			// utility.clearDatabaseSystem();
 
 			// ---------------------Employee Table--------------------------
 			// String strTableName = "Employee";
-			// Hashtable htblColNameType = new Hashtable();
+			// Hashtable<String, String> htblColNameType = new Hashtable<>();
 			// htblColNameType.put("id", "java.lang.Integer");
 			// htblColNameType.put("name", "java.lang.String");
-			// htblColNameType.put("gpa", "java.lang.double");
+			// htblColNameType.put("gpa", "java.lang.Double");
 			// dbApp.createTable(strTableName, "id", htblColNameType);
 			// -------------------------------------------------------------
 
-			String strTableName = "Student";
+			// String strTableName = "Student";
 
-			Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
-			htblColNameType.put("id", "java.lang.Integer");
-			htblColNameType.put("name", "java.lang.String");
-			htblColNameType.put("gpa", "java.lang.double");
-			dbApp.createTable(strTableName, "id", htblColNameType);
+			// Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
+			// htblColNameType.put("id", "java.lang.Integer");
+			// htblColNameType.put("name", "java.lang.String");
+			// htblColNameType.put("gpa", "java.lang.Double");
+			// dbApp.createTable(strTableName, "id", htblColNameType);
 
 			// for (int i = 2; i <= 11; i++) {
 			// Hashtable<String, Object> htblColNameValue = new Hashtable<>();
@@ -237,27 +243,53 @@ public class DBApp {
 			// System.out.println("Inserted id " + i);
 			// break;
 			// }
-			int n = 50;
-			Vector<Integer> nums = new Vector<>();
-			for (int i = 1; i <= n; i++) {
-				nums.add(i);
+			// int n = 50;
+			// Vector<Integer> nums = new Vector<>();
+			// for (int i = 1; i <= n; i++) {
+			// nums.add(i);
 
-			}
-			Collections.shuffle(nums);
+			// }
+			// Collections.shuffle(nums);
 
-			System.out.println(nums);
+			// System.out.println(nums);
 
-			for (int i : nums) {
-				Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-				htblColNameValue.put("id", i);
-				htblColNameValue.put("name", "Moski no " + i);
-				htblColNameValue.put("gpa", 3.5);
-				System.out.println("Before inserting" + htblColNameValue);
-				dbApp.insertIntoTable(strTableName, htblColNameValue);
-			}
-			printTable("Student");
+			// for (int i : nums) {
+			// Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+			// htblColNameValue.put("id", i);
+			// htblColNameValue.put("name", "Moski no " + i);
+			// htblColNameValue.put("gpa", 3.5);
+			// // System.out.println("Before inserting" + htblColNameValue);
+			// dbApp.insertIntoTable(strTableName, htblColNameValue);
+			// }
+			// printTable("Student");
 
+			// printTable("Employee");
+			// printTable("o");
+
+			// String strTableName = "allNumsTable";
+			// Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
+			// htblColNameType.put("id", "java.lang.Integer");
+			// htblColNameType.put("age", "java.lang.Integer");
+			// htblColNameType.put("height", "java.lang.Integer");
+			// dbApp.createTable(strTableName, "id", htblColNameType);
+
+			// Hashtable<String, Object> htblColNameValue = new Hashtable<String, Object>();
+			// htblColNameValue.put("id", 1.5);
+			// htblColNameValue.put("id", 20);
+			// htblColNameValue.put("id", 180);
+			// dbApp.insertIntoTable("allNumsTable", htblColNameValue);
 			// System.out.println(myTable);
+
+			Iterator iterator = dbApp.selectFromTable(
+					new SQLTerm[] { new SQLTerm("Student", "id", "<=", 7), new SQLTerm("Student", "id", "<=", 5) },
+					new String[] { "XOR" });
+
+			// <= 7 1,2,3,4,5,6,7
+			// <= 5 1,2,3,4,5
+
+			while (iterator.hasNext()) {
+				System.out.println(iterator.next());
+			}
 
 		} catch (Exception exp) {
 			exp.printStackTrace();

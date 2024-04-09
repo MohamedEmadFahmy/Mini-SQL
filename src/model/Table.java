@@ -601,7 +601,7 @@ public class Table implements Serializable {
         Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
         htblColNameType.put("id", "java.lang.Integer");
         htblColNameType.put("name", "java.lang.String");
-        htblColNameType.put("gpa", "java.lang.double");
+        htblColNameType.put("gpa", "java.lang.Double");
         Table myTable = new Table(strTableName, "id", htblColNameType);
         myTable.saveTable();
         Metadata.addTable(strTableName, strTableName, htblColNameType);

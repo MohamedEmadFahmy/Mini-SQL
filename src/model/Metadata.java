@@ -195,14 +195,14 @@ public class Metadata {
         if (htblColNameValue.size() != ht.get(strTableName).size()) {
             return false;
         }
-        return compatibleTypes(strTableName, htblColNameValue);
+        return validColumnNamesAndTypes(strTableName, htblColNameValue);
     }
 
     // Used in:
     // DBAPP.delete
     // DBAPP.update
     // DBAPP.selectFromTable
-    public static boolean compatibleTypes(String strTableName,
+    public static boolean validColumnNamesAndTypes(String strTableName,
             Hashtable<String, Object> htblColNameValue) {
         readMetadata();
         for (Map.Entry<String, Object> entry : htblColNameValue.entrySet()) {
@@ -219,7 +219,7 @@ public class Metadata {
                 if (!(columnValue instanceof Integer)) {
                     return false;
                 }
-            } else if (columnType.equals("java.lang.double")) {
+            } else if (columnType.equals("java.lang.Double")) {
                 if (!(columnValue instanceof Double)) {
                     return false;
                 }
