@@ -448,7 +448,7 @@ public class Table implements Serializable {
         return myTable;
     }
 
-    @SuppressWarnings("unchecked")
+    // @SuppressWarnings("unchecked")
     public static void main(String[] args) throws DBAppException {
         // Integer x = 3;
         // Integer y = 5;

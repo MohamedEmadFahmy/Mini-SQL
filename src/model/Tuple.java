@@ -3,6 +3,9 @@ package model;
 import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Vector;
+
+import resources.BTree;
 
 public class Tuple implements Serializable {
     private Hashtable<String, Object> colNameVal;
@@ -102,6 +105,42 @@ public class Tuple implements Serializable {
         }
 
         return result;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public void addDataToAvailableIndices(String tableName, String pageName) {
+        Vector<BTree> indices = Metadata.getIndicesOnTable(tableName);
+        if (indices.isEmpty()) {
+            return;
+        }
+        for (Map.Entry<String, Object> entry : this.colNameVal.entrySet()) {
+            String columnName = entry.getKey();
+            if (!Metadata.tableHasIndexOnColumn(tableName, columnName)) {
+                continue;
+            }
+            Object value = entry.getValue();
+            String indexName = Metadata.getIndexName(tableName, columnName);
+            BTree index = BTree.loadIndex(indexName);
+            index.insert((Comparable) value, pageName);
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    public void deleteDataFromAvailableIndices(String tableName, String pageName) {
+        Vector<BTree> indices = Metadata.getIndicesOnTable(tableName);
+        if (indices.isEmpty()) {
+            return;
+        }
+        for (Map.Entry<String, Object> entry : this.colNameVal.entrySet()) {
+            String columnName = entry.getKey();
+            if (!Metadata.tableHasIndexOnColumn(tableName, columnName)) {
+                continue;
+            }
+            Object value = entry.getValue();
+            String indexName = Metadata.getIndexName(tableName, columnName);
+            BTree index = BTree.loadIndex(indexName);
+            index.delete((Comparable) value, pageName);
+        }
     }
 
     public static void main(String[] args) {
