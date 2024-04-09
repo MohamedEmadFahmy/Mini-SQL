@@ -368,17 +368,46 @@ public class Table implements Serializable {
         for (int i = 0; i < pagesList.size(); i++) {
             String currentPageName = pagesList.get(i);
             Page currentPage = Page.loadPage(currentPageName);
-            System.out.println("current page Min: " + currentPage.getMin() + "   ");
-            System.out.println("current page Max: " + currentPage.getMax() + "   ");
+            // System.out.println("current page Min: " + currentPage.getMin() + " ");
+            // System.out.println("current page Max: " + currentPage.getMax() + " ");
             if (tuple.compareTo(currentPage.getMin(), tuple.getPrimaryKeyName()) > -1
                     && tuple.compareTo(currentPage.getMax(), tuple.getPrimaryKeyName()) < 1) {
-                System.out.println("entered range, update running on Page: " + currentPageName);
+                // System.out.println("entered range, update running on Page: " +
+                // currentPageName);
                 currentPage.updateTuple(strClusteringKeyValue, htblColNameValue);
                 currentPage.savePage();
                 return;
             }
         }
-        // this.saveTable();
+        throw new DBAppException("Tuple not in Range for any Page");
+    }
+
+    public void updateTupleBinary(Object strClusteringKeyValue, Hashtable<String, Object> htblColNameValue)
+            throws DBAppException {
+        Hashtable<String, Object> tempHashtable = new Hashtable<String, Object>();
+        tempHashtable.put(this.primaryKeyName, strClusteringKeyValue);
+        Tuple tuple = new Tuple(tempHashtable, this.primaryKeyName);
+
+        int low = 0;
+        int high = pagesList.size() - 1;
+
+        while (low <= high) {
+            int mid = low + (high - low) / 2;
+            String currentPageName = pagesList.get(mid);
+            Page currentPage = Page.loadPage(currentPageName);
+
+            if (tuple.compareTo(currentPage.getMin(), tuple.getPrimaryKeyName()) >= 0
+                    && tuple.compareTo(currentPage.getMax(), tuple.getPrimaryKeyName()) <= 0) {
+                currentPage.updateTuple(strClusteringKeyValue, htblColNameValue);
+                currentPage.savePage();
+                return;
+            } else if (tuple.compareTo(currentPage.getMin(), tuple.getPrimaryKeyName()) < 0) {
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+        throw new DBAppException("Tuple not in Range for any Page");
     }
 
     public void createIndex(String strColName, String strIndexName) throws DBAppException {
@@ -478,7 +507,7 @@ public class Table implements Serializable {
         htblColNameValue.put("name", "7aramy no " + 6);
         htblColNameValue.put("gpa", 3.5);
         // System.out.println(myTable);
-        myTable.updateTuple(6, htblColNameValue);
+        myTable.updateTupleBinary(1, htblColNameValue);
         System.out.println(myTable);
         // SQLTerm A = new SQLTerm();
         // SQLTerm B = new SQLTerm();
