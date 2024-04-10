@@ -7,9 +7,14 @@ import java.util.Vector;
 
 import model.Metadata;
 import model.Table;
+import model.Tuple;
+import resources.utility;
 import exceptions.DBAppException;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Hashtable;
 
 public class DBApp {
@@ -34,6 +39,16 @@ public class DBApp {
 			Hashtable<String, String> htblColNameType) throws DBAppException {
 		if (Metadata.tableExists(strTableName)) {
 			throw new DBAppException("Table " + strTableName + " already exists!");
+		}
+		if (!htblColNameType.containsKey(strClusteringKeyColumn)) {
+			throw new DBAppException("Hashtable must include primary key!");
+		}
+
+		if (strClusteringKeyColumn.trim().length() == 0) {
+			throw new DBAppException("You must specify a primary key!");
+		}
+		if (htblColNameType.isEmpty()) {
+			throw new DBAppException("Table columns can not be empty");
 		}
 
 		Table myTable = new Table(strTableName, strClusteringKeyColumn, htblColNameType);
@@ -83,8 +98,8 @@ public class DBApp {
 		}
 
 		Table table = Table.loadTable(strTableName);
-		// table.insert(htblColNameValue);
-		table.insertTuple(htblColNameValue);
+		table.insert(htblColNameValue);
+		// table.insertTuple(htblColNameValue);
 	}
 
 	// following method updates one row only
@@ -210,12 +225,78 @@ public class DBApp {
 		System.out.println(myTable);
 	}
 
+	public static void logTable(String strTableName) {
+		if (!Metadata.tableExists(strTableName)) {
+			System.out.println("Table " + strTableName + " does not exist!");
+			return;
+		}
+
+		Table myTable = Table.loadTable(strTableName);
+		String tableString = myTable.toString();
+
+		try (FileWriter writer = new FileWriter("output.txt")) {
+			writer.write(tableString);
+			System.out.println("Table " + strTableName + " logged successfully to output.txt");
+		} catch (IOException e) {
+			System.err.println("Error writing to output.txt: " + e.getMessage());
+		}
+	}
+
 	@SuppressWarnings("rawtypes")
+	private void bulkInsertIntoTable(String tableName, int startNum, int endNum) throws DBAppException {
+		Vector<Integer> nums = new Vector<>();
+		for (int i = startNum; i <= endNum; i++) {
+			nums.add(i);
+
+		}
+		Collections.shuffle(nums);
+
+		System.out.println(nums);
+
+		for (int i : nums) {
+			Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+			htblColNameValue.put("id", i);
+			htblColNameValue.put("name", "Moski no " + i);
+			htblColNameValue.put("gpa", 3.5);
+			// System.out.println("Before inserting" + htblColNameValue);
+			this.insertIntoTable(tableName, htblColNameValue);
+		}
+		printTable(tableName);
+		Iterator iterator = this.selectFromTable(
+				new SQLTerm[] { new SQLTerm(tableName, "id", ">", 0) },
+				new String[] {});
+
+		while (iterator.hasNext()) {
+			Tuple currentTuple = (Tuple) iterator.next();
+			nums.remove(currentTuple.getPrimaryKey());
+		}
+
+		if (nums.isEmpty()) {
+			System.out.println("All numbers inserted");
+		} else {
+			System.out.println("These numbers not inserted");
+			System.out.println(nums);
+		}
+	}
+
 	public static void main(String[] args) {
 
 		try {
 			DBApp dbApp = new DBApp();
-			// utility.clearDatabaseSystem();
+			utility.clearDatabaseSystem();
+
+			String strTableName = "Employee";
+			Hashtable<String, String> htblColNameType = new Hashtable<>();
+			dbApp.createTable(strTableName, "id", htblColNameType);
+
+			// String strTableName = "Student";
+			// Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
+			// htblColNameType.put("id", "java.lang.Integer");
+			// htblColNameType.put("name", "java.lang.String");
+			// htblColNameType.put("gpa", "java.lang.Double");
+			// dbApp.createTable(strTableName, "id", htblColNameType);
+
+			// dbApp.bulkInsertIntoTable("Student", 52, 52);
 
 			// ---------------------Employee Table--------------------------
 			// String strTableName = "Employee";
@@ -225,43 +306,6 @@ public class DBApp {
 			// htblColNameType.put("gpa", "java.lang.Double");
 			// dbApp.createTable(strTableName, "id", htblColNameType);
 			// -------------------------------------------------------------
-
-			// String strTableName = "Student";
-
-			// Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
-			// htblColNameType.put("id", "java.lang.Integer");
-			// htblColNameType.put("name", "java.lang.String");
-			// htblColNameType.put("gpa", "java.lang.Double");
-			// dbApp.createTable(strTableName, "id", htblColNameType);
-
-			// for (int i = 2; i <= 11; i++) {
-			// Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-			// htblColNameValue.put("id", i);
-			// htblColNameValue.put("name", "Moski no " + i);
-			// htblColNameValue.put("gpa", 3.5);
-			// dbApp.insertIntoTable(strTableName, htblColNameValue);
-			// System.out.println("Inserted id " + i);
-			// break;
-			// }
-			// int n = 50;
-			// Vector<Integer> nums = new Vector<>();
-			// for (int i = 1; i <= n; i++) {
-			// nums.add(i);
-
-			// }
-			// Collections.shuffle(nums);
-
-			// System.out.println(nums);
-
-			// for (int i : nums) {
-			// Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-			// htblColNameValue.put("id", i);
-			// htblColNameValue.put("name", "Moski no " + i);
-			// htblColNameValue.put("gpa", 3.5);
-			// // System.out.println("Before inserting" + htblColNameValue);
-			// dbApp.insertIntoTable(strTableName, htblColNameValue);
-			// }
-			// printTable("Student");
 
 			// printTable("Employee");
 			// printTable("o");
@@ -280,16 +324,17 @@ public class DBApp {
 			// dbApp.insertIntoTable("allNumsTable", htblColNameValue);
 			// System.out.println(myTable);
 
-			Iterator iterator = dbApp.selectFromTable(
-					new SQLTerm[] { new SQLTerm("Student", "id", "<=", 7), new SQLTerm("Student", "id", "<=", 5) },
-					new String[] { "XOR" });
+			// Iterator iterator = dbApp.selectFromTable(
+			// new SQLTerm[] { new SQLTerm("Student", "id", "<=", 7), new SQLTerm("Student",
+			// "id", "<=", 5) },
+			// new String[] { "XOR" });
 
-			// <= 7 1,2,3,4,5,6,7
-			// <= 5 1,2,3,4,5
+			// // <= 7 1,2,3,4,5,6,7
+			// // <= 5 1,2,3,4,5
 
-			while (iterator.hasNext()) {
-				System.out.println(iterator.next());
-			}
+			// while (iterator.hasNext()) {
+			// System.out.println(iterator.next());
+			// }
 
 		} catch (Exception exp) {
 			exp.printStackTrace();

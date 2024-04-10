@@ -1,0 +1,15 @@
+Create table:
+    WORKS:
+        create table with empty primary key name should throw error
+        create table normally works
+        create table with name that already exists should throw error
+        create table with no columns should throw an error
+    Doesn't Work:
+
+
+
+Insert into table:
+    WORKS:
+        Insert table normally
+        Insert with already existing primary key should throw error
+    Doesn't Work:

@@ -76,7 +76,7 @@ public class Page implements Serializable {
 
         for (Tuple currentTuple : this.tuples) {
             if (currentTuple.getColNameVal().get(primaryKeyName).equals(primaryKeyValue)) {
-                throw new DBAppException("Primary Key already in use");
+                throw new DBAppException("Primary Key \"" + primaryKeyValue + "\" already in use");
             }
         }
 

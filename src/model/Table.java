@@ -143,7 +143,7 @@ public class Table implements Serializable {
 
     public void insert(Hashtable<String, Object> htblColNameValue)
             throws DBAppException {
-        System.out.println("Attempting to insert: " + htblColNameValue);
+        // System.out.println("Attempting to insert: " + htblColNameValue);
         Tuple tuple = new Tuple(htblColNameValue, this.primaryKeyName);
 
         if (pagesList.isEmpty()) {
@@ -152,8 +152,9 @@ public class Table implements Serializable {
 
             Page page = new Page(this.strTableName, pageName, this.htblColNameType, this.primaryKeyName);
             page.addTuple(tuple);
-            System.out.println("Succesfully inserted " + tuple.getPrimaryKey() + " into " + this.strTableName
-                    + " Page: " + pageName);
+            // System.out.println("Succesfully inserted " + tuple.getPrimaryKey() + " into "
+            // + this.strTableName
+            // + " Page: " + pageName);
             page.savePage();
 
             pagesList.add(pageName);
@@ -190,8 +191,9 @@ public class Table implements Serializable {
             if ((tuple.compareTo(currentPage.getMin(), primaryKeyName) == 1)
                     && (tuple.compareTo(currentPage.getMax(), primaryKeyName) == -1)) {
                 overflowTuple = currentPage.addTuple(tuple);
-                System.out.println("Succesfully inserted " + tuple.getPrimaryKey() + " into " + this.strTableName
-                        + " Page: " + currentPageName);
+                // System.out.println("Succesfully inserted " + tuple.getPrimaryKey() + " into "
+                // + this.strTableName
+                // + " Page: " + currentPageName);
                 currentPage.savePage();
                 insertedPage = mid;
                 // System.out.println("1, inserted @ " + mid);
@@ -200,8 +202,9 @@ public class Table implements Serializable {
 
                 if (mid == pagesList.size() - 1) {
                     overflowTuple = currentPage.addTuple(tuple);
-                    System.out.println("Succesfully inserted " + tuple.getPrimaryKey() + " into " + this.strTableName
-                            + " Page: " + currentPageName);
+                    // System.out.println("Succesfully inserted " + tuple.getPrimaryKey() + " into "
+                    // + this.strTableName
+                    // + " Page: " + currentPageName);
                     currentPage.savePage();
                     insertedPage = mid;
                     // System.out.println("2, inserted @ " + mid);
@@ -215,13 +218,14 @@ public class Table implements Serializable {
                     break;
                 }
                 low = mid + 1;
-                System.out.println("3rd");
+                // System.out.println("3rd");
             } else if (tuple.compareTo(currentPage.getMin(), primaryKeyName) == -1) {
 
                 if (mid == 0) {
                     overflowTuple = currentPage.addTuple(tuple);
-                    System.out.println("Succesfully inserted " + tuple.getPrimaryKey() + " into " + this.strTableName
-                            + " Page: " + currentPageName);
+                    // System.out.println("Succesfully inserted " + tuple.getPrimaryKey() + " into "
+                    // + this.strTableName
+                    // + " Page: " + currentPageName);
                     currentPage.savePage();
                     insertedPage = mid;
                     // System.out.println("3, inserted @ " + mid);
@@ -235,31 +239,33 @@ public class Table implements Serializable {
                     break;
                 }
                 high = mid - 1;
-                System.out.println("4th");
+                // System.out.println("4th");
             } else {
-                throw new DBAppException("Primary key already exists");
+                throw new DBAppException("Primary Key \"" + tuple.getPrimaryKey() + "\" already in use");
             }
         }
-        System.out.println("exited loop");
+        // System.out.println("exited loop");
 
         for (int i = insertedPage; i < pagesList.size(); i++) {
-            System.out.println("entred Overflow");
+            // System.out.println("entred Overflow");
             if (overflowTuple == null) {
                 break;
             }
             String currentPageName = pagesList.elementAt(i);
             Page currentPage = Page.loadPage(currentPageName);
             overflowTuple = currentPage.addTuple(overflowTuple);
-            System.out.println("Overflow inserted " + tuple.getPrimaryKey() + " into " + this.strTableName
-                    + " Page: " + currentPageName);
+            // System.out.println("Overflow inserted " + tuple.getPrimaryKey() + " into " +
+            // this.strTableName
+            // + " Page: " + currentPageName);
             currentPage.savePage();
             if ((overflowTuple != null) && (i == pagesList.size() - 1)) {
                 String pageName = this.strTableName + "" + this.currentPageID;
                 this.currentPageID++;
                 Page page = new Page(strTableName, pageName, this.htblColNameType, this.primaryKeyName);
                 page.addTuple(overflowTuple);
-                System.out.println("Overflow inserted " + tuple.getPrimaryKey() + " into " + this.strTableName
-                        + " Page: " + pageName);
+                // System.out.println("Overflow inserted " + tuple.getPrimaryKey() + " into " +
+                // this.strTableName
+                // + " Page: " + pageName);
                 page.savePage();
                 pagesList.add(pageName);
                 break;
