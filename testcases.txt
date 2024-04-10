@@ -23,7 +23,42 @@ Create index:
 
 
 Insert into table:
+    insert to table that doesnt exist should throw error
+    insert with missing values should throw error
+    insert with incompatible data types should throw error
     WORKS:
-        Insert table normally
+        insert with complete values into present table with a new primary key should work 
         Insert with already existing primary key should throw error
     DOESN'T:
+
+
+Update Table:
+    table not present should thrown an error
+    incompatible data types should throw an error
+    primary key present in values to update should throw an error
+    
+    WORKS:
+
+    DOESN'T:
+
+Delete from Table:
+    table not present should throw an error
+    incompatible data types should throw an error
+    delete without index works correctly
+    delete with index uses index correctly and works correctly 
+    WORKS:
+
+    DOESN'T:
+
+Select from Table:
+    table not present should throw an error
+    incompatible data types of sqlTerms should throw an error
+    no sql terms should throws an error
+    wrong amount of sql terms throws an error
+    wrong operator used should throw an error 
+    select without index works correctly
+    select with index uses index correctly and works correctly 
+    WORKS:
+
+    DOESN'T:
+
