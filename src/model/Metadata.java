@@ -31,6 +31,7 @@ public class Metadata {
      * compatibleOperation
      * indexExists
      * getIndicesOnTable
+     * getAllTables
      * 
      *
      * 
@@ -261,6 +262,25 @@ public class Metadata {
             }
         }
         return indices;
+    }
+
+    public static String getAllTables() {
+        readMetadata();
+        String tablesString = "";
+
+        for (String tableName : ht.keySet()) {
+            String tableDetails = tableName + "(";
+
+            for (String columnName : ht.get(tableName).keySet()) {
+                tableDetails += columnName + ",";
+            }
+
+            tableDetails = tableDetails.substring(0, tableDetails.length() - 1);
+
+            tablesString += tableDetails + ")" + "\n";
+        }
+
+        return tablesString;
     }
 
     public static void main(String[] args) throws DBAppException {

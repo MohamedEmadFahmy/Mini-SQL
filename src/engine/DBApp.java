@@ -69,11 +69,11 @@ public class DBApp {
 		if (!Metadata.tableHasColumn(strTableName, strColName)) {
 			throw new DBAppException("Column " + strColName + " does not exist in table " + strTableName);
 		}
-		if (!Metadata.tableHasIndexOnColumn(strTableName, strColName)) {
-			throw new DBAppException("Column " + strColName + " is already indexed in table " + strTableName);
+		if (Metadata.tableHasIndexOnColumn(strTableName, strColName)) {
+			throw new DBAppException("Column " + strColName + " in Table " + strTableName + " is already indexed");
 
 		}
-		if (!Metadata.indexExists(strIndexName)) {
+		if (Metadata.indexExists(strIndexName)) {
 			throw new DBAppException("Index " + strIndexName + " already exists in Database ");
 		}
 
@@ -82,6 +82,10 @@ public class DBApp {
 		Table table = Table.loadTable(strTableName);
 
 		table.createIndex(strColName, strIndexName);
+
+		System.out
+				.println("Index (" + strIndexName + ") created on Table (" + strTableName + ") on Column (" + strColName
+						+ ")");
 	}
 
 	// following method inserts one row only.
@@ -243,7 +247,7 @@ public class DBApp {
 	}
 
 	@SuppressWarnings("rawtypes")
-	private void bulkInsertIntoTable(String tableName, int startNum, int endNum) throws DBAppException {
+	protected void bulkInsertIntoTable(String tableName, int startNum, int endNum) throws DBAppException {
 		Vector<Integer> nums = new Vector<>();
 		for (int i = startNum; i <= endNum; i++) {
 			nums.add(i);
@@ -283,11 +287,31 @@ public class DBApp {
 
 		try {
 			DBApp dbApp = new DBApp();
+
 			utility.clearDatabaseSystem();
 
-			String strTableName = "Employee";
-			Hashtable<String, String> htblColNameType = new Hashtable<>();
+			String strTableName = "Student";
+			Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
+			htblColNameType.put("id", "java.lang.Integer");
+			htblColNameType.put("name", "java.lang.String");
+			htblColNameType.put("gpa", "java.lang.Double");
 			dbApp.createTable(strTableName, "id", htblColNameType);
+
+			String strTableName2 = "Student2";
+			Hashtable<String, String> htblColNameType2 = new Hashtable<String, String>();
+			htblColNameType2.put("id", "java.lang.Integer");
+			htblColNameType2.put("name", "java.lang.String");
+			htblColNameType2.put("gpa", "java.lang.Double");
+			dbApp.createTable(strTableName2, "id", htblColNameType2);
+
+			System.out.println(Metadata.getAllTables());
+
+			dbApp.createIndex("Student", "id", "index1");
+			dbApp.createIndex("Student2", "id", "index1");
+
+			// String strTableName = "Employee";
+			// Hashtable<String, String> htblColNameType = new Hashtable<>();
+			// dbApp.createTable(strTableName, "id", htblColNameType);
 
 			// String strTableName = "Student";
 			// Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
@@ -295,8 +319,6 @@ public class DBApp {
 			// htblColNameType.put("name", "java.lang.String");
 			// htblColNameType.put("gpa", "java.lang.Double");
 			// dbApp.createTable(strTableName, "id", htblColNameType);
-
-			// dbApp.bulkInsertIntoTable("Student", 52, 52);
 
 			// ---------------------Employee Table--------------------------
 			// String strTableName = "Employee";

@@ -1,10 +1,24 @@
 Create table:
     WORKS:
-        create table with empty primary key name should throw error
         create table normally works
+        create table with empty primary key name should throw error
         create table with name that already exists should throw error
         create table with no columns should throw an error
-    Doesn't Work:
+    DOESN'T:
+
+
+Create index:
+
+
+    WORKS:
+        create index on an existing table with an existing column with no previous indices with the same name   
+            and previous index on the column
+        create index on table that doesnt exist should throw an error
+        create index on column that doesnt exist should throw an error
+        create index on column that already has an index should throw an error
+        create index with an already existing index name should throw an error
+    DOESN'T:
+
 
 
 
@@ -12,4 +26,4 @@ Insert into table:
     WORKS:
         Insert table normally
         Insert with already existing primary key should throw error
-    Doesn't Work:
+    DOESN'T:
