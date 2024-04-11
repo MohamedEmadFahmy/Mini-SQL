@@ -310,7 +310,7 @@ public class DBApp {
 
 			System.out.println(Metadata.getAllTables());
 
-			// dbApp.createIndex("Student", "id", "index1");
+			dbApp.createIndex("Student", "id", "index1");
 			// dbApp.createIndex("Student2", "id", "index2");
 
 			// String strTableName = "Employee";
@@ -359,10 +359,8 @@ public class DBApp {
 			}
 			dbApp.printTable("Student");
 			SQLTerm[] sqlArray = { new SQLTerm("Student", "id", "<=", 2),
-					new SQLTerm("Student", "id", "<=", 5),
-					new SQLTerm("Student", "id", "<=", 7),
-					new SQLTerm("Student", "id", "<=", 10) };
-			String[] ops = { "AND", "OR", "XOR" };
+					new SQLTerm("Student", "id", "<=", 5) };
+			String[] ops = { "AND" };
 			SQLTerm[] sqlArray2 = {};
 
 			Iterator iterator = dbApp.selectFromTable(sqlArray, ops);

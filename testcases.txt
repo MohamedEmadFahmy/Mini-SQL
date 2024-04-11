@@ -63,7 +63,6 @@ Select from Table:
         select works with multiple terms and operators ---->fixed
 
     DOESN'T:
-        multiple operators and multiple sqlterms doesn't always work
 
 
     select without index Cases:------------> all fixed 
