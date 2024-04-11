@@ -310,7 +310,6 @@ public class DBApp {
 
 			System.out.println(Metadata.getAllTables());
 
-			dbApp.createIndex("Student", "id", "index1");
 			// dbApp.createIndex("Student2", "id", "index2");
 
 			// String strTableName = "Employee";
@@ -350,6 +349,7 @@ public class DBApp {
 			// dbApp.insertIntoTable("allNumsTable", htblColNameValue);
 			// ------------------------SELECT TESTING-------------------------//
 
+			dbApp.createIndex("Student", "id", "index");
 			for (int i = 1; i <= 10; i++) {
 				Hashtable<String, Object> htblColNameValue = new Hashtable<>();
 				htblColNameValue.put("id", i);
@@ -358,9 +358,11 @@ public class DBApp {
 				dbApp.insertIntoTable("Student", htblColNameValue);
 			}
 			dbApp.printTable("Student");
-			SQLTerm[] sqlArray = { new SQLTerm("Student", "id", "<=", 2),
-					new SQLTerm("Student", "id", "<=", 5) };
-			String[] ops = { "AND" };
+			SQLTerm[] sqlArray = {
+					new SQLTerm("Student", "id", "<=", 2),
+					new SQLTerm("Student", "id", "<=", 5),
+					new SQLTerm("Student", "id", "<=", 7) };
+			String[] ops = { "AND", "XOR" };
 			SQLTerm[] sqlArray2 = {};
 
 			Iterator iterator = dbApp.selectFromTable(sqlArray, ops);

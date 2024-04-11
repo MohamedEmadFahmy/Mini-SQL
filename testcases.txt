@@ -51,24 +51,22 @@ Delete from Table:
     DOESN'T:
 
 Select from Table:
-    select with index uses index correctly and works correctly 
-    Problem: XOR doesn't delete existing items
     WORKS:
         wrong amount of sql terms/operators throws an error
         table not present should throw an error
         incompatible data types of sqlTerms should throw an error
         incorect column name
-        no sql terms should throws an error --->fixed
         wrong operator used should throw an error 
+        no sql terms should throws an error --->fixed
         select works with multiple terms and operators ---->fixed
-
-    DOESN'T:
-
-
-    select without index Cases:------------> all fixed 
-        WORKS:
+        Problem: XOR doesn't delete existing items ----->fixed
+        select without index Cases -------> all fixed:
             - 2 ANDs, 3 terms 
             - AND,OR, 3 terms ---------->fixed
             - 2 ORs, 3 terms ----------->fixed
-            - 2 XOR/AND, XOR, 3 terms ---> XOR doesnt remove existing results from previous operations  ------>fixed
-        DOESN'T:
+            - 2 XOR/AND, XOR, 3 terms ---> XOR doesnt remove existing results from previous operations  ----->fixed
+
+        select with index uses index correctly and works correctly 
+    DOESN'T:
+
+

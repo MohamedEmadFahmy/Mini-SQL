@@ -334,6 +334,7 @@ public class Table implements Serializable {
             if (Metadata.tableHasIndexOnColumn(strTableName, columnName)) {
                 // get the pages from indexing
                 BTree index = BTree.loadIndex(Metadata.getIndexName(strTableName, columnName));
+                System.out.println("after creating index");
                 switch (operator) {
                     case "=":
                         pagesToSearch.addAll(index.search((Comparable) value));
@@ -359,7 +360,7 @@ public class Table implements Serializable {
                 pagesToSearch.addAll(this.pagesList);
             }
 
-            for (int i = 0; i < pagesToSearch.size(); i++) {// iterate search on unindexed pages
+            for (int i = 0; i < pagesToSearch.size(); i++) {
                 Page page = Page.loadPage(pagesToSearch.get(i));
                 tuples = page.selectTuple(columnName, operator, value);
                 // -------> serialization not needed because the pages are unchanged
@@ -400,7 +401,8 @@ public class Table implements Serializable {
             Vector<Tuple> currentTermResult = termResults.get(i);
             Vector<Tuple> nextTermResult = termResults.get(i + 1);
             // operatorResult.clear();
-            System.out.println("On loop: " + i + " Operator result is: " + operatorResult);
+            // System.out.println("On loop: " + i + " Operator result is: " +
+            // operatorResult);
             if (operator.equals("AND")) {
                 // System.out.println("operatorResult Address: " +
                 // System.identityHashCode(operatorResult)

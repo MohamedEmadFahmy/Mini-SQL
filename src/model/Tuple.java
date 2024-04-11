@@ -122,6 +122,7 @@ public class Tuple implements Serializable {
             String indexName = Metadata.getIndexName(tableName, columnName);
             BTree index = BTree.loadIndex(indexName);
             index.insert((Comparable) value, pageName);
+            index.saveIndex();
         }
     }
 
@@ -140,6 +141,7 @@ public class Tuple implements Serializable {
             String indexName = Metadata.getIndexName(tableName, columnName);
             BTree index = BTree.loadIndex(indexName);
             index.delete((Comparable) value, pageName);
+            index.saveIndex();
         }
     }
 
