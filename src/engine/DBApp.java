@@ -360,8 +360,9 @@ public class DBApp {
 			dbApp.printTable("Student");
 			SQLTerm[] sqlArray = { new SQLTerm("Student", "id", "<=", 2),
 					new SQLTerm("Student", "id", "<=", 5),
-					new SQLTerm("Student", "id", "<=", 7) };
-			String[] ops = { "XOR", "XOR" };
+					new SQLTerm("Student", "id", "<=", 7),
+					new SQLTerm("Student", "id", "<=", 10) };
+			String[] ops = { "AND", "OR", "XOR" };
 			SQLTerm[] sqlArray2 = {};
 
 			Iterator iterator = dbApp.selectFromTable(sqlArray, ops);

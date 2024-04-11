@@ -402,6 +402,10 @@ public class Table implements Serializable {
             // operatorResult.clear();
             System.out.println("On loop: " + i + " Operator result is: " + operatorResult);
             if (operator.equals("AND")) {
+                System.out.println("operatorResult Address: " + System.identityHashCode(operatorResult)
+                        + "  currentTerm result Address: " + System
+                                .identityHashCode(currentTermResult));
+                System.out.println("Current operator result is: " + operatorResult);
                 System.out.println("Current term result is: " + currentTermResult);
                 for (int j = 0; j < nextTermResult.size(); j++) {
                     // System.out.println("entered operator loop, operator: " + operator + "
@@ -437,6 +441,12 @@ public class Table implements Serializable {
             Vector<Tuple> currentTermResult = termResults.get(i);
             Vector<Tuple> nextTermResult = termResults.get(i + 1);
             if (operator.equals("XOR")) {
+                System.out.println("operatorResult Address: " + System.identityHashCode(operatorResult)
+                        + "  currentTerm result Address: " + System
+                                .identityHashCode(currentTermResult));
+                System.out.println("Current operator result is: " + operatorResult);
+                operatorResult = new Vector<Tuple>();
+                System.out.println("Operator result cleared");
                 System.out.println("Current term result is: " + currentTermResult);
                 for (int j = 0; j < currentTermResult.size(); j++) {
                     if (!Contains(nextTermResult, currentTermResult.get(j))
@@ -473,6 +483,10 @@ public class Table implements Serializable {
             Vector<Tuple> currentTermResult = termResults.get(i);
             Vector<Tuple> nextTermResult = termResults.get(i + 1);
             if (operator.equals("OR")) {
+                System.out.println("operatorResult Address: " + System.identityHashCode(operatorResult)
+                        + "  currentTerm result Address: " + System
+                                .identityHashCode(currentTermResult));
+                System.out.println("Current operator result is: " + operatorResult);
                 operatorResult = new Vector<Tuple>(); // this makes operator result and curreTermResult stop sharing the
                                                       // same address
                 System.out.println("Operator result cleared");
