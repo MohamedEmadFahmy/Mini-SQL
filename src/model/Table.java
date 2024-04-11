@@ -399,7 +399,10 @@ public class Table implements Serializable {
             operator = strVOperators.get(i);
             Vector<Tuple> currentTermResult = termResults.get(i);
             Vector<Tuple> nextTermResult = termResults.get(i + 1);
+            // operatorResult.clear();
+            System.out.println("On loop: " + i + " Operator result is: " + operatorResult);
             if (operator.equals("AND")) {
+                System.out.println("Current term result is: " + currentTermResult);
                 for (int j = 0; j < nextTermResult.size(); j++) {
                     // System.out.println("entered operator loop, operator: " + operator + "
                     // currentTermRes: "
@@ -409,19 +412,21 @@ public class Table implements Serializable {
                     // System.out.println(Contains(currentTermResult, nextTermResult.get(j)));
                     // System.out.println(currentTermResult.get(j));
                     // System.out.println(currentTermResult.get(0).equals(nextTermResult.get(0)));
-                    if (Contains(currentTermResult, nextTermResult.get(j))) {
+                    if (Contains(currentTermResult, nextTermResult.get(j))
+                            && !Contains(operatorResult, nextTermResult.get(j))) {
                         operatorResult.add(nextTermResult.get(j));
-                        // System.out.println("added to operator result: " + nextTermResult.get(j));
+
+                        System.out.println("added to operator result: " + nextTermResult.get(j));
                     }
                 }
-                // System.out.println("Operator Result " + operatorResult);
-                // System.out.println("termResults before insert " + termResults + "i =" + i);
+                System.out.println("Operator Result " + operatorResult);
+                // System.out.println("termResults before replace " + termResults + "i =" + i);
                 termResults.remove(i);
                 termResults.add(i, operatorResult);
-                // System.out.println("termResults after insert,before delete " + termResults +
+                // System.out.println("termResults after replace,before delete " + termResults +
                 // "i =" + i);
                 termResults.remove(i + 1);
-                // System.out.println("termResults after delete " + termResults + "i =" + i);
+                System.out.println("termResults after delete " + termResults + "i =" + i);
                 strVOperators.remove(i);
                 i -= 1;
             }
@@ -432,19 +437,32 @@ public class Table implements Serializable {
             Vector<Tuple> currentTermResult = termResults.get(i);
             Vector<Tuple> nextTermResult = termResults.get(i + 1);
             if (operator.equals("XOR")) {
+                System.out.println("Current term result is: " + currentTermResult);
                 for (int j = 0; j < currentTermResult.size(); j++) {
-                    if (!Contains(nextTermResult, currentTermResult.get(j))) {
+                    if (!Contains(nextTermResult, currentTermResult.get(j))
+                            && !Contains(operatorResult, currentTermResult.get(j))) {
+                        System.out.println(currentTermResult.get(j) + "  Added to operator result");
                         operatorResult.add(currentTermResult.get(j));
+
                     }
                 }
                 for (int k = 0; k < nextTermResult.size(); k++) {
-                    if (!Contains(currentTermResult, nextTermResult.get(k))) {
+                    if (!Contains(currentTermResult, nextTermResult.get(k))
+                            && !Contains(operatorResult, nextTermResult.get(k))) {
+
+                        System.out.println(nextTermResult.get(k) + "  Added to operator result");
                         operatorResult.add(nextTermResult.get(k));
+
                     }
                 }
+                System.out.println("Operator Result " + operatorResult);
+                // System.out.println("termResults before replace " + termResults + "i =" + i);
                 termResults.remove(i);
                 termResults.add(i, operatorResult);
+                // System.out.println("termResults after replace,before delete " + termResults +
+                // "i =" + i);
                 termResults.remove(i + 1);
+                System.out.println("termResults after delete " + termResults + "i =" + i);
                 strVOperators.remove(i);
                 i -= 1;
             }
@@ -455,19 +473,31 @@ public class Table implements Serializable {
             Vector<Tuple> currentTermResult = termResults.get(i);
             Vector<Tuple> nextTermResult = termResults.get(i + 1);
             if (operator.equals("OR")) {
+                operatorResult = new Vector<Tuple>(); // this makes operator result and curreTermResult stop sharing the
+                                                      // same address
+                System.out.println("Operator result cleared");
+                System.out.println("Current term result is: " + currentTermResult);
                 operatorResult.addAll(currentTermResult);
                 for (int j = 0; j < nextTermResult.size(); j++) {
                     // System.out.println("entered operator loop, operator: " + operator + "
                     // currentTermRes: "
                     // + currentTermResult + " nextTermRes(j): " + nextTermResult.get(j));
                     // System.out.println(!currentTermResult.contains(nextTermResult.get(j)));
-                    if (!Contains(currentTermResult, nextTermResult.get(j))) {
+                    if (!Contains(currentTermResult, nextTermResult.get(j))
+                            && !Contains(operatorResult, nextTermResult.get(j))) {
+
                         operatorResult.add(nextTermResult.get(j));
+                        System.out.println("Added to operator result: " + nextTermResult.get(j));
                     }
                 }
+                System.out.println("Operator Result " + operatorResult);
+                // System.out.println("termResults before replace " + termResults + "i =" + i);
                 termResults.remove(i);
                 termResults.add(i, operatorResult);
+                // System.out.println("termResults after replace,before delete " + termResults +
+                // "i =" + i);
                 termResults.remove(i + 1);
+                System.out.println("termResults after delete " + termResults + "i =" + i);
                 strVOperators.remove(i);
                 i -= 1;
             } else {

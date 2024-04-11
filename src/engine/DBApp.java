@@ -186,14 +186,18 @@ public class DBApp {
 	@SuppressWarnings("rawtypes")
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms,
 			String[] strarrOperators) throws DBAppException {
-		// can only select from one table at a time
+		// can only select from one table at a time if (arrSQLTerms.length == 0) {
+		if (arrSQLTerms.length == 0) {
+			throw new DBAppException("Error: No Sql Terms detected");
+		}
+
 		String tableName = arrSQLTerms[0]._strTableName;
 
 		if (!Metadata.tableExists(tableName)) {
 			throw new DBAppException("Table " + tableName + " does not exist!");
 		}
 		if (arrSQLTerms.length != strarrOperators.length + 1) {
-			throw new DBAppException("Invalid number of operators");
+			throw new DBAppException("Invalid number of operators/Sql Terms");
 		}
 
 		String[] operators = { "=", "!=", "<", "<=", ">", ">=" };
@@ -306,8 +310,8 @@ public class DBApp {
 
 			System.out.println(Metadata.getAllTables());
 
-			dbApp.createIndex("Student", "id", "index1");
-			dbApp.createIndex("Student2", "id", "index1");
+			// dbApp.createIndex("Student", "id", "index1");
+			// dbApp.createIndex("Student2", "id", "index2");
 
 			// String strTableName = "Employee";
 			// Hashtable<String, String> htblColNameType = new Hashtable<>();
@@ -344,19 +348,30 @@ public class DBApp {
 			// htblColNameValue.put("id", 20);
 			// htblColNameValue.put("id", 180);
 			// dbApp.insertIntoTable("allNumsTable", htblColNameValue);
-			// System.out.println(myTable);
+			// ------------------------SELECT TESTING-------------------------//
 
-			// Iterator iterator = dbApp.selectFromTable(
-			// new SQLTerm[] { new SQLTerm("Student", "id", "<=", 7), new SQLTerm("Student",
-			// "id", "<=", 5) },
-			// new String[] { "XOR" });
+			for (int i = 1; i <= 10; i++) {
+				Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+				htblColNameValue.put("id", i);
+				htblColNameValue.put("name", "Moski no " + i);
+				htblColNameValue.put("gpa", 3.5);
+				dbApp.insertIntoTable("Student", htblColNameValue);
+			}
+			dbApp.printTable("Student");
+			SQLTerm[] sqlArray = { new SQLTerm("Student", "id", "<=", 2),
+					new SQLTerm("Student", "id", "<=", 5),
+					new SQLTerm("Student", "id", "<=", 7) };
+			String[] ops = { "XOR", "XOR" };
+			SQLTerm[] sqlArray2 = {};
 
-			// // <= 7 1,2,3,4,5,6,7
-			// // <= 5 1,2,3,4,5
+			Iterator iterator = dbApp.selectFromTable(sqlArray, ops);
 
-			// while (iterator.hasNext()) {
-			// System.out.println(iterator.next());
-			// }
+			// <= 7 1,2,3,4,5,6,7
+			// <= 5 1,2,3,4,5
+
+			while (iterator.hasNext()) {
+				System.out.println(iterator.next());
+			}
 
 		} catch (Exception exp) {
 			exp.printStackTrace();

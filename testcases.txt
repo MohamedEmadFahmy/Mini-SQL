@@ -51,14 +51,24 @@ Delete from Table:
     DOESN'T:
 
 Select from Table:
-    table not present should throw an error
-    incompatible data types of sqlTerms should throw an error
-    no sql terms should throws an error
-    wrong amount of sql terms throws an error
-    wrong operator used should throw an error 
-    select without index works correctly
     select with index uses index correctly and works correctly 
     WORKS:
+        wrong amount of sql terms/operators throws an error
+        table not present should throw an error
+        incompatible data types of sqlTerms should throw an error
+        incorect column name
+        no sql terms should throws an error --->fixed
+        wrong operator used should throw an error 
 
     DOESN'T:
+        multiple operators and multiple sqlterms doesn't always work
+        
 
+
+    select without index Cases:------------>
+        WORKS:
+            - 2 ANDs, 3 terms 
+        DOESN'T:
+            - AND,OR, 3 terms
+            - 2 ORs, 3 terms
+            - 2 XOR/AND, XOR, 3 terms ---> XOR doesnt remove existing results from previous operations
