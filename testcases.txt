@@ -23,23 +23,24 @@ Create index:
 
 
 Insert into table:
-    insert to table that doesnt exist should throw error
-    insert with missing values should throw error
-    insert with incompatible data types should throw error
     WORKS:
-        insert with complete values into present table with a new primary key should work 
         Insert with already existing primary key should throw error
+        insert to table that doesnt exist should throw error
     DOESN'T:
+        insert with missing values should throw error
+        insert with incompatible data types should throw error
+        insert tuple with a new primary key-->works when validInsert is removed
 
 
 Update Table:
-    table not present should thrown an error
-    incompatible data types should throw an error
-    primary key present in values to update should throw an error
-    
     WORKS:
+        Id not integer throws an error
+        table not present should throw an error
+        primary key present in values to update should throw an error -------->not needed
+
 
     DOESN'T:
+        incompatible data types should throw an error
 
 Delete from Table:
 

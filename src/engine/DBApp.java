@@ -97,7 +97,7 @@ public class DBApp {
 		if (!Metadata.tableExists(strTableName)) {
 			throw new DBAppException("Table " + strTableName + " does not exist!");
 		}
-		if (!Metadata.validInsert(strTableName, htblColNameValue)) {
+		if (!Metadata.validInsert(strTableName, htblColNameValue)) {// TODO validInsert fix method
 			throw new DBAppException("Not the correct format for insert!");
 		}
 
@@ -118,7 +118,7 @@ public class DBApp {
 		if (!Metadata.tableExists(strTableName)) {
 			throw new DBAppException("Table " + strTableName + " does not exist!");
 		}
-		if (htblColNameValue.contains(Metadata.getPrimaryKeyName(strTableName))) {
+		if (htblColNameValue.containsKey(Metadata.getPrimaryKeyName(strTableName))) {
 			throw new DBAppException("Primary key cannot be updated");
 		}
 
@@ -154,7 +154,7 @@ public class DBApp {
 				throw new DBAppException("Primary key value must be an integer, double, or string");
 		}
 
-		if (!Metadata.validColumnNamesAndTypes(strTableName, htblColNameValue)) {
+		if (!Metadata.validColumnNamesAndTypes(strTableName, htblColNameValue)) {// {TODO fix this method
 			throw new DBAppException("Invalid column names or types!");
 		}
 
@@ -375,7 +375,50 @@ public class DBApp {
 			// System.out.println(iterator.next());
 			// }
 
-			// ----------------- Create Table Testing ---------------------\\
+			// ----------------- Delete Table Testing ---------------------\\
+
+			// for (int i = 1; i <= 20; i++) {
+			// Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+			// htblColNameValue.put("id", i);
+			// htblColNameValue.put("name", "Moski no " + i);
+			// if (i > 6) {
+			// htblColNameValue.put("gpa", 3.5);
+			// } else {
+			// htblColNameValue.put("gpa", 2.5);
+			// }
+			// dbApp.insertIntoTable("Student", htblColNameValue);
+			// }
+			// dbApp.createIndex("Student", "gpa", "index");
+			// Hashtable<String, Object> htblTuplesToDelete = new Hashtable<>();
+			// // htblTuplesToDelete.put("id", 6);
+			// // htblTuplesToDelete.put("name", "Moski no " + "6");
+			// htblTuplesToDelete.put("gpa", 3.5);
+			// dbApp.deleteFromTable("Student", htblTuplesToDelete);
+
+			// dbApp.printTable("Student");
+
+			// ----------------- Update Table Testing ---------------------\\
+
+			// for (int i = 1; i <= 20; i++) {
+			// Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+			// htblColNameValue.put("id", i);
+			// htblColNameValue.put("name", "Moski no " + i);
+			// if (i > 6) {
+			// htblColNameValue.put("gpa", 3.5);
+			// } else {
+			// htblColNameValue.put("gpa", 2.5);
+			// }
+			// dbApp.insertIntoTable("Student", htblColNameValue);
+			// }
+			// dbApp.createIndex("Student", "gpa", "index");
+			// Hashtable<String, Object> htblUpdatedTuple = new Hashtable<>();
+			// htblUpdatedTuple.put("id", 7);
+			// htblUpdatedTuple.put("gpa", 6);
+			// htblUpdatedTuple.put("name", "Updated");
+			// dbApp.updateTable("Student", "6", htblUpdatedTuple);
+			// dbApp.printTable("Student");
+
+			// ----------------- Insert Table Testing ---------------------\\
 
 			for (int i = 1; i <= 20; i++) {
 				Hashtable<String, Object> htblColNameValue = new Hashtable<>();
@@ -386,20 +429,19 @@ public class DBApp {
 				} else {
 					htblColNameValue.put("gpa", 2.5);
 				}
-				dbApp.insertIntoTable("Student", htblColNameValue);
+				if (i != 7) {
+					dbApp.insertIntoTable("Student", htblColNameValue);
+				}
 			}
-			dbApp.createIndex("Student", "gpa", "index");
-			Hashtable<String, Object> htblTuplesToDelete = new Hashtable<>();
-			// htblTuplesToDelete.put("id", 6);
-			// htblTuplesToDelete.put("name", "Moski no " + "6");
-			htblTuplesToDelete.put("gpa", 3.5);
-			dbApp.deleteFromTable("Student", htblTuplesToDelete);
-
+			// dbApp.createIndex("Student", "gpa", "index");
+			Hashtable<String, Object> htblTupleToInsert = new Hashtable<>();
+			htblTupleToInsert.put("id", 21);
+			htblTupleToInsert.put("gpa", 6);
+			htblTupleToInsert.put("name", "Abso");
+			dbApp.insertIntoTable("Student", htblTupleToInsert);
 			dbApp.printTable("Student");
-
 		} catch (Exception exp) {
 			exp.printStackTrace();
 		}
 	}
-
 }

@@ -196,6 +196,7 @@ public class Metadata {
         if (htblColNameValue.size() != ht.get(strTableName).size()) {
             return false;
         }
+        System.out.println("valid size");
         return validColumnNamesAndTypes(strTableName, htblColNameValue);
     }
 
