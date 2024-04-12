@@ -130,21 +130,40 @@ public class Page implements Serializable {
         return low;
     }
 
-    public boolean delete(Hashtable<String, Object> x) {
-        // deletes any tuple that matches the given criteria
-        // returns true if the page is empty after deletion
-        // updates the min and max tuples
+    // public boolean delete(Hashtable<String, Object> x) {
+    // // deletes any tuple that matches the given criteria
+    // // returns true if the page is empty after deletion
+    // // updates the min and max tuples
 
-        for (Tuple currentTuple : this.tuples) {
+    // for (Tuple currentTuple : this.tuples) {
+    // if (currentTuple.matchesCriteria(x)) {
+    // this.tuples.remove(currentTuple);
+    // currentTuple.deleteDataFromAvailableIndices(this.strTableName,
+    // this.pageName);
+    // this.tupleCount -= 1;
+    // }
+    // }
+
+    // this.min = this.tuples.firstElement();
+    // this.max = this.tuples.lastElement();
+
+    // return this.tuples.isEmpty();
+    // }
+
+    public boolean delete(Hashtable<String, Object> x) {
+        for (int i = 0; i < this.tuples.size(); i++) {
+            Tuple currentTuple = this.tuples.get(i);
             if (currentTuple.matchesCriteria(x)) {
-                this.tuples.remove(currentTuple);
+                this.tuples.remove(i);
                 currentTuple.deleteDataFromAvailableIndices(this.strTableName, this.pageName);
                 this.tupleCount -= 1;
+                i--;
             }
         }
-
-        this.min = this.tuples.firstElement();
-        this.max = this.tuples.lastElement();
+        if (!this.tuples.isEmpty()) {
+            this.min = this.tuples.firstElement();
+            this.max = this.tuples.lastElement();
+        }
 
         return this.tuples.isEmpty();
     }

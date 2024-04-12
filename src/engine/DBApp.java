@@ -170,6 +170,7 @@ public class DBApp {
 	// DONE
 	public void deleteFromTable(String strTableName,
 			Hashtable<String, Object> htblColNameValue) throws DBAppException {
+		System.out.println("test1");
 		if (!Metadata.tableExists(strTableName)) {
 			throw new DBAppException("Table " + strTableName + " does not exist!");
 		}
@@ -179,6 +180,7 @@ public class DBApp {
 		}
 
 		Table table = Table.loadTable(strTableName);
+		System.out.println("test2");
 		table.delete(strTableName, htblColNameValue);
 	}
 
@@ -349,30 +351,51 @@ public class DBApp {
 			// dbApp.insertIntoTable("allNumsTable", htblColNameValue);
 			// ------------------------SELECT TESTING-------------------------//
 
-			dbApp.createIndex("Student", "id", "index");
-			for (int i = 1; i <= 10; i++) {
+			// dbApp.createIndex("Student", "id", "index");
+			// for (int i = 1; i <= 20; i++) {
+			// Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+			// htblColNameValue.put("id", i);
+			// htblColNameValue.put("name", "Moski no " + i);
+			// htblColNameValue.put("gpa", 3.5);
+			// dbApp.insertIntoTable("Student", htblColNameValue);
+			// }
+			// dbApp.printTable("Student");
+			// SQLTerm[] sqlArray = {
+			// new SQLTerm("Student", "id", "=", 2),
+			// new SQLTerm("Student", "id", "=", 15) };
+			// String[] ops = { "AND" };
+			// SQLTerm[] sqlArray2 = {};
+
+			// Iterator iterator = dbApp.selectFromTable(sqlArray, ops);
+
+			// // <= 7 1,2,3,4,5,6,7
+			// // <= 5 1,2,3,4,5
+
+			// while (iterator.hasNext()) {
+			// System.out.println(iterator.next());
+			// }
+
+			// ----------------- Create Table Testing ---------------------\\
+
+			for (int i = 1; i <= 20; i++) {
 				Hashtable<String, Object> htblColNameValue = new Hashtable<>();
 				htblColNameValue.put("id", i);
 				htblColNameValue.put("name", "Moski no " + i);
-				htblColNameValue.put("gpa", 3.5);
+				if (i > 6) {
+					htblColNameValue.put("gpa", 3.5);
+				} else {
+					htblColNameValue.put("gpa", 2.5);
+				}
 				dbApp.insertIntoTable("Student", htblColNameValue);
 			}
+			dbApp.createIndex("Student", "gpa", "index");
+			Hashtable<String, Object> htblTuplesToDelete = new Hashtable<>();
+			// htblTuplesToDelete.put("id", 6);
+			// htblTuplesToDelete.put("name", "Moski no " + "6");
+			htblTuplesToDelete.put("gpa", 3.5);
+			dbApp.deleteFromTable("Student", htblTuplesToDelete);
+
 			dbApp.printTable("Student");
-			SQLTerm[] sqlArray = {
-					new SQLTerm("Student", "id", "<=", 2),
-					new SQLTerm("Student", "id", "<=", 5),
-					new SQLTerm("Student", "id", "<=", 7) };
-			String[] ops = { "AND", "XOR" };
-			SQLTerm[] sqlArray2 = {};
-
-			Iterator iterator = dbApp.selectFromTable(sqlArray, ops);
-
-			// <= 7 1,2,3,4,5,6,7
-			// <= 5 1,2,3,4,5
-
-			while (iterator.hasNext()) {
-				System.out.println(iterator.next());
-			}
 
 		} catch (Exception exp) {
 			exp.printStackTrace();

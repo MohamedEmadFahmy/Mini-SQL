@@ -42,13 +42,18 @@ Update Table:
     DOESN'T:
 
 Delete from Table:
-    table not present should throw an error
-    incompatible data types should throw an error
-    delete without index works correctly
-    delete with index uses index correctly and works correctly 
+
     WORKS:
+        Deleting tuple with a single criteria
+        Deleting tuple with mor than one criteria
+        table not present should throw an error
+        incompatible data types should throw an error
+        incompatible Column name should throw an error
+        Delete with index uses index correctly and works correctly -----> fixed
+        Deleting multiple tuples ------->fixed
 
     DOESN'T:
+        delete without index works correctly
 
 Select from Table:
     WORKS:
@@ -60,13 +65,13 @@ Select from Table:
         no sql terms should throws an error --->fixed
         select works with multiple terms and operators ---->fixed
         Problem: XOR doesn't delete existing items ----->fixed
+        select with index uses index correctly and works correctly 
         select without index Cases -------> all fixed:
             - 2 ANDs, 3 terms 
             - AND,OR, 3 terms ---------->fixed
             - 2 ORs, 3 terms ----------->fixed
             - 2 XOR/AND, XOR, 3 terms ---> XOR doesnt remove existing results from previous operations  ----->fixed
 
-        select with index uses index correctly and works correctly 
     DOESN'T:
 
 

@@ -279,41 +279,41 @@ public class Table implements Serializable {
     public void delete(String strTableName, Hashtable<String, Object> htblColNameValue)
             throws DBAppException {
 
-        Vector<String> pagesToDelete = new Vector<String>();
-        pagesToDelete.addAll(pagesList);
+        Vector<String> pagesToDelete = new Vector<>(pagesList);
 
         for (String colName : htblColNameValue.keySet()) {
             if (Metadata.tableHasIndexOnColumn(strTableName, colName)) {
                 BTree index = BTree.loadIndex(Metadata.getIndexName(strTableName, colName));
                 Vector<String> pagesInIndex = index.search((Comparable) htblColNameValue.get(colName));
-                for (String currentPage : pagesToDelete) {
-                    if (!pagesInIndex.contains(currentPage)) {
-                        pagesToDelete.remove(currentPage);
-                    }
-                }
+                pagesToDelete.retainAll(pagesInIndex);
             }
         }
 
-        for (int i = 0; i < pagesToDelete.size(); i++) {
-            String currentPageName = pagesToDelete.elementAt(i);
-            Page currentPage = Page.loadPage(currentPageName);
-            if (currentPage.delete(htblColNameValue)) {
-                pagesToDelete.remove(currentPageName);
+        Vector<String> pagesToRemove = new Vector<>();
 
-                // delete serialized file
-                try {
-                    File currentPageFile = new File(
-                            ".//src//resources//Serialized_Pages//" + currentPageName + ".class");
-                    currentPageFile.delete();
-                } catch (Exception e) {
-                    throw new DBAppException("Couldnt delete Page:  " + currentPageName);
-                }
+        for (int i = 0; i < pagesToDelete.size(); i++) {
+            String currentPageName = pagesToDelete.get(i);
+            Page currentPage = Page.loadPage(currentPageName);
+            System.out.println("Page Loaded: " + currentPageName);
+            boolean pageIsEmpty = currentPage.delete(htblColNameValue);
+
+            if (pageIsEmpty) {
+                // If the page is empty after deletion, mark it for removal instead of removing
+                // it directly
+                pagesToRemove.add(currentPageName);
+                File currentPageFile = new File(
+                        ".//src//resources//Serialized_Pages//" + currentPageName + ".class");
+                currentPageFile.delete();
+                System.out.println("Page removed: " + currentPageName);
             } else {
                 currentPage.savePage();
             }
         }
-        this.saveTable();
 
+        // Remove empty pages from pagesList
+        pagesList.removeAll(pagesToRemove);
+
+        this.saveTable();
     }
 
     @SuppressWarnings("rawtypes")
@@ -334,7 +334,7 @@ public class Table implements Serializable {
             if (Metadata.tableHasIndexOnColumn(strTableName, columnName)) {
                 // get the pages from indexing
                 BTree index = BTree.loadIndex(Metadata.getIndexName(strTableName, columnName));
-                System.out.println("after creating index");
+                // System.out.println("after creating index");
                 switch (operator) {
                     case "=":
                         pagesToSearch.addAll(index.search((Comparable) value));
@@ -362,6 +362,7 @@ public class Table implements Serializable {
 
             for (int i = 0; i < pagesToSearch.size(); i++) {
                 Page page = Page.loadPage(pagesToSearch.get(i));
+                System.out.println("Page Loaded: " + pagesToSearch.get(i));
                 tuples = page.selectTuple(columnName, operator, value);
                 // -------> serialization not needed because the pages are unchanged
                 termResult.addAll(tuples);
