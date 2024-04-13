@@ -196,7 +196,7 @@ public class Metadata {
         if (htblColNameValue.size() != ht.get(strTableName).size()) {
             return false;
         }
-        System.out.println("valid size");
+        // System.out.println("valid size");
         return validColumnNamesAndTypes(strTableName, htblColNameValue);
     }
 
@@ -216,16 +216,20 @@ public class Metadata {
             }
 
             String columnType = getColumnType(strTableName, columnName);
+            System.out.println("column " + columnName + " is of type: " + columnType);
             // System.out.println(columnType + " " + columnValue.getClass().getName());
             if (columnType.equals("java.lang.Integer")) {
+                System.out.println("column is an Integer");
                 if (!(columnValue instanceof Integer)) {
                     return false;
                 }
             } else if (columnType.equals("java.lang.Double")) {
+                System.out.println("column is a Double");
                 if (!(columnValue instanceof Double)) {
                     return false;
                 }
-            } else if (columnType.equals("java.util.String")) {
+            } else if (columnType.equals("java.lang.String")) {
+                System.out.println("column is a string");
                 if (!(columnValue instanceof String && ((String) columnValue).trim().length() > 0)) {
                     return false;
                 }

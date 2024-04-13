@@ -412,8 +412,8 @@ public class DBApp {
 			// }
 			// dbApp.createIndex("Student", "gpa", "index");
 			// Hashtable<String, Object> htblUpdatedTuple = new Hashtable<>();
-			// htblUpdatedTuple.put("id", 7);
-			// htblUpdatedTuple.put("gpa", 6);
+			// // htblUpdatedTuple.put("id", 7);
+			// htblUpdatedTuple.put("gpa", 6.0);
 			// htblUpdatedTuple.put("name", "Updated");
 			// dbApp.updateTable("Student", "6", htblUpdatedTuple);
 			// dbApp.printTable("Student");
@@ -436,10 +436,15 @@ public class DBApp {
 			// dbApp.createIndex("Student", "gpa", "index");
 			Hashtable<String, Object> htblTupleToInsert = new Hashtable<>();
 			htblTupleToInsert.put("id", 21);
-			htblTupleToInsert.put("gpa", 6);
+			htblTupleToInsert.put("gpa", 6.0);
 			htblTupleToInsert.put("name", "Abso");
 			dbApp.insertIntoTable("Student", htblTupleToInsert);
 			dbApp.printTable("Student");
+			// System.out.println("valid insert: " + Metadata.validInsert("Student",
+			// htblTupleToInsert));
+			// System.out.println("valid ColNameType: " +
+			// Metadata.validColumnNamesAndTypes("Student", htblTupleToInsert));
+
 		} catch (Exception exp) {
 			exp.printStackTrace();
 		}

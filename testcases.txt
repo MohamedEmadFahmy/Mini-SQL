@@ -26,10 +26,10 @@ Insert into table:
     WORKS:
         Insert with already existing primary key should throw error
         insert to table that doesnt exist should throw error
-    DOESN'T:
         insert with missing values should throw error
-        insert with incompatible data types should throw error
         insert tuple with a new primary key-->works when validInsert is removed
+    DOESN'T:
+        insert with incompatible data types should throw error ------> name doesnt give error when not string
 
 
 Update Table:
@@ -40,7 +40,7 @@ Update Table:
 
 
     DOESN'T:
-        incompatible data types should throw an error
+        incompatible data types should throw an error -------------> String Name doesnt work 
 
 Delete from Table:
 
