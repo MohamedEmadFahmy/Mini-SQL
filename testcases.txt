@@ -28,8 +28,8 @@ Insert into table:
         insert to table that doesnt exist should throw error
         insert with missing values should throw error
         insert tuple with a new primary key-->works when validInsert is removed
+        insert with incompatible data types should throw error ------> name doesnt give error when not string-->fixed
     DOESN'T:
-        insert with incompatible data types should throw error ------> name doesnt give error when not string
 
 
 Update Table:
@@ -37,10 +37,10 @@ Update Table:
         Id not integer throws an error
         table not present should throw an error
         primary key present in values to update should throw an error -------->not needed
+        incompatible data types should throw an error -------------> String Name doesnt work--->fixed
 
 
     DOESN'T:
-        incompatible data types should throw an error -------------> String Name doesnt work 
 
 Delete from Table:
 

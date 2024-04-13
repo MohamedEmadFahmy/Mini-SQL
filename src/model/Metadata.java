@@ -216,20 +216,20 @@ public class Metadata {
             }
 
             String columnType = getColumnType(strTableName, columnName);
-            System.out.println("column " + columnName + " is of type: " + columnType);
+            // System.out.println("column " + columnName + " is of type: " + columnType);
             // System.out.println(columnType + " " + columnValue.getClass().getName());
             if (columnType.equals("java.lang.Integer")) {
-                System.out.println("column is an Integer");
+                // System.out.println("column is an Integer");
                 if (!(columnValue instanceof Integer)) {
                     return false;
                 }
             } else if (columnType.equals("java.lang.Double")) {
-                System.out.println("column is a Double");
+                // System.out.println("column is a Double");
                 if (!(columnValue instanceof Double)) {
                     return false;
                 }
             } else if (columnType.equals("java.lang.String")) {
-                System.out.println("column is a string");
+                // System.out.println("column is a string");
                 if (!(columnValue instanceof String && ((String) columnValue).trim().length() > 0)) {
                     return false;
                 }
