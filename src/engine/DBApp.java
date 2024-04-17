@@ -393,8 +393,8 @@ public class DBApp {
 			// // htblTuplesToDelete.put("id", 6);
 			// // htblTuplesToDelete.put("name", "Moski no " + "6");
 			// htblTuplesToDelete.put("gpa", 3.5);
+			// dbApp.printTable("Student");
 			// dbApp.deleteFromTable("Student", htblTuplesToDelete);
-
 			// dbApp.printTable("Student");
 
 			// ----------------- Update Table Testing ---------------------\\
@@ -420,26 +420,26 @@ public class DBApp {
 
 			// ----------------- Insert Table Testing ---------------------\\
 
-			for (int i = 1; i <= 20; i++) {
-				Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-				htblColNameValue.put("id", i);
-				htblColNameValue.put("name", "Moski no " + i);
-				if (i > 6) {
-					htblColNameValue.put("gpa", 3.5);
-				} else {
-					htblColNameValue.put("gpa", 2.5);
-				}
-				if (i != 7) {
-					dbApp.insertIntoTable("Student", htblColNameValue);
-				}
-			}
+			// for (int i = 1; i <= 20; i++) {
+			// Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+			// htblColNameValue.put("id", i);
+			// htblColNameValue.put("name", "Moski no " + i);
+			// if (i > 6) {
+			// htblColNameValue.put("gpa", 3.5);
+			// } else {
+			// htblColNameValue.put("gpa", 2.5);
+			// }
+			// if (i != 7) {
+			// dbApp.insertIntoTable("Student", htblColNameValue);
+			// }
+			// }
 			// dbApp.createIndex("Student", "gpa", "index");
-			Hashtable<String, Object> htblTupleToInsert = new Hashtable<>();
-			htblTupleToInsert.put("id", 7);
-			htblTupleToInsert.put("gpa", 6.0);
-			htblTupleToInsert.put("name", "Abso");
-			dbApp.insertIntoTable("Student", htblTupleToInsert);
-			dbApp.printTable("Student");
+			// Hashtable<String, Object> htblTupleToInsert = new Hashtable<>();
+			// htblTupleToInsert.put("id", 7);
+			// htblTupleToInsert.put("gpa", 6.0);
+			// htblTupleToInsert.put("name", "Abso");
+			// dbApp.insertIntoTable("Student", htblTupleToInsert);
+			// dbApp.printTable("Student");
 			// System.out.println("valid insert: " + Metadata.validInsert("Student",
 			// htblTupleToInsert));
 			// System.out.println("valid ColNameType: " +

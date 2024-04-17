@@ -150,7 +150,8 @@ public class Page implements Serializable {
     // return this.tuples.isEmpty();
     // }
 
-    public boolean delete(Hashtable<String, Object> x) {
+    public Vector<Tuple> delete(Hashtable<String, Object> x) {
+        Vector<Tuple> pageRange = new Vector<>();
         for (int i = 0; i < this.tuples.size(); i++) {
             Tuple currentTuple = this.tuples.get(i);
             if (currentTuple.matchesCriteria(x)) {
@@ -163,9 +164,12 @@ public class Page implements Serializable {
         if (!this.tuples.isEmpty()) {
             this.min = this.tuples.firstElement();
             this.max = this.tuples.lastElement();
+            pageRange.add(min);
+            pageRange.add(max);
+            return pageRange;
         }
 
-        return this.tuples.isEmpty();
+        return null;
     }
 
     public Vector<Tuple> selectTuple(String columnName, String operator, Object value) throws DBAppException {

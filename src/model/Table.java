@@ -214,7 +214,7 @@ public class Table implements Serializable {
                 // + this.strTableName
                 // + " Page: " + currentPageName);
                 pageRanges.remove(mid);
-                currentPageRanges.clear();
+                currentPageRanges = new Vector<Tuple>();
                 currentPageRanges.add(currentPage.getMin());
                 currentPageRanges.add(currentPage.getMax());
                 pageRanges.add(mid, currentPageRanges);
@@ -230,7 +230,7 @@ public class Table implements Serializable {
                     // + this.strTableName
                     // + " Page: " + currentPageName);
                     pageRanges.remove(mid);
-                    currentPageRanges.clear();
+                    currentPageRanges = new Vector<Tuple>();
                     currentPageRanges.add(currentPage.getMin());
                     currentPageRanges.add(currentPage.getMax());
                     pageRanges.add(mid, currentPageRanges);
@@ -243,7 +243,7 @@ public class Table implements Serializable {
                 if (tuple.compareTo(currentPageMin, primaryKeyName) == -1) {
                     overflowTuple = currentPage.addTuple(tuple);
                     pageRanges.remove(mid);
-                    currentPageRanges.clear();
+                    currentPageRanges = new Vector<Tuple>();
                     currentPageRanges.add(currentPage.getMin());
                     currentPageRanges.add(currentPage.getMax());
                     pageRanges.add(mid, currentPageRanges);
@@ -261,7 +261,7 @@ public class Table implements Serializable {
                     // + this.strTableName
                     // + " Page: " + currentPageName);
                     pageRanges.remove(mid);
-                    currentPageRanges.clear();
+                    currentPageRanges = new Vector<Tuple>();
                     currentPageRanges.add(currentPage.getMin());
                     currentPageRanges.add(currentPage.getMax());
                     pageRanges.add(mid, currentPageRanges);
@@ -274,7 +274,7 @@ public class Table implements Serializable {
                 if (tuple.compareTo(prevPageMax, primaryKeyName) == 1) {
                     overflowTuple = currentPage.addTuple(tuple);
                     pageRanges.remove(mid);
-                    currentPageRanges.clear();
+                    currentPageRanges = new Vector<Tuple>();
                     currentPageRanges.add(currentPage.getMin());
                     currentPageRanges.add(currentPage.getMax());
                     pageRanges.add(mid, currentPageRanges);
@@ -299,7 +299,7 @@ public class Table implements Serializable {
             Page currentPage = Page.loadPage(currentPageName);
             overflowTuple = currentPage.addTuple(overflowTuple);
             pageRanges.remove(i);
-            currentPageRanges.clear();
+            currentPageRanges = new Vector<Tuple>();
             currentPageRanges.add(currentPage.getMin());
             currentPageRanges.add(currentPage.getMax());
             pageRanges.add(i, currentPageRanges);
@@ -312,7 +312,7 @@ public class Table implements Serializable {
                 this.currentPageID++;
                 Page page = new Page(strTableName, pageName, this.htblColNameType, this.primaryKeyName);
                 page.addTuple(overflowTuple);
-                currentPageRanges.clear();
+                currentPageRanges = new Vector<Tuple>();
                 currentPageRanges.add(page.getMin());
                 currentPageRanges.add(page.getMax());
                 pageRanges.add(currentPageRanges);
@@ -324,7 +324,7 @@ public class Table implements Serializable {
                 break;
             }
         }
-
+        // System.out.println("page Ranges: " + pageRanges);
         this.saveTable();
     }
 
@@ -332,7 +332,9 @@ public class Table implements Serializable {
     public void delete(String strTableName, Hashtable<String, Object> htblColNameValue)
             throws DBAppException {
 
+        System.out.println("Page ranges: " + pageRanges);
         Vector<String> pagesToDelete = new Vector<>(pagesList);
+        int x;
 
         for (String colName : htblColNameValue.keySet()) {
             if (Metadata.tableHasIndexOnColumn(strTableName, colName)) {
@@ -343,29 +345,42 @@ public class Table implements Serializable {
         }
 
         Vector<String> pagesToRemove = new Vector<>();
+        Vector<Vector<Tuple>> rangesToRemove = new Vector<>();
 
         for (int i = 0; i < pagesToDelete.size(); i++) {
             String currentPageName = pagesToDelete.get(i);
             Page currentPage = Page.loadPage(currentPageName);
             System.out.println("Page Loaded: " + currentPageName);
-            boolean pageIsEmpty = currentPage.delete(htblColNameValue);
+            Vector<Tuple> pageRange = currentPage.delete(htblColNameValue);
+            x = pagesList.indexOf(currentPageName);
+            pageRanges.remove(x);
+            pageRanges.add(x, pageRange);
+            // System.out.println("range to replace : " + pageRange + " index: " + i);
+            // System.out.println("new range : " + pageRange + " index: " + i);
 
-            if (pageIsEmpty) {
+            if (pageRange == null) {
                 // If the page is empty after deletion, mark it for removal instead of removing
                 // it directly
                 pagesToRemove.add(currentPageName);
+                rangesToRemove.add(pageRange);
                 File currentPageFile = new File(
                         ".//src//resources//Serialized_Pages//" + currentPageName + ".class");
                 currentPageFile.delete();
                 System.out.println("Page removed: " + currentPageName);
+                System.out.println("Range removed: " + i);
             } else {
                 currentPage.savePage();
             }
         }
 
         // Remove empty pages from pagesList
+        System.out.println("Page ranges: " + pageRanges);
+        System.out.println("Pages: " + pagesList);
+        System.out.println("rangesToRemove " + rangesToRemove);
         pagesList.removeAll(pagesToRemove);
-
+        pageRanges.removeAll(rangesToRemove);
+        System.out.println("Pages: " + pagesList);
+        System.out.println("Page ranges: " + pageRanges);
         this.saveTable();
     }
 

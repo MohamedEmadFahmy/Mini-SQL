@@ -52,9 +52,9 @@ Delete from Table:
         incompatible Column name should throw an error
         Delete with index uses index correctly and works correctly -----> fixed
         Deleting multiple tuples ------->fixed
+        delete without index works correctly
 
     DOESN'T:
-        delete without index works correctly
 
 Select from Table:
     WORKS:
