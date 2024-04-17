@@ -435,7 +435,7 @@ public class DBApp {
 			}
 			// dbApp.createIndex("Student", "gpa", "index");
 			Hashtable<String, Object> htblTupleToInsert = new Hashtable<>();
-			htblTupleToInsert.put("id", 21);
+			htblTupleToInsert.put("id", 7);
 			htblTupleToInsert.put("gpa", 6.0);
 			htblTupleToInsert.put("name", "Abso");
 			dbApp.insertIntoTable("Student", htblTupleToInsert);

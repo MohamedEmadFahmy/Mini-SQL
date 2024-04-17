@@ -31,6 +31,8 @@ public class Table implements Serializable {
     private String primaryKeyName;
     private Hashtable<String, String> htblColNameType;
     private Vector<String> pagesList;
+    private Vector<Vector<Tuple>> pageRanges;
+    // private Vector<Hashtable<String,Object>> pagesInfo;
     private int currentPageID;
 
     public Table(String strTableName, String primaryKeyName, Hashtable<String, String> htblColNameType) {
@@ -38,6 +40,8 @@ public class Table implements Serializable {
         this.primaryKeyName = primaryKeyName;
         this.htblColNameType = htblColNameType;
         this.pagesList = new Vector<String>();
+        this.pageRanges = new Vector<>();
+        // this.pagesInfo = new Vector<Hashtable<String,Object>>();
         this.currentPageID = 1;
     }
 
@@ -152,6 +156,10 @@ public class Table implements Serializable {
 
             Page page = new Page(this.strTableName, pageName, this.htblColNameType, this.primaryKeyName);
             page.addTuple(tuple);
+            Vector<Tuple> pageRange = new Vector<>();
+            pageRange.add(page.getMin());
+            pageRange.add(page.getMax());
+            pageRanges.add(pageRange);
             // System.out.println("Succesfully inserted " + tuple.getPrimaryKey() + " into "
             // + this.strTableName
             // + " Page: " + pageName);
@@ -166,20 +174,31 @@ public class Table implements Serializable {
         int high = pagesList.size() - 1;
         int insertedPage = -1;
         Tuple overflowTuple = null;
+        Vector<Tuple> currentPageRanges = new Vector<>();
 
         while (low <= high) {
             int mid = (low + high) / 2;
             // int mid = low + (high - low) / 2;
             String currentPageName = pagesList.elementAt(mid);
+            Tuple currentPageMin = pageRanges.get(mid).get(0);
+            Tuple currentPageMax = pageRanges.get(mid).get(1);
             Page currentPage = Page.loadPage(currentPageName);
             Page nextPage = null;
             Page prevPage = null;
+            Tuple nextPageMin = null;
+            Tuple nextPageMax = null;
+            Tuple prevPageMin = null;
+            Tuple prevPageMax = null;
             if (mid > 0) {
                 String prevPageName = pagesList.elementAt(mid - 1);
+                prevPageMin = pageRanges.get(mid - 1).get(0);
+                prevPageMax = pageRanges.get(mid - 1).get(1);
                 prevPage = Page.loadPage(prevPageName);
             }
             if (mid < pagesList.size() - 1) {
                 String nextPageName = pagesList.elementAt(mid + 1);
+                nextPageMin = pageRanges.get(mid + 1).get(0);
+                nextPageMax = pageRanges.get(mid + 1).get(1);
                 nextPage = Page.loadPage(nextPageName);
             }
             // System.out.println("mid is :" + mid);
@@ -188,52 +207,77 @@ public class Table implements Serializable {
             // System.out.println("min is :" + currentPage.getMin());
             // System.out.println("max is :" + currentPage.getMax());
             // System.out.println("Looping");
-            if ((tuple.compareTo(currentPage.getMin(), primaryKeyName) == 1)
-                    && (tuple.compareTo(currentPage.getMax(), primaryKeyName) == -1)) {
+            if ((tuple.compareTo(currentPageMin, primaryKeyName) == 1)
+                    && (tuple.compareTo(currentPageMax, primaryKeyName) == -1)) {
                 overflowTuple = currentPage.addTuple(tuple);
                 // System.out.println("Succesfully inserted " + tuple.getPrimaryKey() + " into "
                 // + this.strTableName
                 // + " Page: " + currentPageName);
+                pageRanges.remove(mid);
+                currentPageRanges.clear();
+                currentPageRanges.add(currentPage.getMin());
+                currentPageRanges.add(currentPage.getMax());
+                pageRanges.add(mid, currentPageRanges);
                 currentPage.savePage();
                 insertedPage = mid;
                 // System.out.println("1, inserted @ " + mid);
                 break;
-            } else if (tuple.compareTo(currentPage.getMax(), primaryKeyName) == 1) {
+            } else if (tuple.compareTo(currentPageMax, primaryKeyName) == 1) {
 
                 if (mid == pagesList.size() - 1) {
                     overflowTuple = currentPage.addTuple(tuple);
                     // System.out.println("Succesfully inserted " + tuple.getPrimaryKey() + " into "
                     // + this.strTableName
                     // + " Page: " + currentPageName);
+                    pageRanges.remove(mid);
+                    currentPageRanges.clear();
+                    currentPageRanges.add(currentPage.getMin());
+                    currentPageRanges.add(currentPage.getMax());
+                    pageRanges.add(mid, currentPageRanges);
                     currentPage.savePage();
                     insertedPage = mid;
                     // System.out.println("2, inserted @ " + mid);
                     break;
                 }
 
-                if (tuple.compareTo(nextPage.getMin(), primaryKeyName) == -1) {
+                if (tuple.compareTo(currentPageMin, primaryKeyName) == -1) {
                     overflowTuple = currentPage.addTuple(tuple);
+                    pageRanges.remove(mid);
+                    currentPageRanges.clear();
+                    currentPageRanges.add(currentPage.getMin());
+                    currentPageRanges.add(currentPage.getMax());
+                    pageRanges.add(mid, currentPageRanges);
                     currentPage.savePage();
                     insertedPage = mid;
                     break;
                 }
                 low = mid + 1;
                 // System.out.println("3rd");
-            } else if (tuple.compareTo(currentPage.getMin(), primaryKeyName) == -1) {
+            } else if (tuple.compareTo(currentPageMin, primaryKeyName) == -1) {
 
                 if (mid == 0) {
                     overflowTuple = currentPage.addTuple(tuple);
                     // System.out.println("Succesfully inserted " + tuple.getPrimaryKey() + " into "
                     // + this.strTableName
                     // + " Page: " + currentPageName);
+                    pageRanges.remove(mid);
+                    currentPageRanges.clear();
+                    currentPageRanges.add(currentPage.getMin());
+                    currentPageRanges.add(currentPage.getMax());
+                    pageRanges.add(mid, currentPageRanges);
                     currentPage.savePage();
                     insertedPage = mid;
                     // System.out.println("3, inserted @ " + mid);
                     break;
                 }
 
-                if (tuple.compareTo(prevPage.getMax(), primaryKeyName) == 1) {
+                if (tuple.compareTo(prevPageMax, primaryKeyName) == 1) {
                     overflowTuple = currentPage.addTuple(tuple);
+                    pageRanges.remove(mid);
+                    currentPageRanges.clear();
+                    currentPageRanges.add(currentPage.getMin());
+                    currentPageRanges.add(currentPage.getMax());
+                    pageRanges.add(mid, currentPageRanges);
                     currentPage.savePage();
                     insertedPage = mid;
                     break;
@@ -254,6 +298,11 @@ public class Table implements Serializable {
             String currentPageName = pagesList.elementAt(i);
             Page currentPage = Page.loadPage(currentPageName);
             overflowTuple = currentPage.addTuple(overflowTuple);
+            pageRanges.remove(i);
+            currentPageRanges.clear();
+            currentPageRanges.add(currentPage.getMin());
+            currentPageRanges.add(currentPage.getMax());
+            pageRanges.add(i, currentPageRanges);
             // System.out.println("Overflow inserted " + tuple.getPrimaryKey() + " into " +
             // this.strTableName
             // + " Page: " + currentPageName);
@@ -263,6 +312,10 @@ public class Table implements Serializable {
                 this.currentPageID++;
                 Page page = new Page(strTableName, pageName, this.htblColNameType, this.primaryKeyName);
                 page.addTuple(overflowTuple);
+                currentPageRanges.clear();
+                currentPageRanges.add(page.getMin());
+                currentPageRanges.add(page.getMax());
+                pageRanges.add(currentPageRanges);
                 // System.out.println("Overflow inserted " + tuple.getPrimaryKey() + " into " +
                 // this.strTableName
                 // + " Page: " + pageName);
