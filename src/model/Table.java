@@ -332,7 +332,7 @@ public class Table implements Serializable {
     public void delete(String strTableName, Hashtable<String, Object> htblColNameValue)
             throws DBAppException {
 
-        System.out.println("Page ranges: " + pageRanges);
+        // System.out.println("Page ranges: " + pageRanges);
         Vector<String> pagesToDelete = new Vector<>(pagesList);
         int x;
 
@@ -350,7 +350,7 @@ public class Table implements Serializable {
         for (int i = 0; i < pagesToDelete.size(); i++) {
             String currentPageName = pagesToDelete.get(i);
             Page currentPage = Page.loadPage(currentPageName);
-            System.out.println("Page Loaded: " + currentPageName);
+            // System.out.println("Page Loaded: " + currentPageName);
             Vector<Tuple> pageRange = currentPage.delete(htblColNameValue);
             x = pagesList.indexOf(currentPageName);
             pageRanges.remove(x);
@@ -366,21 +366,21 @@ public class Table implements Serializable {
                 File currentPageFile = new File(
                         ".//src//resources//Serialized_Pages//" + currentPageName + ".class");
                 currentPageFile.delete();
-                System.out.println("Page removed: " + currentPageName);
-                System.out.println("Range removed: " + i);
+                // System.out.println("Page removed: " + currentPageName);
+                // System.out.println("Range removed: " + i);
             } else {
                 currentPage.savePage();
             }
         }
 
         // Remove empty pages from pagesList
-        System.out.println("Page ranges: " + pageRanges);
-        System.out.println("Pages: " + pagesList);
-        System.out.println("rangesToRemove " + rangesToRemove);
+        // System.out.println("Page ranges: " + pageRanges);
+        // System.out.println("Pages: " + pagesList);
+        // System.out.println("rangesToRemove " + rangesToRemove);
         pagesList.removeAll(pagesToRemove);
         pageRanges.removeAll(rangesToRemove);
-        System.out.println("Pages: " + pagesList);
-        System.out.println("Page ranges: " + pageRanges);
+        // System.out.println("Pages: " + pagesList);
+        // System.out.println("Page ranges: " + pageRanges);
         this.saveTable();
     }
 
@@ -656,18 +656,19 @@ public class Table implements Serializable {
 
         int low = 0;
         int high = pagesList.size() - 1;
-
         while (low <= high) {
             int mid = low + (high - low) / 2;
             String currentPageName = pagesList.get(mid);
+            Tuple currentPageMin = pageRanges.get(mid).get(0);
+            Tuple currentPageMax = pageRanges.get(mid).get(1);
             Page currentPage = Page.loadPage(currentPageName);
 
-            if (tuple.compareTo(currentPage.getMin(), tuple.getPrimaryKeyName()) >= 0
-                    && tuple.compareTo(currentPage.getMax(), tuple.getPrimaryKeyName()) <= 0) {
+            if (tuple.compareTo(currentPageMin, tuple.getPrimaryKeyName()) >= 0
+                    && tuple.compareTo(currentPageMax, tuple.getPrimaryKeyName()) <= 0) {
                 currentPage.updateTuple(strClusteringKeyValue, htblColNameValue);
                 currentPage.savePage();
                 return;
-            } else if (tuple.compareTo(currentPage.getMin(), tuple.getPrimaryKeyName()) < 0) {
+            } else if (tuple.compareTo(currentPageMin, tuple.getPrimaryKeyName()) < 0) {
                 high = mid - 1;
             } else {
                 low = mid + 1;
