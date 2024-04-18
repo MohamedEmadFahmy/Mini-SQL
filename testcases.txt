@@ -58,6 +58,7 @@ Delete from Table:
 
 Select from Table:
     WORKS:
+        Different table names in sql terms array should throw an error
         wrong amount of sql terms/operators throws an error
         table not present should throw an error
         incompatible data types of sqlTerms should throw an error

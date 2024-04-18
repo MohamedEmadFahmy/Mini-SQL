@@ -10,7 +10,6 @@ import model.Table;
 import model.Tuple;
 import resources.utility;
 import exceptions.DBAppException;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
@@ -67,7 +66,7 @@ public class DBApp {
 
 		}
 		if (!Metadata.tableHasColumn(strTableName, strColName)) {
-			throw new DBAppException("Column " + strColName + " does not exist in table " + strTableName);
+			throw new DBAppException("Column " + strColName + " does not exist in Table " + strTableName);
 		}
 		if (Metadata.tableHasIndexOnColumn(strTableName, strColName)) {
 			throw new DBAppException("Column " + strColName + " in Table " + strTableName + " is already indexed");
@@ -103,7 +102,6 @@ public class DBApp {
 
 		Table table = Table.loadTable(strTableName);
 		table.insert(htblColNameValue);
-		// table.insertTuple(htblColNameValue);
 	}
 
 	// following method updates one row only
@@ -170,7 +168,7 @@ public class DBApp {
 	// DONE
 	public void deleteFromTable(String strTableName,
 			Hashtable<String, Object> htblColNameValue) throws DBAppException {
-		System.out.println("test1");
+		// System.out.println("test1");
 		if (!Metadata.tableExists(strTableName)) {
 			throw new DBAppException("Table " + strTableName + " does not exist!");
 		}
@@ -180,7 +178,7 @@ public class DBApp {
 		}
 
 		Table table = Table.loadTable(strTableName);
-		System.out.println("test2");
+		// System.out.println("test2");
 		table.delete(strTableName, htblColNameValue);
 	}
 
@@ -188,12 +186,23 @@ public class DBApp {
 	@SuppressWarnings("rawtypes")
 	public Iterator selectFromTable(SQLTerm[] arrSQLTerms,
 			String[] strarrOperators) throws DBAppException {
+
+		if (arrSQLTerms == null || strarrOperators == null) {
+			throw new DBAppException("Error: Null SQL Terms array or Operators array");
+
+		}
 		// can only select from one table at a time if (arrSQLTerms.length == 0) {
 		if (arrSQLTerms.length == 0) {
 			throw new DBAppException("Error: No Sql Terms detected");
 		}
 
 		String tableName = arrSQLTerms[0]._strTableName;
+
+		for (SQLTerm sqlTerm : arrSQLTerms) {
+			if (!sqlTerm._strTableName.equals(tableName)) {
+				throw new DBAppException("Error: Can only select from one table at a time");
+			}
+		}
 
 		if (!Metadata.tableExists(tableName)) {
 			throw new DBAppException("Table " + tableName + " does not exist!");
@@ -222,8 +231,7 @@ public class DBApp {
 		// htblColNameValue));
 
 		Table table = Table.loadTable(tableName);
-		Iterator iterator = table.selectTuple(arrSQLTerms, strarrOperators);
-		return iterator;
+		return table.selectTuple(arrSQLTerms, strarrOperators);
 	}
 
 	public static void printTable(String strTableName) {

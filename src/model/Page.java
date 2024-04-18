@@ -23,15 +23,16 @@ public class Page implements Serializable {
     private Tuple max;
     // private static final long serialVersionUID = -4544542885377264750L;
 
-    public Page(String strTableName, String pageName, Hashtable<String, String> colNameType, String primaryKeyName) {
+    public Page(String strTableName, String pageName, Hashtable<String, String> colNameType, String primaryKeyName,
+            int maxTupleCount) {
         this.strTableName = strTableName;
         this.pageName = pageName;
         this.tuples = new Vector<Tuple>();
         this.tupleCount = 0;
         this.primaryKeyName = primaryKeyName;
         this.colNameType = colNameType;
+        this.maxTupleCount = maxTupleCount;
 
-        loadMaxTuplesCount();
         min = null;
         max = null;
     }
@@ -44,26 +45,6 @@ public class Page implements Serializable {
         return max;
     }
 
-    public void loadMaxTuplesCount() {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("src/resources/DBApp.config"));
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith("MaximumRowsCountinPage")) {
-                    this.maxTupleCount = Integer.parseInt(line.split("=")[1].trim());
-                    // System.out.println(this.maxTupleCount);
-                    break;
-                }
-            }
-            reader.close();
-        } catch (Exception e) {
-            // Handle exceptions, e.g., file not found or format error
-            e.printStackTrace();
-        }
-    }
-
-    // @SuppressWarnings("rawtypes")
     public Tuple addTuple(Tuple tuple) throws DBAppException {
         // returns overflow tuple, null if no overflow
 
@@ -178,28 +159,28 @@ public class Page implements Serializable {
         Hashtable<String, Object> colNameVal = new Hashtable<String, Object>();
         colNameVal.put(columnName, value);
         for (Tuple currentTuple : this.tuples) {
-            if (operator == "=") {
-                if (currentTuple.compareWith(columnName, value) == 0) {
+            if (operator.equals("=")) {
+                if (currentTuple.compareWithValue(columnName, value) == 0) {
                     selectedTuples.add(currentTuple);
                 }
-            } else if (operator == "!=") {
-                if (currentTuple.compareWith(columnName, value) != 0) {
+            } else if (operator.equals("!=")) {
+                if (currentTuple.compareWithValue(columnName, value) != 0) {
                     selectedTuples.add(currentTuple);
                 }
-            } else if (operator == "<") {
-                if (currentTuple.compareWith(columnName, value) == -1) {
+            } else if (operator.equals("<")) {
+                if (currentTuple.compareWithValue(columnName, value) < 0) {
                     selectedTuples.add(currentTuple);
                 }
-            } else if (operator == "<=") {
-                if (currentTuple.compareWith(columnName, value) <= 0) {
+            } else if (operator.equals("<=")) {
+                if (currentTuple.compareWithValue(columnName, value) <= 0) {
                     selectedTuples.add(currentTuple);
                 }
-            } else if (operator == ">") {
-                if (currentTuple.compareWith(columnName, value) == 1) {
+            } else if (operator.equals(">")) {
+                if (currentTuple.compareWithValue(columnName, value) > 0) {
                     selectedTuples.add(currentTuple);
                 }
-            } else if (operator == ">=") {
-                if (currentTuple.compareWith(columnName, value) >= 0) {
+            } else if (operator.equals(">=")) {
+                if (currentTuple.compareWithValue(columnName, value) >= 0) {
                     selectedTuples.add(currentTuple);
                 }
             }
@@ -210,15 +191,16 @@ public class Page implements Serializable {
 
     public void updateTuple(Object oldPrimaryKeyValue, Hashtable<String, Object> newValues)
             throws DBAppException {
-        System.out.println("Primary key to update: " + oldPrimaryKeyValue);
+        // System.out.println("Primary key to update: " + oldPrimaryKeyValue);
         for (int i = 0; i < tuples.size(); i++) {
             Hashtable<String, Object> ht = this.tuples.get(i).getColNameVal();
-            System.out.println("Current Primary Key: " + ht.get(this.primaryKeyName) + ", ");
+            // System.out.println("Current Primary Key: " + ht.get(this.primaryKeyName) + ",
+            // ");
             if (ht.get(this.primaryKeyName).equals(oldPrimaryKeyValue)) {
                 this.tuples.get(i).deleteDataFromAvailableIndices(this.strTableName, this.pageName);
                 for (String colName : newValues.keySet()) {
-                    System.out.println(
-                            "changed value from " + ht.get(colName) + "to " + newValues.get(colName));
+                    // System.out.println("changed value from " + ht.get(colName) + "to " +
+                    // newValues.get(colName));
                     ht.put(colName, newValues.get(colName));
                 }
                 this.tuples.get(i).addDataToAvailableIndices(this.strTableName, this.pageName);
@@ -353,7 +335,7 @@ public class Page implements Serializable {
         htblColNameValue.put("name", "Ahmed Noor");
         htblColNameValue.put("gpa", 0.95);
 
-        Page page = new Page("Student", "page1", htblColNameType, "id");
+        Page page = new Page("Student", "page1", htblColNameType, "id", 5);
         Tuple tuple = new Tuple(htblColNameValue, "id");
         page.addTuple(tuple);
         // System.out.println(page);
