@@ -1,15 +1,15 @@
-package tests;
+package com.halberdski.tests;
 
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 
-import engine.DBApp;
-import engine.SQLTerm;
-import exceptions.DBAppException;
-import resources.BTree;
-import resources.utility;
+import com.halberdski.engine.DBApp;
+import com.halberdski.engine.SQLTerm;
+import com.halberdski.exceptions.DBAppException;
+import com.halberdski.resources.BTree;
+import com.halberdski.resources.utility;
 
 @SuppressWarnings("unused")
 class DBTests {

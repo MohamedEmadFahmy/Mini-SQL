@@ -1,4 +1,4 @@
-package model;
+package com.halberdski.model;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import exceptions.DBAppException;
-import resources.BTree;
+import com.halberdski.exceptions.DBAppException;
+import com.halberdski.resources.BTree;
 
 @SuppressWarnings("unused")
 public class Page implements Serializable {

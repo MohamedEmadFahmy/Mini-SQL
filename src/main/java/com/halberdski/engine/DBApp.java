@@ -1,15 +1,15 @@
-package engine;
+package com.halberdski.engine;
 
 /** * @author Wael Abouelsaadat */
 
 import java.util.Iterator;
 import java.util.Vector;
 
-import model.Metadata;
-import model.Table;
-import model.Tuple;
-import resources.utility;
-import exceptions.DBAppException;
+import com.halberdski.model.Metadata;
+import com.halberdski.model.Table;
+import com.halberdski.model.Tuple;
+import com.halberdski.resources.utility;
+import com.halberdski.exceptions.DBAppException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
@@ -96,7 +96,7 @@ public class DBApp {
 		if (!Metadata.tableExists(strTableName)) {
 			throw new DBAppException("Table " + strTableName + " does not exist!");
 		}
-		if (!Metadata.validInsert(strTableName, htblColNameValue)) {// TODO validInsert fix method
+		if (!Metadata.validInsert(strTableName, htblColNameValue)) {
 			throw new DBAppException("Not the correct format for insert!");
 		}
 
@@ -152,7 +152,7 @@ public class DBApp {
 				throw new DBAppException("Primary key value must be an integer, double, or string");
 		}
 
-		if (!Metadata.validColumnNamesAndTypes(strTableName, htblColNameValue)) {// {TODO fix this method
+		if (!Metadata.validColumnNamesAndTypes(strTableName, htblColNameValue)) {
 			throw new DBAppException("Invalid column names or types!");
 		}
 

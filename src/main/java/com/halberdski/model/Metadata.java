@@ -1,4 +1,4 @@
-package model;
+package com.halberdski.model;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -9,8 +9,8 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Vector;
 
-import exceptions.DBAppException;
-import resources.BTree;
+import com.halberdski.exceptions.DBAppException;
+import com.halberdski.resources.BTree;
 
 public class Metadata {
     private static Hashtable<String, Hashtable<String, Hashtable<String, String>>> ht = new Hashtable<String, Hashtable<String, Hashtable<String, String>>>();

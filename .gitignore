@@ -1,4 +1,1 @@
-.vscode
-.gitignore
-metadata2.csv
-/bin
+target

@@ -1,11 +1,11 @@
-package model;
+package com.halberdski.model;
 
 import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Vector;
 
-import resources.BTree;
+import com.halberdski.resources.BTree;
 
 public class Tuple implements Serializable {
     private Hashtable<String, Object> colNameVal;

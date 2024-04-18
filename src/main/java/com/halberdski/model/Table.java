@@ -1,4 +1,4 @@
-package model;
+package com.halberdski.model;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -22,11 +22,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import engine.DBApp;
-import engine.SQLTerm;
-import exceptions.DBAppException;
-import resources.BTree;
-import resources.utility;
+import com.halberdski.engine.DBApp;
+import com.halberdski.engine.SQLTerm;
+import com.halberdski.exceptions.DBAppException;
+import com.halberdski.resources.BTree;
+import com.halberdski.resources.utility;
 
 @SuppressWarnings("unused")
 public class Table implements Serializable {
