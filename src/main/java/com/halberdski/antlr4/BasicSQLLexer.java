@@ -1,3 +1,5 @@
+package com.halberdski.antlr4;
+
 // Generated from c:/Users/Mohamed/Desktop/basic sql/BasicSQL.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
