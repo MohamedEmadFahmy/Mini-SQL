@@ -1,58 +1,23 @@
 grammar BasicSQL;
 
-sqlStatement: insertStatement
-            | createTableStatement
-            | selectStatement
-            | updateStatement
-            | deleteStatement
-            | createIndexStatement
-            ;
+sqlStatement: selectStatement | helloWorld;
 
-insertStatement: INSERT INTO tableName '(' columnNameList ')' VALUES '(' valueList ')' ';';
-createTableStatement: CREATE TABLE tableName '(' columnDefinitionList ')' ';';
-selectStatement: SELECT columnList FROM tableName (WHERE condition)? ';';
-updateStatement: UPDATE tableName SET columnValueList (WHERE condition)? ';';
-deleteStatement: DELETE FROM tableName (WHERE condition)? ';';
-createIndexStatement: CREATE INDEX indexName ON tableName '(' columnNameList ')' ';';
+helloWorld: 'Hello';
 
+selectStatement: SELECT STAR FROM tableName WHERE condition (LOGICAL_OPERATOR condition)* ';';
+
+SELECT: 'SELECT' | 'select';
+STAR: '*';
+FROM: 'FROM' | 'from';
+WHERE: 'WHERE' | 'where';
 tableName: ID;
-indexName: ID;
+condition: ID OPERATOR (ID | DIGIT)?;
 
-columnNameList: columnName (',' columnName)*;
-columnDefinitionList: columnDefinition (',' columnDefinition)*;
-columnDefinition: columnName dataType;
+ID: [a-zA-Z][a-zA-Z0-9_]*;
 
-columnValueList: columnValue (',' columnValue)*;
-columnValue: columnName '=' value;
-
-columnList: '*' | columnNameList;
-valueList: value (',' value)*;
-
-value: STRING | NUMBER | BOOLEAN;
-condition: columnName OPERATOR value;
-
-STRING: '\'' (~'\'')* '\'';
-NUMBER: ('-' | '+')? DIGIT+ ('.' DIGIT+)?;
-BOOLEAN: 'TRUE' | 'FALSE';
-ID: [a-zA-Z_][a-zA-Z0-9_]*;
-
-columnName: ID; // Define a rule for column names
-dataType: ID; // You might want to define data types as well
-
-INSERT: 'INSERT';
-INTO: 'INTO';
-CREATE: 'CREATE';
-TABLE: 'TABLE';
-SELECT: 'SELECT';
-UPDATE: 'UPDATE';
-DELETE: 'DELETE';
-INDEX: 'INDEX';
-FROM: 'FROM';
-WHERE: 'WHERE';
-SET: 'SET';
-ON: 'ON';
-VALUES: 'VALUES';
-
-OPERATOR: '=' | '<' | '>' | '<=' | '>=' | '<>';
+OPERATOR: '=' | '<' | '>' | '<=' | '>=' | '!=';
 WS: [ \t\r\n]+ -> skip;
 DIGIT: [0-9];
+
+// LOGICAL_OPERATOR: 'AND' | 'and' | 'OR' | 'or' | 'XOR' | 'xor';
+LOGICAL_OPERATOR: 'AND' | 'OR' | 'XOR';
