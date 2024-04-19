@@ -11,7 +11,7 @@ import com.halberdski.exceptions.DBAppException;
 import com.halberdski.model.BTree;
 import com.halberdski.engine.utility;
 
-@SuppressWarnings("unused")
+// @SuppressWarnings("unused")
 class DBTests {
 
     private static void testDeletes(int n) throws DBAppException {

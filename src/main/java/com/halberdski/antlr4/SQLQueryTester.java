@@ -24,7 +24,7 @@ public class SQLQueryTester {
         try {
             // Parse the input SQL query using the root rule
             parser.sqlStatement();
-            System.out.println(parser.getRuleIndex(sql));
+            // System.out.println(parser.getRuleIndex(sql));
 
             System.out.println("Valid SQL: " + sql);
         } catch (ParseCancellationException e) {
@@ -53,5 +53,6 @@ public class SQLQueryTester {
             testSQLQuery(sql);
             System.out.println("\n\n");
         }
+        System.out.println("Done1");
     }
 }
