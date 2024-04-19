@@ -1,4 +1,4 @@
-// Generated from c:/Users/Mohamed/Desktop/basic sql/BasicSQL.g4 by ANTLR 4.13.1
+// Generated from d:/Semester 6/Databases 2/Projects/Project 1/database-system/src/main/java/com/halberdski/antlr4/BasicSQL.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -105,6 +105,14 @@ public class BasicSQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_sqlStatement; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof BasicSQLListener ) ((BasicSQLListener)listener).enterSqlStatement(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof BasicSQLListener ) ((BasicSQLListener)listener).exitSqlStatement(this);
+		}
 	}
 
 	public final SqlStatementContext sqlStatement() throws RecognitionException {
@@ -149,6 +157,14 @@ public class BasicSQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_helloWorld; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof BasicSQLListener ) ((BasicSQLListener)listener).enterHelloWorld(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof BasicSQLListener ) ((BasicSQLListener)listener).exitHelloWorld(this);
+		}
 	}
 
 	public final HelloWorldContext helloWorld() throws RecognitionException {
@@ -197,6 +213,14 @@ public class BasicSQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_selectStatement; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof BasicSQLListener ) ((BasicSQLListener)listener).enterSelectStatement(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof BasicSQLListener ) ((BasicSQLListener)listener).exitSelectStatement(this);
+		}
 	}
 
 	public final SelectStatementContext selectStatement() throws RecognitionException {
@@ -258,6 +282,14 @@ public class BasicSQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_tableName; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof BasicSQLListener ) ((BasicSQLListener)listener).enterTableName(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof BasicSQLListener ) ((BasicSQLListener)listener).exitTableName(this);
+		}
 	}
 
 	public final TableNameContext tableName() throws RecognitionException {
@@ -291,6 +323,14 @@ public class BasicSQLParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_condition; }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof BasicSQLListener ) ((BasicSQLListener)listener).enterCondition(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof BasicSQLListener ) ((BasicSQLListener)listener).exitCondition(this);
+		}
 	}
 
 	public final ConditionContext condition() throws RecognitionException {
