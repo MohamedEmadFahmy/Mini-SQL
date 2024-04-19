@@ -5,8 +5,6 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Vector;
 
-import com.halberdski.resources.BTree;
-
 public class Tuple implements Serializable {
     private Hashtable<String, Object> colNameVal;
     private String primaryKeyName;

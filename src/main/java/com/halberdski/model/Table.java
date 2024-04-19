@@ -22,11 +22,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.text.TabExpander;
+
 import com.halberdski.engine.DBApp;
 import com.halberdski.engine.SQLTerm;
+import com.halberdski.engine.utility;
 import com.halberdski.exceptions.DBAppException;
-import com.halberdski.resources.BTree;
-import com.halberdski.resources.utility;
 
 @SuppressWarnings("unused")
 public class Table implements Serializable {
@@ -35,9 +36,11 @@ public class Table implements Serializable {
     private Hashtable<String, String> htblColNameType;
     private Vector<String> pagesList;
     private Vector<Vector<Tuple>> pageRanges;
-    // private Vector<Hashtable<String,Object>> pagesInfo;
     private int currentPageID;
     private int maxTupleCount;
+
+    private static String pathToTablesFolder = "./src/main/resources/Serialized_Tables/";
+    private static String pathToConfig = "./src/main/resources/DBApp.config";
 
     public Table(String strTableName, String primaryKeyName, Hashtable<String, String> htblColNameType)
             throws DBAppException {
@@ -46,7 +49,6 @@ public class Table implements Serializable {
         this.htblColNameType = htblColNameType;
         this.pagesList = new Vector<String>();
         this.pageRanges = new Vector<>();
-        // this.pagesInfo = new Vector<Hashtable<String,Object>>();
         this.currentPageID = 1;
 
         loadMaxTuplesCount();
@@ -58,9 +60,10 @@ public class Table implements Serializable {
 
     public void loadMaxTuplesCount() throws DBAppException {
 
-        String pathToConfig = "src/resources/DBApp.config";
+        // System.out.println(this.getClass().getProtectionDomain().getCodeSource().getLocation());
+
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(pathToConfig));
+            BufferedReader reader = new BufferedReader(new FileReader(Table.pathToConfig));
             String line;
 
             while ((line = reader.readLine()) != null) {
@@ -296,8 +299,9 @@ public class Table implements Serializable {
                 // it directly
                 pagesToRemove.add(currentPageName);
                 rangesToRemove.add(pageRange);
-                File currentPageFile = new File(
-                        ".//src//resources//Serialized_Pages//" + currentPageName + ".class");
+
+                // Delete the page from disk
+                File currentPageFile = new File(Table.pathToTablesFolder + currentPageName + ".class");
                 currentPageFile.delete();
                 // System.out.println("Page removed: " + currentPageName);
                 // System.out.println("Range removed: " + i);
@@ -633,7 +637,7 @@ public class Table implements Serializable {
         // Store table on disk
         try {
             FileOutputStream fileOut = new FileOutputStream(
-                    "./src/resources/Serialized_Tables/" + this.getStrTableName() + ".class");
+                    Table.pathToTablesFolder + this.getStrTableName() + ".class");
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(this);
             out.close();
@@ -647,8 +651,7 @@ public class Table implements Serializable {
         Table myTable = null;
         // Load table from disk
         try {
-            FileInputStream fileIn = new FileInputStream(
-                    "./src/resources/Serialized_Tables/" + strTableName + ".class");
+            FileInputStream fileIn = new FileInputStream(Table.pathToTablesFolder + strTableName + ".class");
             ObjectInputStream in = new ObjectInputStream(fileIn);
             myTable = (Table) in.readObject();
             in.close();

@@ -8,8 +8,8 @@ import java.util.Vector;
 import com.halberdski.engine.DBApp;
 import com.halberdski.engine.SQLTerm;
 import com.halberdski.exceptions.DBAppException;
-import com.halberdski.resources.BTree;
-import com.halberdski.resources.utility;
+import com.halberdski.model.BTree;
+import com.halberdski.engine.utility;
 
 @SuppressWarnings("unused")
 class DBTests {
@@ -445,15 +445,17 @@ class DBTests {
     }
 
     public static void main(String[] args) throws DBAppException {
-        // testInserts(101);
-        // testDeletes(10);
-        // testUpdates(10);
-        // testCreateIndex();
-        // wrongTestCase(10);
-        // testInsertsStringPrimaryKey(101);
-        // testInsertsDoublePrimaryKey(101);
-        // testSelect();
-        // testSelectOperatorPrecedence();
+        testInserts(101);
+        testDeletes(10);
+        testUpdates(10);
+        testCreateIndex();
+        wrongTestCase(10);
+        testInsertsStringPrimaryKey(101);
+        testInsertsDoublePrimaryKey(101);
+        testSelect();
+        testSelectOperatorPrecedence();
+
+        // System.out.println(System.getProperty("user.dir"));
 
     }
 

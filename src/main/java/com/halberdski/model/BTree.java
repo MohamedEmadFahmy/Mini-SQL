@@ -1,4 +1,4 @@
-package com.halberdski.resources;
+package com.halberdski.model;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,6 +17,8 @@ public class BTree implements Serializable {
     private PriorityQueue<Comparable> minHeap;
     private PriorityQueue<Comparable> maxHeap;
     private String indexName;
+
+    private static String pathToIndicesFolder = "./src/main/resources/Serialized_Indices/";
 
     public String getIndexName() {
         return indexName;
@@ -1260,8 +1262,7 @@ public class BTree implements Serializable {
 
     public void saveIndex() {
         try {
-            FileOutputStream fileOut = new FileOutputStream(
-                    "./src/resources/Serialized_Indices/" + this.indexName + ".class");
+            FileOutputStream fileOut = new FileOutputStream(BTree.pathToIndicesFolder + this.indexName + ".class");
             ObjectOutputStream ObjectOut = new ObjectOutputStream(fileOut);
             ObjectOut.writeObject(this);
             ObjectOut.close();
@@ -1276,7 +1277,8 @@ public class BTree implements Serializable {
 
     public static BTree loadIndex(String indexName) {
         try {
-            FileInputStream fileIn = new FileInputStream("./src/resources/Serialized_Indices/" + indexName + ".class");
+
+            FileInputStream fileIn = new FileInputStream(BTree.pathToIndicesFolder + indexName + ".class");
             ObjectInputStream ObjectIn = new ObjectInputStream(fileIn);
             BTree index = null;
             index = (BTree) ObjectIn.readObject();

@@ -10,12 +10,11 @@ import java.util.Map;
 import java.util.Vector;
 
 import com.halberdski.exceptions.DBAppException;
-import com.halberdski.resources.BTree;
 
 public class Metadata {
     private static Hashtable<String, Hashtable<String, Hashtable<String, String>>> ht = new Hashtable<String, Hashtable<String, Hashtable<String, String>>>();
 
-    private static String filePathToMetadata = "metadata.csv";
+    private static String pathToMetadataFile = "./src/main/resources/metadata.csv";
 
     /*
      * 
@@ -106,7 +105,7 @@ public class Metadata {
         // System.out.println(attributes);
 
         // // Write to metadata.csv file
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(Metadata.filePathToMetadata, false))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(Metadata.pathToMetadataFile, false))) {
             writer.write(content);
         } catch (IOException e) {
             System.err.println("Error writing to file: " + e.getMessage());
@@ -117,7 +116,7 @@ public class Metadata {
         // Load the metadata from the file
         ht.clear();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(Metadata.filePathToMetadata))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(Metadata.pathToMetadataFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");

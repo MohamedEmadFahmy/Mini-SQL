@@ -1,4 +1,4 @@
-package com.halberdski.resources;
+package com.halberdski.engine;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,12 +7,20 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class utility {
+    private static String pathToMetadataFile = "./src/main/resources/metadata.csv";
+    private static String pathToTablesFolder = "./src/main/resources/Serialized_Tables/";
+    private static String pathToPagesFolder = "./src/main/resources/Serialized_Pages/";
+    private static String pathToIndicesFolder = "./src/main/resources/Serialized_Indices/";
+
+    // private static String pathToConfig = System.getProperty("user.dir") +
+    // "\\src\\main\\resources\\DBApp.config";
+
     public static void clearDatabaseSystem() {
-        Path tableFolder = Paths.get("./src/resources/Serialized_Tables");
-        deleteAndRecreateFolder(tableFolder);
-        Path pagesFolder = Paths.get("./src/resources/Serialized_Pages");
+        Path tablesFolder = Paths.get(pathToTablesFolder);
+        deleteAndRecreateFolder(tablesFolder);
+        Path pagesFolder = Paths.get(pathToPagesFolder);
         deleteAndRecreateFolder(pagesFolder);
-        Path indicesFolder = Paths.get("./src/resources/Serialized_Indices");
+        Path indicesFolder = Paths.get(pathToIndicesFolder);
         deleteAndRecreateFolder(indicesFolder);
         recreateMetaDataFile();
         System.out.println("Database Cleared");
@@ -37,8 +45,7 @@ public class utility {
     }
 
     public static void recreateMetaDataFile() {
-        String filePath = "metadata.csv";
-        File file = new File(filePath);
+        File file = new File(pathToMetadataFile);
 
         if (file.exists()) {
             if (file.delete()) {

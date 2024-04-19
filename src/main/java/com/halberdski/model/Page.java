@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Vector;
 
 import com.halberdski.exceptions.DBAppException;
-import com.halberdski.resources.BTree;
 
 @SuppressWarnings("unused")
 public class Page implements Serializable {
@@ -21,7 +20,8 @@ public class Page implements Serializable {
     private Hashtable<String, String> colNameType;
     private Tuple min;
     private Tuple max;
-    // private static final long serialVersionUID = -4544542885377264750L;
+
+    private static String pathToPagesFolder = "./src/main/resources/Serialized_Pages/";
 
     public Page(String strTableName, String pageName, Hashtable<String, String> colNameType, String primaryKeyName,
             int maxTupleCount) {
@@ -271,14 +271,14 @@ public class Page implements Serializable {
 
     public void savePage() throws DBAppException {
         try {
-            FileOutputStream fileOut = new FileOutputStream(
-                    ".//src//resources//Serialized_Pages//" + this.pageName + ".class");
+            FileOutputStream fileOut = new FileOutputStream(Page.pathToPagesFolder + this.pageName + ".class");
             ObjectOutputStream ObjectOut = new ObjectOutputStream(fileOut);
             ObjectOut.writeObject(this);
             ObjectOut.close();
             fileOut.close();
             // System.out.println("Page Serialized");
         } catch (FileNotFoundException e) {
+            System.out.println(Page.pathToPagesFolder + this.pageName + ".class");
             throw new DBAppException("File not found");
         } catch (IOException e) {
             throw new DBAppException("Error occured while saving page");
@@ -287,7 +287,7 @@ public class Page implements Serializable {
 
     public static Page loadPage(String pageName) throws DBAppException {
         try {
-            FileInputStream fileIn = new FileInputStream("./src/resources/Serialized_Pages/" + pageName + ".class");
+            FileInputStream fileIn = new FileInputStream(Page.pathToPagesFolder + pageName + ".class");
             ObjectInputStream ObjectIn = new ObjectInputStream(fileIn);
             Page page = null;
             page = (Page) ObjectIn.readObject();

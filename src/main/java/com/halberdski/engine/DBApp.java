@@ -8,7 +8,6 @@ import java.util.Vector;
 import com.halberdski.model.Metadata;
 import com.halberdski.model.Table;
 import com.halberdski.model.Tuple;
-import com.halberdski.resources.utility;
 import com.halberdski.exceptions.DBAppException;
 import java.io.FileWriter;
 import java.io.IOException;
