@@ -32,4 +32,14 @@
         </plugins>
     </build>
 
+    <dependencies>
+        <!-- Other dependencies -->
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4-runtime</artifactId>
+            <version>4.9.3</version> <!-- Specify the version you want -->
+        </dependency>
+    </dependencies>
+    
+
 </project>
