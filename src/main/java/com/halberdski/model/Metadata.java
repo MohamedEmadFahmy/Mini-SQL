@@ -14,7 +14,7 @@ import com.halberdski.exceptions.DBAppException;
 public class Metadata {
     private static Hashtable<String, Hashtable<String, Hashtable<String, String>>> ht = new Hashtable<String, Hashtable<String, Hashtable<String, String>>>();
 
-    private static String pathToMetadataFile = "./src/main/resources/metadata.csv";
+    private static String pathToMetadataFile = "/src/main/resources/metadata.csv";
 
     /*
      * 
@@ -209,6 +209,10 @@ public class Metadata {
         for (Map.Entry<String, Object> entry : htblColNameValue.entrySet()) {
             String columnName = entry.getKey();
             Object columnValue = entry.getValue();
+
+            if (columnName.trim().length() == 0) {
+                return false;
+            }
 
             if (!tableHasColumn(strTableName, columnName)) {
                 return false;

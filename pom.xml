@@ -23,7 +23,8 @@
                     <outputDirectory>${project.basedir}</outputDirectory>
                     <archive>
                         <manifest>
-                            <mainClass>com.halberdski.engine.DBApp</mainClass>
+                            <!-- <mainClass>com.halberdski.engine.DBApp</mainClass> -->
+                            <mainClass>com.halberdski.tests.DBTests</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

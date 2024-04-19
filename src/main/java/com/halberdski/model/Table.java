@@ -39,7 +39,7 @@ public class Table implements Serializable {
     private int currentPageID;
     private int maxTupleCount;
 
-    private static String pathToTablesFolder = "./src/main/resources/Serialized_Tables/";
+    private static String pathToTablesFolder = "/src/main/resources/Serialized_Tables/";
     private static String pathToConfig = "./src/main/resources/DBApp.config";
 
     public Table(String strTableName, String primaryKeyName, Hashtable<String, String> htblColNameType)

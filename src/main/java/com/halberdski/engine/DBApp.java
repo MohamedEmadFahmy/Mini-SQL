@@ -3,16 +3,13 @@ package com.halberdski.engine;
 /** * @author Wael Abouelsaadat */
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Vector;
 
 import com.halberdski.model.Metadata;
 import com.halberdski.model.Table;
-import com.halberdski.model.Tuple;
 import com.halberdski.exceptions.DBAppException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Hashtable;
 
 public class DBApp {
@@ -35,6 +32,30 @@ public class DBApp {
 	// type as value
 	public void createTable(String strTableName, String strClusteringKeyColumn,
 			Hashtable<String, String> htblColNameType) throws DBAppException {
+
+		if (strTableName.trim().length() == 0) {
+			throw new DBAppException("Table name cannot be empty");
+		}
+		if (strClusteringKeyColumn.trim().length() == 0) {
+			throw new DBAppException("Primary key column cannot be empty");
+		}
+		if (htblColNameType.size() == 0) {
+			throw new DBAppException("Table must have at least one column");
+		}
+
+		for (Map.Entry<String, String> entry : htblColNameType.entrySet()) {
+			if (entry.getKey().trim().length() == 0) {
+				throw new DBAppException("Column name cannot be empty");
+			}
+			if (entry.getValue().trim().length() == 0) {
+				throw new DBAppException("Column type cannot be empty");
+			}
+			if (!(entry.getValue().equals("java.lang.Integer") || entry.getValue().equals("java.lang.Double")
+					|| entry.getValue().equals("java.lang.String"))) {
+				throw new DBAppException("Column type must be either Integer, Double, or String");
+			}
+		}
+
 		if (Metadata.tableExists(strTableName)) {
 			throw new DBAppException("Table " + strTableName + " already exists!");
 		}
@@ -59,6 +80,20 @@ public class DBApp {
 	public void createIndex(String strTableName,
 			String strColName,
 			String strIndexName) throws DBAppException {
+
+		if (strTableName.trim().length() == 0) {
+			throw new DBAppException("Table name cannot be empty");
+		}
+		if (strColName.trim().length() == 0) {
+			throw new DBAppException("Column name cannot be empty");
+		}
+		if (strIndexName.trim().length() == 0) {
+			throw new DBAppException("Index name cannot be empty");
+		}
+
+		if (strIndexName.toLowerCase().equals("null")) {
+			throw new DBAppException("Index name cannot be null");
+		}
 
 		if (!Metadata.tableExists(strTableName)) {
 			throw new DBAppException("Table " + strTableName + " does not exist!");
@@ -92,6 +127,10 @@ public class DBApp {
 	public void insertIntoTable(String strTableName,
 			Hashtable<String, Object> htblColNameValue) throws DBAppException {
 
+		if (strTableName.trim().length() == 0) {
+			throw new DBAppException("Table name cannot be empty");
+		}
+
 		if (!Metadata.tableExists(strTableName)) {
 			throw new DBAppException("Table " + strTableName + " does not exist!");
 		}
@@ -112,9 +151,20 @@ public class DBApp {
 			String strClusteringKeyValue,
 			Hashtable<String, Object> htblColNameValue) throws DBAppException {
 
+		if (strTableName.trim().length() == 0) {
+			throw new DBAppException("Primary key value cannot be empty");
+		}
+		if (strClusteringKeyValue.trim().length() == 0) {
+			throw new DBAppException("Primary key value cannot be empty");
+		}
+
 		if (!Metadata.tableExists(strTableName)) {
 			throw new DBAppException("Table " + strTableName + " does not exist!");
 		}
+		if (htblColNameValue.isEmpty()) {
+			throw new DBAppException("No columns to update");
+		}
+
 		if (htblColNameValue.containsKey(Metadata.getPrimaryKeyName(strTableName))) {
 			throw new DBAppException("Primary key cannot be updated");
 		}
@@ -167,7 +217,11 @@ public class DBApp {
 	// DONE
 	public void deleteFromTable(String strTableName,
 			Hashtable<String, Object> htblColNameValue) throws DBAppException {
-		// System.out.println("test1");
+
+		if (strTableName.trim().length() == 0) {
+			throw new DBAppException("Table name cannot be empty");
+		}
+
 		if (!Metadata.tableExists(strTableName)) {
 			throw new DBAppException("Table " + strTableName + " does not exist!");
 		}
@@ -207,7 +261,7 @@ public class DBApp {
 			throw new DBAppException("Table " + tableName + " does not exist!");
 		}
 		if (arrSQLTerms.length != strarrOperators.length + 1) {
-			throw new DBAppException("Invalid number of operators/Sql Terms");
+			throw new DBAppException("Invalid number of SQL Terms / Operators");
 		}
 
 		String[] operators = { "=", "!=", "<", "<=", ">", ">=" };
@@ -242,59 +296,61 @@ public class DBApp {
 		System.out.println(myTable);
 	}
 
-	public static void logTable(String strTableName) {
-		if (!Metadata.tableExists(strTableName)) {
-			System.out.println("Table " + strTableName + " does not exist!");
-			return;
-		}
+	// public static void logTable(String strTableName) {
+	// if (!Metadata.tableExists(strTableName)) {
+	// System.out.println("Table " + strTableName + " does not exist!");
+	// return;
+	// }
 
-		Table myTable = Table.loadTable(strTableName);
-		String tableString = myTable.toString();
+	// Table myTable = Table.loadTable(strTableName);
+	// String tableString = myTable.toString();
 
-		try (FileWriter writer = new FileWriter("output.txt")) {
-			writer.write(tableString);
-			System.out.println("Table " + strTableName + " logged successfully to output.txt");
-		} catch (IOException e) {
-			System.err.println("Error writing to output.txt: " + e.getMessage());
-		}
-	}
+	// try (FileWriter writer = new FileWriter("output.txt")) {
+	// writer.write(tableString);
+	// System.out.println("Table " + strTableName + " logged successfully to
+	// output.txt");
+	// } catch (IOException e) {
+	// System.err.println("Error writing to output.txt: " + e.getMessage());
+	// }
+	// }
 
-	@SuppressWarnings("rawtypes")
-	protected void bulkInsertIntoTable(String tableName, int startNum, int endNum) throws DBAppException {
-		Vector<Integer> nums = new Vector<>();
-		for (int i = startNum; i <= endNum; i++) {
-			nums.add(i);
+	// @SuppressWarnings("rawtypes")
+	// protected void bulkInsertIntoTable(String tableName, int startNum, int
+	// endNum) throws DBAppException {
+	// Vector<Integer> nums = new Vector<>();
+	// for (int i = startNum; i <= endNum; i++) {
+	// nums.add(i);
 
-		}
-		Collections.shuffle(nums);
+	// }
+	// Collections.shuffle(nums);
 
-		System.out.println(nums);
+	// System.out.println(nums);
 
-		for (int i : nums) {
-			Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-			htblColNameValue.put("id", i);
-			htblColNameValue.put("name", "Moski no " + i);
-			htblColNameValue.put("gpa", 3.5);
-			// System.out.println("Before inserting" + htblColNameValue);
-			this.insertIntoTable(tableName, htblColNameValue);
-		}
-		printTable(tableName);
-		Iterator iterator = this.selectFromTable(
-				new SQLTerm[] { new SQLTerm(tableName, "id", ">", 0) },
-				new String[] {});
+	// for (int i : nums) {
+	// Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+	// htblColNameValue.put("id", i);
+	// htblColNameValue.put("name", "Moski no " + i);
+	// htblColNameValue.put("gpa", 3.5);
+	// // System.out.println("Before inserting" + htblColNameValue);
+	// this.insertIntoTable(tableName, htblColNameValue);
+	// }
+	// printTable(tableName);
+	// Iterator iterator = this.selectFromTable(
+	// new SQLTerm[] { new SQLTerm(tableName, "id", ">", 0) },
+	// new String[] {});
 
-		while (iterator.hasNext()) {
-			Tuple currentTuple = (Tuple) iterator.next();
-			nums.remove(currentTuple.getPrimaryKey());
-		}
+	// while (iterator.hasNext()) {
+	// Tuple currentTuple = (Tuple) iterator.next();
+	// nums.remove(currentTuple.getPrimaryKey());
+	// }
 
-		if (nums.isEmpty()) {
-			System.out.println("All numbers inserted");
-		} else {
-			System.out.println("These numbers not inserted");
-			System.out.println(nums);
-		}
-	}
+	// if (nums.isEmpty()) {
+	// System.out.println("All numbers inserted");
+	// } else {
+	// System.out.println("These numbers not inserted");
+	// System.out.println(nums);
+	// }
+	// }
 
 	public static void main(String[] args) {
 
@@ -358,22 +414,22 @@ public class DBApp {
 			// dbApp.insertIntoTable("allNumsTable", htblColNameValue);
 			// ------------------------SELECT TESTING-------------------------//
 
-			// dbApp.createIndex("Student", "id", "index");
-			// for (int i = 1; i <= 20; i++) {
-			// Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-			// htblColNameValue.put("id", i);
-			// htblColNameValue.put("name", "Moski no " + i);
-			// htblColNameValue.put("gpa", 3.5);
-			// dbApp.insertIntoTable("Student", htblColNameValue);
-			// }
-			// dbApp.printTable("Student");
-			// SQLTerm[] sqlArray = {
-			// new SQLTerm("Student", "id", "=", 2),
-			// new SQLTerm("Student", "id", "=", 15) };
-			// String[] ops = { "AND" };
+			dbApp.createIndex("Student", "id", "index");
+			for (int i = 1; i <= 20; i++) {
+				Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+				htblColNameValue.put("id", i);
+				htblColNameValue.put("name", "Moski no " + i);
+				htblColNameValue.put("gpa", 3.5);
+				dbApp.insertIntoTable("Student", htblColNameValue);
+			}
+			DBApp.printTable("Student");
+			SQLTerm[] sqlArray = {
+					new SQLTerm("Student", "id", "=", 2),
+					new SQLTerm("Student", "id", "=", 15) };
+			String[] ops = { "AND", "OR" };
 			// SQLTerm[] sqlArray2 = {};
 
-			// Iterator iterator = dbApp.selectFromTable(sqlArray, ops);
+			dbApp.selectFromTable(sqlArray, ops);
 
 			// // <= 7 1,2,3,4,5,6,7
 			// // <= 5 1,2,3,4,5

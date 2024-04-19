@@ -21,7 +21,7 @@ public class Page implements Serializable {
     private Tuple min;
     private Tuple max;
 
-    private static String pathToPagesFolder = "./src/main/resources/Serialized_Pages/";
+    private static String pathToPagesFolder = "/src/main/resources/Serialized_Pages/";
 
     public Page(String strTableName, String pageName, Hashtable<String, String> colNameType, String primaryKeyName,
             int maxTupleCount) {
@@ -110,26 +110,6 @@ public class Page implements Serializable {
 
         return low;
     }
-
-    // public boolean delete(Hashtable<String, Object> x) {
-    // // deletes any tuple that matches the given criteria
-    // // returns true if the page is empty after deletion
-    // // updates the min and max tuples
-
-    // for (Tuple currentTuple : this.tuples) {
-    // if (currentTuple.matchesCriteria(x)) {
-    // this.tuples.remove(currentTuple);
-    // currentTuple.deleteDataFromAvailableIndices(this.strTableName,
-    // this.pageName);
-    // this.tupleCount -= 1;
-    // }
-    // }
-
-    // this.min = this.tuples.firstElement();
-    // this.max = this.tuples.lastElement();
-
-    // return this.tuples.isEmpty();
-    // }
 
     public Vector<Tuple> delete(Hashtable<String, Object> x) {
         Vector<Tuple> pageRange = new Vector<>();
@@ -249,29 +229,12 @@ public class Page implements Serializable {
         return result;
     }
 
-    // private static int binarySearch(int[] array, int num) {
-    // int low = 0;
-    // int high = array.length - 1;
-
-    // while (low <= high) {
-    // int mid = (low + high) / 2;
-    // int currentElement = array[mid];
-
-    // if (currentElement < num) {
-    // low = mid + 1;
-    // } else if (currentElement > num) {
-    // high = mid - 1;
-    // } else {
-    // return mid;
-    // }
-    // }
-
-    // return low;
-    // }
-
     public void savePage() throws DBAppException {
         try {
-            FileOutputStream fileOut = new FileOutputStream(Page.pathToPagesFolder + this.pageName + ".class");
+            FileOutputStream fileOut = new FileOutputStream(Page.pathToPagesFolder +
+                    this.pageName + ".class");
+            // FileOutputStream fileOut = new FileOutputStream(
+            // ".//src//resources//Serialized_Pages//" + this.pageName + ".class");
             ObjectOutputStream ObjectOut = new ObjectOutputStream(fileOut);
             ObjectOut.writeObject(this);
             ObjectOut.close();
