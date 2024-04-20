@@ -50,8 +50,8 @@ public class Controller extends BasicSQLBaseListener {
                     // TODO: handle exception
                 }
                 try {
-                    Boolean bool = Boolean.parseBoolean(subChild);
-                    columnValues.add(bool);
+                    Double doubleVal = Double.parseDouble(subChild);
+                    columnValues.add(doubleVal);
                     continue;
                 } catch (Exception e) {
                     // TODO: handle exception
