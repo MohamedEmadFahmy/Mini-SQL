@@ -6,8 +6,17 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
 
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
+
 import com.halberdski.model.Metadata;
 import com.halberdski.model.Table;
+import com.halberdski.antlr4.BasicSQLLexer;
+import com.halberdski.antlr4.BasicSQLParser;
+import com.halberdski.antlr4.CustomErrorListener;
+import com.halberdski.antlr4.Controller;
 import com.halberdski.exceptions.DBAppException;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -352,164 +361,211 @@ public class DBApp {
 	// }
 	// }
 
-	public static void main(String[] args) {
+	// public static void main(String[] args) {
+
+	// try {
+	// DBApp dbApp = new DBApp();
+
+	// utility.clearDatabaseSystem();
+
+	// String strTableName = "Student";
+	// Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
+	// htblColNameType.put("id", "java.lang.Integer");
+	// htblColNameType.put("name", "java.lang.String");
+	// htblColNameType.put("gpa", "java.lang.Double");
+	// dbApp.createTable(strTableName, "id", htblColNameType);
+
+	// String strTableName2 = "Student2";
+	// Hashtable<String, String> htblColNameType2 = new Hashtable<String, String>();
+	// htblColNameType2.put("id", "java.lang.Integer");
+	// htblColNameType2.put("name", "java.lang.String");
+	// htblColNameType2.put("gpa", "java.lang.Double");
+	// dbApp.createTable(strTableName2, "id", htblColNameType2);
+
+	// System.out.println(Metadata.getAllTables());
+
+	// // dbApp.createIndex("Student2", "id", "index2");
+
+	// // String strTableName = "Employee";
+	// // Hashtable<String, String> htblColNameType = new Hashtable<>();
+	// // dbApp.createTable(strTableName, "id", htblColNameType);
+
+	// // String strTableName = "Student";
+	// // Hashtable<String, String> htblColNameType = new Hashtable<String,
+	// String>();
+	// // htblColNameType.put("id", "java.lang.Integer");
+	// // htblColNameType.put("name", "java.lang.String");
+	// // htblColNameType.put("gpa", "java.lang.Double");
+	// // dbApp.createTable(strTableName, "id", htblColNameType);
+
+	// // ---------------------Employee Table--------------------------
+	// // String strTableName = "Employee";
+	// // Hashtable<String, String> htblColNameType = new Hashtable<>();
+	// // htblColNameType.put("id", "java.lang.Integer");
+	// // htblColNameType.put("name", "java.lang.String");
+	// // htblColNameType.put("gpa", "java.lang.Double");
+	// // dbApp.createTable(strTableName, "id", htblColNameType);
+	// // -------------------------------------------------------------
+
+	// // printTable("Employee");
+	// // printTable("o");
+
+	// // String strTableName = "allNumsTable";
+	// // Hashtable<String, String> htblColNameType = new Hashtable<String,
+	// String>();
+	// // htblColNameType.put("id", "java.lang.Integer");
+	// // htblColNameType.put("age", "java.lang.Integer");
+	// // htblColNameType.put("height", "java.lang.Integer");
+	// // dbApp.createTable(strTableName, "id", htblColNameType);
+
+	// // Hashtable<String, Object> htblColNameValue = new Hashtable<String,
+	// Object>();
+	// // htblColNameValue.put("id", 1.5);
+	// // htblColNameValue.put("id", 20);
+	// // htblColNameValue.put("id", 180);
+	// // dbApp.insertIntoTable("allNumsTable", htblColNameValue);
+	// // ------------------------SELECT TESTING-------------------------//
+
+	// dbApp.createIndex("Student", "id", "index");
+	// for (int i = 1; i <= 20; i++) {
+	// Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+	// htblColNameValue.put("id", i);
+	// htblColNameValue.put("name", "Moski no " + i);
+	// htblColNameValue.put("gpa", 3.5);
+	// dbApp.insertIntoTable("Student", htblColNameValue);
+	// }
+	// DBApp.printTable("Student");
+	// SQLTerm[] sqlArray = {
+	// new SQLTerm("Student", "id", "=", 2),
+	// new SQLTerm("Student", "id", "=", 15) };
+	// String[] ops = { "AND", "OR" };
+	// // SQLTerm[] sqlArray2 = {};
+
+	// dbApp.selectFromTable(sqlArray, ops);
+
+	// // // <= 7 1,2,3,4,5,6,7
+	// // // <= 5 1,2,3,4,5
+
+	// // while (iterator.hasNext()) {
+	// // System.out.println(iterator.next());
+	// // }
+
+	// // ----------------- Delete Table Testing ---------------------\\
+
+	// // for (int i = 1; i <= 20; i++) {
+	// // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+	// // htblColNameValue.put("id", i);
+	// // htblColNameValue.put("name", "Moski no " + i);
+	// // if (i > 6) {
+	// // htblColNameValue.put("gpa", 3.5);
+	// // } else {
+	// // htblColNameValue.put("gpa", 2.5);
+	// // }
+	// // dbApp.insertIntoTable("Student", htblColNameValue);
+	// // }
+	// // dbApp.createIndex("Student", "gpa", "index");
+	// // Hashtable<String, Object> htblTuplesToDelete = new Hashtable<>();
+	// // // htblTuplesToDelete.put("id", 6);
+	// // // htblTuplesToDelete.put("name", "Moski no " + "6");
+	// // htblTuplesToDelete.put("gpa", 3.5);
+	// // dbApp.printTable("Student");
+	// // dbApp.deleteFromTable("Student", htblTuplesToDelete);
+	// // dbApp.printTable("Student");
+
+	// // ----------------- Update Table Testing ---------------------\\
+
+	// // for (int i = 1; i <= 20; i++) {
+	// // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+	// // htblColNameValue.put("id", i);
+	// // htblColNameValue.put("name", "Moski no " + i);
+	// // if (i > 6) {
+	// // htblColNameValue.put("gpa", 3.5);
+	// // } else {
+	// // htblColNameValue.put("gpa", 2.5);
+	// // }
+	// // dbApp.insertIntoTable("Student", htblColNameValue);
+	// // }
+	// // dbApp.createIndex("Student", "gpa", "index");
+	// // Hashtable<String, Object> htblUpdatedTuple = new Hashtable<>();
+	// // // htblUpdatedTuple.put("id", 7);
+	// // htblUpdatedTuple.put("gpa", 6.0);
+	// // htblUpdatedTuple.put("name", "Updated");
+	// // dbApp.updateTable("Student", "6", htblUpdatedTuple);
+	// // dbApp.printTable("Student");
+
+	// // ----------------- Insert Table Testing ---------------------\\
+
+	// // for (int i = 1; i <= 20; i++) {
+	// // Hashtable<String, Object> htblColNameValue = new Hashtable<>();
+	// // htblColNameValue.put("id", i);
+	// // htblColNameValue.put("name", "Moski no " + i);
+	// // if (i > 6) {
+	// // htblColNameValue.put("gpa", 3.5);
+	// // } else {
+	// // htblColNameValue.put("gpa", 2.5);
+	// // }
+	// // if (i != 7) {
+	// // dbApp.insertIntoTable("Student", htblColNameValue);
+	// // }
+	// // }
+	// // dbApp.createIndex("Student", "gpa", "index");
+	// // Hashtable<String, Object> htblTupleToInsert = new Hashtable<>();
+	// // htblTupleToInsert.put("id", 7);
+	// // htblTupleToInsert.put("gpa", 6.0);
+	// // htblTupleToInsert.put("name", "Abso");
+	// // dbApp.insertIntoTable("Student", htblTupleToInsert);
+	// // dbApp.printTable("Student");
+	// // System.out.println("valid insert: " + Metadata.validInsert("Student",
+	// // htblTupleToInsert));
+	// // System.out.println("valid ColNameType: " +
+	// // Metadata.validColumnNamesAndTypes("Student", htblTupleToInsert));
+
+	// } catch (Exception exp) {
+	// exp.printStackTrace();
+	// }
+	// }
+
+	public static void runSQL(String sql) throws DBAppException {
+		// Create a CharStream from the input SQL string
+		CharStream input = CharStreams.fromString(sql);
+
+		// Create a lexer that feeds off of the input CharStream
+		BasicSQLLexer lexer = new BasicSQLLexer(input);
+
+		// Create a buffer of tokens pulled from the lexer
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+		// Create a parser that feeds off the tokens buffer
+		BasicSQLParser parser = new BasicSQLParser(tokens);
+
+		// Set custom error listeners to suppress error messages
+		lexer.removeErrorListeners();
+		parser.removeErrorListeners();
+
+		parser.addErrorListener(new CustomErrorListener(parser));
 
 		try {
-			DBApp dbApp = new DBApp();
+			// parser.sqlStatement();
+			BasicSQLParser.SqlStatementContext tree = parser.sqlStatement();
 
-			utility.clearDatabaseSystem();
+			Controller listener = new Controller();
 
-			String strTableName = "Student";
-			Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
-			htblColNameType.put("id", "java.lang.Integer");
-			htblColNameType.put("name", "java.lang.String");
-			htblColNameType.put("gpa", "java.lang.Double");
-			dbApp.createTable(strTableName, "id", htblColNameType);
+			ParseTreeWalker walker = new ParseTreeWalker();
+			walker.walk(listener, tree);
 
-			String strTableName2 = "Student2";
-			Hashtable<String, String> htblColNameType2 = new Hashtable<String, String>();
-			htblColNameType2.put("id", "java.lang.Integer");
-			htblColNameType2.put("name", "java.lang.String");
-			htblColNameType2.put("gpa", "java.lang.Double");
-			dbApp.createTable(strTableName2, "id", htblColNameType2);
+		} catch (RuntimeException e) {
+			throw new DBAppException(e.getMessage());
+		}
 
-			System.out.println(Metadata.getAllTables());
+	}
 
-			// dbApp.createIndex("Student2", "id", "index2");
-
-			// String strTableName = "Employee";
-			// Hashtable<String, String> htblColNameType = new Hashtable<>();
-			// dbApp.createTable(strTableName, "id", htblColNameType);
-
-			// String strTableName = "Student";
-			// Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
-			// htblColNameType.put("id", "java.lang.Integer");
-			// htblColNameType.put("name", "java.lang.String");
-			// htblColNameType.put("gpa", "java.lang.Double");
-			// dbApp.createTable(strTableName, "id", htblColNameType);
-
-			// ---------------------Employee Table--------------------------
-			// String strTableName = "Employee";
-			// Hashtable<String, String> htblColNameType = new Hashtable<>();
-			// htblColNameType.put("id", "java.lang.Integer");
-			// htblColNameType.put("name", "java.lang.String");
-			// htblColNameType.put("gpa", "java.lang.Double");
-			// dbApp.createTable(strTableName, "id", htblColNameType);
-			// -------------------------------------------------------------
-
-			// printTable("Employee");
-			// printTable("o");
-
-			// String strTableName = "allNumsTable";
-			// Hashtable<String, String> htblColNameType = new Hashtable<String, String>();
-			// htblColNameType.put("id", "java.lang.Integer");
-			// htblColNameType.put("age", "java.lang.Integer");
-			// htblColNameType.put("height", "java.lang.Integer");
-			// dbApp.createTable(strTableName, "id", htblColNameType);
-
-			// Hashtable<String, Object> htblColNameValue = new Hashtable<String, Object>();
-			// htblColNameValue.put("id", 1.5);
-			// htblColNameValue.put("id", 20);
-			// htblColNameValue.put("id", 180);
-			// dbApp.insertIntoTable("allNumsTable", htblColNameValue);
-			// ------------------------SELECT TESTING-------------------------//
-
-			dbApp.createIndex("Student", "id", "index");
-			for (int i = 1; i <= 20; i++) {
-				Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-				htblColNameValue.put("id", i);
-				htblColNameValue.put("name", "Moski no " + i);
-				htblColNameValue.put("gpa", 3.5);
-				dbApp.insertIntoTable("Student", htblColNameValue);
-			}
-			DBApp.printTable("Student");
-			SQLTerm[] sqlArray = {
-					new SQLTerm("Student", "id", "=", 2),
-					new SQLTerm("Student", "id", "=", 15) };
-			String[] ops = { "AND", "OR" };
-			// SQLTerm[] sqlArray2 = {};
-
-			dbApp.selectFromTable(sqlArray, ops);
-
-			// // <= 7 1,2,3,4,5,6,7
-			// // <= 5 1,2,3,4,5
-
-			// while (iterator.hasNext()) {
-			// System.out.println(iterator.next());
-			// }
-
-			// ----------------- Delete Table Testing ---------------------\\
-
-			// for (int i = 1; i <= 20; i++) {
-			// Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-			// htblColNameValue.put("id", i);
-			// htblColNameValue.put("name", "Moski no " + i);
-			// if (i > 6) {
-			// htblColNameValue.put("gpa", 3.5);
-			// } else {
-			// htblColNameValue.put("gpa", 2.5);
-			// }
-			// dbApp.insertIntoTable("Student", htblColNameValue);
-			// }
-			// dbApp.createIndex("Student", "gpa", "index");
-			// Hashtable<String, Object> htblTuplesToDelete = new Hashtable<>();
-			// // htblTuplesToDelete.put("id", 6);
-			// // htblTuplesToDelete.put("name", "Moski no " + "6");
-			// htblTuplesToDelete.put("gpa", 3.5);
-			// dbApp.printTable("Student");
-			// dbApp.deleteFromTable("Student", htblTuplesToDelete);
-			// dbApp.printTable("Student");
-
-			// ----------------- Update Table Testing ---------------------\\
-
-			// for (int i = 1; i <= 20; i++) {
-			// Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-			// htblColNameValue.put("id", i);
-			// htblColNameValue.put("name", "Moski no " + i);
-			// if (i > 6) {
-			// htblColNameValue.put("gpa", 3.5);
-			// } else {
-			// htblColNameValue.put("gpa", 2.5);
-			// }
-			// dbApp.insertIntoTable("Student", htblColNameValue);
-			// }
-			// dbApp.createIndex("Student", "gpa", "index");
-			// Hashtable<String, Object> htblUpdatedTuple = new Hashtable<>();
-			// // htblUpdatedTuple.put("id", 7);
-			// htblUpdatedTuple.put("gpa", 6.0);
-			// htblUpdatedTuple.put("name", "Updated");
-			// dbApp.updateTable("Student", "6", htblUpdatedTuple);
-			// dbApp.printTable("Student");
-
-			// ----------------- Insert Table Testing ---------------------\\
-
-			// for (int i = 1; i <= 20; i++) {
-			// Hashtable<String, Object> htblColNameValue = new Hashtable<>();
-			// htblColNameValue.put("id", i);
-			// htblColNameValue.put("name", "Moski no " + i);
-			// if (i > 6) {
-			// htblColNameValue.put("gpa", 3.5);
-			// } else {
-			// htblColNameValue.put("gpa", 2.5);
-			// }
-			// if (i != 7) {
-			// dbApp.insertIntoTable("Student", htblColNameValue);
-			// }
-			// }
-			// dbApp.createIndex("Student", "gpa", "index");
-			// Hashtable<String, Object> htblTupleToInsert = new Hashtable<>();
-			// htblTupleToInsert.put("id", 7);
-			// htblTupleToInsert.put("gpa", 6.0);
-			// htblTupleToInsert.put("name", "Abso");
-			// dbApp.insertIntoTable("Student", htblTupleToInsert);
-			// dbApp.printTable("Student");
-			// System.out.println("valid insert: " + Metadata.validInsert("Student",
-			// htblTupleToInsert));
-			// System.out.println("valid ColNameType: " +
-			// Metadata.validColumnNamesAndTypes("Student", htblTupleToInsert));
-
-		} catch (Exception exp) {
-			exp.printStackTrace();
+	public static void main(String[] args) {
+		String sql = "insert into moski (name, age) values ('mo', 5);";
+		// String sql = "CREATE TABLE moski (age INT, name VARCHAR primary key);";
+		try {
+			DBApp.runSQL(sql);
+		} catch (DBAppException e) {
+			System.out.println(e.getMessage());
 		}
 	}
 }

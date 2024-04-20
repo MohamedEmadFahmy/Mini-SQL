@@ -5,7 +5,7 @@ import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class QueryTester {
-    public static void testSelectStarQuery(String sql) {
+    public static void testQuery(String sql) {
         // Create a CharStream from the input SQL string
         CharStream input = CharStreams.fromString(sql);
 
@@ -28,7 +28,7 @@ public class QueryTester {
             // parser.sqlStatement();
             BasicSQLParser.SqlStatementContext tree = parser.sqlStatement();
 
-            YourCustomListener listener = new YourCustomListener();
+            Controller listener = new Controller();
 
             // Traverse the parse tree using the listener
             ParseTreeWalker walker = new ParseTreeWalker();
@@ -79,14 +79,14 @@ public class QueryTester {
         // };
 
         // for (String sql : invalidInsertStatements) {
-        // testSelectStarQuery(sql);
+        // testQuery(sql);
         // System.out.println("\n");
         // }
 
         // System.err.println("-----------VALID-----------");
         // System.err.println();
         // for (String sql : validInsertStatements) {
-        // testSelectStarQuery(sql);
+        // testQuery(sql);
         // System.out.println("\n");
         // }
 
@@ -119,14 +119,14 @@ public class QueryTester {
         // };
 
         // for (String sql : invalidCreateStatements) {
-        // testSelectStarQuery(sql);
+        // testQuery(sql);
         // System.out.println("\n");
         // }
 
         // System.err.println("-----------VALID-----------");
         // System.err.println();
         // for (String sql : validCreateStatements) {
-        // testSelectStarQuery(sql);
+        // testQuery(sql);
         // System.out.println("\n");
         // }
 
@@ -153,14 +153,14 @@ public class QueryTester {
         // };
 
         // for (String sql : invalidCreateIndexStatements) {
-        // testSelectStarQuery(sql);
+        // testQuery(sql);
         // System.out.println("\n");
         // }
 
         // System.err.println("-----------VALID-----------");
         // System.err.println();
         // for (String sql : validCreateIndexStatements) {
-        // testSelectStarQuery(sql);
+        // testQuery(sql);
         // System.out.println("\n");
         // }
 
@@ -183,14 +183,14 @@ public class QueryTester {
         // };
 
         // for (String sql : invalidDeleteStatements) {
-        // testSelectStarQuery(sql);
+        // testQuery(sql);
         // System.out.println("\n");
         // }
 
         // System.err.println("-----------VALID-----------");
         // System.err.println();
         // for (String sql : validDeleteStatements) {
-        // testSelectStarQuery(sql);
+        // testQuery(sql);
         // System.out.println("\n");
         // }
 
@@ -217,14 +217,14 @@ public class QueryTester {
         };
 
         for (String sql : invalidUpdateStatements) {
-            testSelectStarQuery(sql);
+            testQuery(sql);
             System.out.println("\n");
         }
 
         System.err.println("-----------VALID-----------");
         System.err.println();
         for (String sql : validUpdateStatements) {
-            testSelectStarQuery(sql);
+            testQuery(sql);
             System.out.println("\n");
         }
     }
