@@ -19,4 +19,9 @@ public class YourCustomListener extends BasicSQLBaseListener {
     public void enterCreateIndexStatement(BasicSQLParser.CreateIndexStatementContext ctx) {
         System.out.println("Entering CreateIndexStatement: " + ctx.toStringTree());
     }
+
+    @Override
+    public void enterDeleteStatement(BasicSQLParser.DeleteStatementContext ctx) {
+        System.out.println("Entering DeleteStatement: " + ctx.toStringTree());
+    }
 }

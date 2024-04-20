@@ -1,6 +1,6 @@
 grammar BasicSQL;
 
-sqlStatement: selectStatement | insertStatement | createTableStatement | createIndexStatement;
+sqlStatement: selectStatement | insertStatement | createTableStatement | createIndexStatement | deleteStatement;
 
 helloWorld: 'Hello';
 

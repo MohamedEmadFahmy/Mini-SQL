@@ -163,10 +163,20 @@ public class QueryTester {
         // }
 
         // -------------------Delete STATEMENTS-------------------
-        String[] invalidDeleteStatements = {    
+
+        String[] invalidDeleteStatements = {
+                "DELETE FROM tableName WHERE id = 5 OR;",
+                "DELETE FROM tableName WHERE;",
+                "DELETE FROM tableName WHERE id IN (1, 2, 3);",
+                "DELETE FROM tableName WHERE EXISTS (SELECT * FROM otherTable WHERE otherTable.id = tableName.id);"
         };
 
         String[] validDeleteStatements = {
+                "DELETE FROM tableName WHERE id = 5 AND age = 10;",
+                "DELETE FROM tableName;",
+                "DELETE FROM tableName WHERE id = 5;",
+                "DELETE FROM tableName WHERE id = 5 AND age > 18;",
+                "DELETE FROM tableName WHERE id = 5 OR age < 18;",
         };
 
         for (String sql : invalidDeleteStatements) {
