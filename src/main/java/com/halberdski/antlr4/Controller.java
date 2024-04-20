@@ -132,17 +132,58 @@ public class Controller extends BasicSQLBaseListener {
     @Override
     public void enterCreateIndexStatement(BasicSQLParser.CreateIndexStatementContext ctx) {
         System.out.println("Entering CreateIndexStatement: " + ctx.toStringTree());
+
+        String indexName = ctx.indexName().getText();
+        String tableName = ctx.tableName().getText();
+        Vector<String> columnNames = new Vector<String>();
+
+        for (int i = 0; i < ctx.columnNameList().getChildCount(); i++) {
+            if (ctx.columnNameList().getChild(i).getChildCount() > 0) {
+                columnNames.add(ctx.columnNameList().getChild(i).getText());
+            }
+        }
+
+        try {
+
+            DBApp dbApp = new DBApp();
+            for (int i = 0; i < columnNames.size(); i++) {
+                dbApp.createIndex(tableName, columnNames.get(i), indexName);
+            }
+        } catch (DBAppException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
-    @Override
-    public void enterDeleteStatement(BasicSQLParser.DeleteStatementContext ctx) {
-        System.out.println("Entering DeleteStatement: " + ctx.toStringTree());
-    }
+    // delete
+    // @Override
+    // public void enterDeleteStatement(BasicSQLParser.DeleteStatementContext ctx) {
+    // System.out.println("Entering DeleteStatement: " + ctx.toStringTree());
+    // String tableName = ctx.tableName().getText();
 
-    @Override
-    public void enterUpdateStatement(BasicSQLParser.UpdateStatementContext ctx) {
-        System.out.println("Entering UpdateStatement: " + ctx.toStringTree());
-    }
+    // String columnName = ctx.deleteCondition().ID().getText();
+    // String operator = ctx.deleteCondition().OPERATOR().getText();
+    // String value = ctx.deleteCondition().literalValue().getText();
+
+    // // remove ''
+    // if (value.startsWith("'") && value.endsWith("'")) {
+    // value = value.substring(1, value.length() - 1);
+    // }
+
+    // Hashtable<String, Object> condition = new Hashtable<>();
+    // condition.put(columnName, value);
+
+    // try {
+    // DBApp dbApp = new DBApp();
+    // dbApp.deleteFromTable(tableName, condition);
+    // } catch (DBAppException e) {
+    // throw new RuntimeException(e.getMessage());
+    // }
+    // }
+
+    // @Override
+    // public void enterUpdateStatement(BasicSQLParser.UpdateStatementContext ctx) {
+    // System.out.println("Entering UpdateStatement: " + ctx.toStringTree());
+    // }
 
     public static void main(String[] args) {
         // QueryTester.testQuery("select * from mytable where name = 5;");

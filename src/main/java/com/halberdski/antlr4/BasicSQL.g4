@@ -28,7 +28,7 @@ columnNameList: '(' columnName (',' columnName)* ')';
 valueList: '(' literalValue (',' literalValue)* ')';
 tableName: ID;
 condition: ID OPERATOR (STRING | NUMBER);
-updateCondition: ID '=' (STRING|NUMBER);
+updateCondition: ID EQUAL (STRING|NUMBER);
 
 
 columnDefinition: columnName dataType (columnConstraint)?;
@@ -88,7 +88,8 @@ INT: DIGIT+;
 DOT: '.';
 DECIMAL: DIGIT+ DOT DIGIT+;
 
-OPERATOR: '=' | '<' | '>' | '<=' | '>=' | '!=';
+OPERATOR: EQUAL | '<' | '>' | '<=' | '>=' | '!=';
+EQUAL: '=';
 
 WS : [ \t\r\n]+ -> skip;
 DIGIT: [0-9];
