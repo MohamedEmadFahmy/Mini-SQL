@@ -1,5 +1,3 @@
-package com.halberdski.antlr4;
-
 // Generated from BasicSQL.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -48,6 +46,36 @@ public interface BasicSQLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitInsertStatement(BasicSQLParser.InsertStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BasicSQLParser#createTableStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterCreateTableStatement(BasicSQLParser.CreateTableStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BasicSQLParser#createTableStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitCreateTableStatement(BasicSQLParser.CreateTableStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BasicSQLParser#tableDefinition}.
+	 * @param ctx the parse tree
+	 */
+	void enterTableDefinition(BasicSQLParser.TableDefinitionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BasicSQLParser#tableDefinition}.
+	 * @param ctx the parse tree
+	 */
+	void exitTableDefinition(BasicSQLParser.TableDefinitionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BasicSQLParser#columnConstraint}.
+	 * @param ctx the parse tree
+	 */
+	void enterColumnConstraint(BasicSQLParser.ColumnConstraintContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BasicSQLParser#columnConstraint}.
+	 * @param ctx the parse tree
+	 */
+	void exitColumnConstraint(BasicSQLParser.ColumnConstraintContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link BasicSQLParser#columnName}.
 	 * @param ctx the parse tree
@@ -108,4 +136,24 @@ public interface BasicSQLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitCondition(BasicSQLParser.ConditionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BasicSQLParser#columnDefinition}.
+	 * @param ctx the parse tree
+	 */
+	void enterColumnDefinition(BasicSQLParser.ColumnDefinitionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BasicSQLParser#columnDefinition}.
+	 * @param ctx the parse tree
+	 */
+	void exitColumnDefinition(BasicSQLParser.ColumnDefinitionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BasicSQLParser#dataType}.
+	 * @param ctx the parse tree
+	 */
+	void enterDataType(BasicSQLParser.DataTypeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BasicSQLParser#dataType}.
+	 * @param ctx the parse tree
+	 */
+	void exitDataType(BasicSQLParser.DataTypeContext ctx);
 }

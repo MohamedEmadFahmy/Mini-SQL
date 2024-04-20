@@ -1,5 +1,3 @@
-package com.halberdski.antlr4;
-
 // Generated from BasicSQL.g4 by ANTLR 4.13.1
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -61,6 +59,42 @@ public class BasicSQLBaseListener implements BasicSQLListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitInsertStatement(BasicSQLParser.InsertStatementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCreateTableStatement(BasicSQLParser.CreateTableStatementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCreateTableStatement(BasicSQLParser.CreateTableStatementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterTableDefinition(BasicSQLParser.TableDefinitionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitTableDefinition(BasicSQLParser.TableDefinitionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterColumnConstraint(BasicSQLParser.ColumnConstraintContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitColumnConstraint(BasicSQLParser.ColumnConstraintContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -133,6 +167,30 @@ public class BasicSQLBaseListener implements BasicSQLListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitCondition(BasicSQLParser.ConditionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterColumnDefinition(BasicSQLParser.ColumnDefinitionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitColumnDefinition(BasicSQLParser.ColumnDefinitionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDataType(BasicSQLParser.DataTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDataType(BasicSQLParser.DataTypeContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

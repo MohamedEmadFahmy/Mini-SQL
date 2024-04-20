@@ -1,5 +1,3 @@
-package com.halberdski.antlr4;
-
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -61,34 +59,65 @@ public class QueryTester {
         // "SELECT * FROM table WHERE id = 'mo' OR age = 1.5..;",
         // "select * FROM table WHERE id = 5;;;",
         // };
+        // String[] validInsertStatements = {
+        // "INSERT INTO tableName (column1, column2) VALUES ('value1', 'value2');",
+        // "INSERT INTO tableName (column1, column2) VALUES (123, 456);",
+        // "INSERT INTO tableName (column1, column2) VALUES (TRUE, FALSE);",
+        // "INSERT INTO tableName (column1) VALUES ('value1');",
+        // };
 
-        // --------------------------------------------------------------------------
+        // String[] invalidInsertStatements = {
+        // "INSERT INTO tableName (column1) VALUES (value1);",
+        // "INSERT INTO tableName (column1, column2) VALUES (NULL, NULL);",
+        // "INSERT INTO tableName VALUES (value1, value2);",
+        // "INSERT INTO tableName VALUES ('value1', 'value2');",
+        // "INSERT INTO tableName VALUES (123, 456);",
+        // "INSERT INTO tableName VALUES (TRUE, FALSE);",
+        // "INSERT INTO tableName VALUES (NULL, NULL);"
+        // };
 
-        String[] validInsertStatements = {
-                "INSERT INTO tableName (column1, column2) VALUES ('value1', 'value2');",
-                "INSERT INTO tableName (column1, column2) VALUES (123, 456);",
-                "INSERT INTO tableName (column1, column2) VALUES (TRUE, FALSE);",
-                "INSERT INTO tableName (column1) VALUES ('value1');",
+        // for (String sql : invalidInsertStatements) {
+        // testSelectStarQuery(sql);
+        // System.out.println("\n");
+        // }
+
+        // System.err.println("-----------VALID-----------");
+        // System.err.println();
+        // for (String sql : validInsertStatements) {
+        // testSelectStarQuery(sql);
+        // System.out.println("\n");
+        // }
+
+        // -------------------SELECT STATEMENTS-------------------
+
+        String[] invalidCreateStatements = {
+                "CREATE TABLE (id INT;",
+                "CREATE TABLE medhat (id INT;",
+                "CREATE TABLE (id INT);",
+                "CREATE TABLE tableName ();",
+                "CREATE TABLE employees (id INT, name VARCHAR(100));",
+                "CREATE TABLE employees (id INT, name VARCHAR(100) NOT NULL, age, department VARCHAR(50));",
+                "CREATE TABLE products (product_id INT PRIMARY KEY, product_name VARCHAR(255), price);",
+                "CREATE TABLE users (user_id INT PRIMARY KEY, username VARCHAR(50) UNIQUE, password VARCHAR(100) UNIQUE);",
+                "CREATE TABLE tableName (column1 INT;, column2 VARCHAR);",
+                "CREATE TABLE tableName (column1 INT, column2 VARCHAR;);",
         };
 
-        String[] invalidInsertStatements = {
-                "INSERT INTO tableName (column1) VALUES (value1);",
-                "INSERT INTO tableName (column1, column2) VALUES (NULL, NULL);",
-                "INSERT INTO tableName VALUES (value1, value2);",
-                "INSERT INTO tableName VALUES ('value1', 'value2');",
-                "INSERT INTO tableName VALUES (123, 456);",
-                "INSERT INTO tableName VALUES (TRUE, FALSE);",
-                "INSERT INTO tableName VALUES (NULL, NULL);"
+        String[] validCreateStatements = {
+                "CREATE TABLE tableName (column1 INT, column2 VARCHAR);",
+                "CREATE TABLE employees (id INT PRIMARY KEY, name VARCHAR , age INT, department VARCHAR);",
+                "CREATE TABLE products (product_id int primary key, product_name varchar, price float);",
+                "CREATE TABLE users (user_id INT PRIMARY KEY, username varchar, password VARCHAR);"
         };
 
-        for (String sql : invalidInsertStatements) {
+        for (String sql : invalidCreateStatements) {
             testSelectStarQuery(sql);
             System.out.println("\n");
         }
 
         System.err.println("-----------VALID-----------");
         System.err.println();
-        for (String sql : validInsertStatements) {
+        for (String sql : validCreateStatements) {
             testSelectStarQuery(sql);
             System.out.println("\n");
         }

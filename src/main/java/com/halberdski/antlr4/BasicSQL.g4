@@ -1,12 +1,17 @@
 grammar BasicSQL;
 
-sqlStatement: selectStatement | insertStatement;
+sqlStatement: selectStatement | insertStatement | createTableStatement;
 
 helloWorld: 'Hello';
 
 selectStatement: SELECT STAR FROM tableName WHERE condition (LOGICAL_OPERATOR condition)* SEMICOLON EOF;
 insertStatement: INSERT INTO tableName columnList VALUES valueList SEMICOLON EOF;
 
+createTableStatement: CREATE TABLE tableName tableDefinition SEMICOLON EOF;
+
+tableDefinition: '(' columnDefinition (',' columnDefinition)* ')';
+
+columnConstraint: PRIMARYKEY;
 
 columnName: ID;
 
@@ -15,6 +20,14 @@ columnList: '(' columnName (',' columnName)* ')';
 valueList: '(' literalValue (',' literalValue)* ')';
 tableName: ID;
 condition: ID OPERATOR (STRING | NUMBER);
+
+columnDefinition: columnName dataType (columnConstraint)?;
+
+dataType: INTTYPE | FLOATTYPE | VARCHARTYPE;
+
+
+
+// -------------------------------------------------------------------
 
 SEMICOLON: ';';
 
@@ -28,18 +41,30 @@ INTO: 'INTO' | 'into';
 VALUES: 'VALUES' | 'values';
 LOGICAL_OPERATOR: 'AND' | 'and' | 'OR' | 'or' | 'XOR' | 'xor';
 
+
+CREATE: 'CREATE' | 'create';
+
+TABLE: 'TABLE' | 'table';
+
+
+INTTYPE: 'INT' | 'int';
+FLOATTYPE: 'FLOAT' | 'float';
+VARCHARTYPE: 'VARCHAR' | 'varchar';
+
+PRIMARYKEY: 'PRIMARY KEY' | 'primary key';
+
 BOOLEAN: 'TRUE' | 'FALSE' | 'true' | 'false' ;
 
 ID: [a-zA-Z][a-zA-Z0-9_]*;
 
 STRING: '\''ID'\'';
 
-NUMBER: INT | FLOAT;
+NUMBER: INT | DECIMAL;
 
 INT: DIGIT+;
 
 DOT: '.';
-FLOAT: DIGIT+ DOT DIGIT+;
+DECIMAL: DIGIT+ DOT DIGIT+;
 
 OPERATOR: '=' | '<' | '>' | '<=' | '>=' | '!=';
 WS : [ \t\r\n]+ -> skip;
