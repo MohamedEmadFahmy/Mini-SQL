@@ -57,6 +57,26 @@ public interface BasicSQLListener extends ParseTreeListener {
 	 */
 	void exitCreateTableStatement(BasicSQLParser.CreateTableStatementContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link BasicSQLParser#createIndexStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterCreateIndexStatement(BasicSQLParser.CreateIndexStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BasicSQLParser#createIndexStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitCreateIndexStatement(BasicSQLParser.CreateIndexStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BasicSQLParser#deleteStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterDeleteStatement(BasicSQLParser.DeleteStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BasicSQLParser#deleteStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitDeleteStatement(BasicSQLParser.DeleteStatementContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link BasicSQLParser#tableDefinition}.
 	 * @param ctx the parse tree
 	 */
@@ -97,15 +117,15 @@ public interface BasicSQLListener extends ParseTreeListener {
 	 */
 	void exitLiteralValue(BasicSQLParser.LiteralValueContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link BasicSQLParser#columnList}.
+	 * Enter a parse tree produced by {@link BasicSQLParser#columnNameList}.
 	 * @param ctx the parse tree
 	 */
-	void enterColumnList(BasicSQLParser.ColumnListContext ctx);
+	void enterColumnNameList(BasicSQLParser.ColumnNameListContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link BasicSQLParser#columnList}.
+	 * Exit a parse tree produced by {@link BasicSQLParser#columnNameList}.
 	 * @param ctx the parse tree
 	 */
-	void exitColumnList(BasicSQLParser.ColumnListContext ctx);
+	void exitColumnNameList(BasicSQLParser.ColumnNameListContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link BasicSQLParser#valueList}.
 	 * @param ctx the parse tree
@@ -156,4 +176,24 @@ public interface BasicSQLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitDataType(BasicSQLParser.DataTypeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BasicSQLParser#indexName}.
+	 * @param ctx the parse tree
+	 */
+	void enterIndexName(BasicSQLParser.IndexNameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BasicSQLParser#indexName}.
+	 * @param ctx the parse tree
+	 */
+	void exitIndexName(BasicSQLParser.IndexNameContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BasicSQLParser#deleteCondition}.
+	 * @param ctx the parse tree
+	 */
+	void enterDeleteCondition(BasicSQLParser.DeleteConditionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BasicSQLParser#deleteCondition}.
+	 * @param ctx the parse tree
+	 */
+	void exitDeleteCondition(BasicSQLParser.DeleteConditionContext ctx);
 }

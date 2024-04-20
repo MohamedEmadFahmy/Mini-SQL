@@ -88,36 +88,95 @@ public class QueryTester {
         // System.out.println("\n");
         // }
 
-        // -------------------SELECT STATEMENTS-------------------
+        // // -------------------SELECT STATEMENTS-------------------
 
-        String[] invalidCreateStatements = {
-                "CREATE TABLE (id INT;",
-                "CREATE TABLE medhat (id INT;",
-                "CREATE TABLE (id INT);",
-                "CREATE TABLE tableName ();",
-                "CREATE TABLE employees (id INT, name VARCHAR(100));",
-                "CREATE TABLE employees (id INT, name VARCHAR(100) NOT NULL, age, department VARCHAR(50));",
-                "CREATE TABLE products (product_id INT PRIMARY KEY, product_name VARCHAR(255), price);",
-                "CREATE TABLE users (user_id INT PRIMARY KEY, username VARCHAR(50) UNIQUE, password VARCHAR(100) UNIQUE);",
-                "CREATE TABLE tableName (column1 INT;, column2 VARCHAR);",
-                "CREATE TABLE tableName (column1 INT, column2 VARCHAR;);",
+        // String[] invalidCreateStatements = {
+        // "CREATE TABLE (id INT;",
+        // "CREATE TABLE medhat (id INT;",
+        // "CREATE TABLE (id INT);",
+        // "CREATE TABLE tableName ();",
+        // "CREATE TABLE employees (id INT, name VARCHAR(100));",
+        // "CREATE TABLE employees (id INT, name VARCHAR(100) NOT NULL, age, department
+        // VARCHAR(50));",
+        // "CREATE TABLE products (product_id INT PRIMARY KEY, product_name
+        // VARCHAR(255), price);",
+        // "CREATE TABLE users (user_id INT PRIMARY KEY, username VARCHAR(50) UNIQUE,
+        // password VARCHAR(100) UNIQUE);",
+        // "CREATE TABLE tableName (column1 INT;, column2 VARCHAR);",
+        // "CREATE TABLE tableName (column1 INT, column2 VARCHAR;);",
+        // };
+
+        // String[] validCreateStatements = {
+        // "CREATE TABLE tableName (column1 INT, column2 VARCHAR);",
+        // "CREATE TABLE employees (id INT PRIMARY KEY, name VARCHAR , age INT,
+        // department VARCHAR);",
+        // "CREATE TABLE products (product_id int primary key, product_name varchar,
+        // price float);",
+        // "CREATE TABLE users (user_id INT PRIMARY KEY, username varchar, password
+        // VARCHAR);"
+        // };
+
+        // for (String sql : invalidCreateStatements) {
+        // testSelectStarQuery(sql);
+        // System.out.println("\n");
+        // }
+
+        // System.err.println("-----------VALID-----------");
+        // System.err.println();
+        // for (String sql : validCreateStatements) {
+        // testSelectStarQuery(sql);
+        // System.out.println("\n");
+        // }
+
+        // -------------------Create Index STATEMENTS-------------------
+
+        // String[] invalidCreateIndexStatements = {
+        // "CREATE INDEX ON tableName (column1);", // Missing index name
+        // "CREATE INDEX idx_name ON (column1);", // Missing table name
+        // "CREATE INDEX idx_age ON employees;", // Missing column list
+        // "CREATE UNIQUE INDEX idx_username ON users (username) WHERE age > 18;", //
+        // Invalid UNIQUE clause
+        // "CREATE INDEX idx_price ON products (price) WHERE price < 0;", // Invalid
+        // WHERE clause condition
+        // "CREATE UNIQUE INDEX idx_username ON users (username);",
+        // "CREATE UNIQUE INDEX idx_email ON contacts (email);",
+        // "CREATE INDEX idx_product_name ON products (product_name) WHERE price >
+        // 100;",
+        // };
+
+        // String[] validCreateIndexStatements = {
+        // "CREATE INDEX idx_name ON tableName (column1);",
+        // "CREATE INDEX idx_age ON employees (age);",
+        // "CREATE INDEX idx_age ON employees (age,moski);",
+        // };
+
+        // for (String sql : invalidCreateIndexStatements) {
+        // testSelectStarQuery(sql);
+        // System.out.println("\n");
+        // }
+
+        // System.err.println("-----------VALID-----------");
+        // System.err.println();
+        // for (String sql : validCreateIndexStatements) {
+        // testSelectStarQuery(sql);
+        // System.out.println("\n");
+        // }
+
+        // -------------------Delete STATEMENTS-------------------
+        String[] invalidDeleteStatements = {    
         };
 
-        String[] validCreateStatements = {
-                "CREATE TABLE tableName (column1 INT, column2 VARCHAR);",
-                "CREATE TABLE employees (id INT PRIMARY KEY, name VARCHAR , age INT, department VARCHAR);",
-                "CREATE TABLE products (product_id int primary key, product_name varchar, price float);",
-                "CREATE TABLE users (user_id INT PRIMARY KEY, username varchar, password VARCHAR);"
+        String[] validDeleteStatements = {
         };
 
-        for (String sql : invalidCreateStatements) {
+        for (String sql : invalidDeleteStatements) {
             testSelectStarQuery(sql);
             System.out.println("\n");
         }
 
         System.err.println("-----------VALID-----------");
         System.err.println();
-        for (String sql : validCreateStatements) {
+        for (String sql : validDeleteStatements) {
             testSelectStarQuery(sql);
             System.out.println("\n");
         }

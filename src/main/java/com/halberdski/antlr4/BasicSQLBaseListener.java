@@ -76,6 +76,30 @@ public class BasicSQLBaseListener implements BasicSQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterCreateIndexStatement(BasicSQLParser.CreateIndexStatementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCreateIndexStatement(BasicSQLParser.CreateIndexStatementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDeleteStatement(BasicSQLParser.DeleteStatementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDeleteStatement(BasicSQLParser.DeleteStatementContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterTableDefinition(BasicSQLParser.TableDefinitionContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -124,13 +148,13 @@ public class BasicSQLBaseListener implements BasicSQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterColumnList(BasicSQLParser.ColumnListContext ctx) { }
+	@Override public void enterColumnNameList(BasicSQLParser.ColumnNameListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitColumnList(BasicSQLParser.ColumnListContext ctx) { }
+	@Override public void exitColumnNameList(BasicSQLParser.ColumnNameListContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -191,6 +215,30 @@ public class BasicSQLBaseListener implements BasicSQLListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitDataType(BasicSQLParser.DataTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterIndexName(BasicSQLParser.IndexNameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitIndexName(BasicSQLParser.IndexNameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDeleteCondition(BasicSQLParser.DeleteConditionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDeleteCondition(BasicSQLParser.DeleteConditionContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

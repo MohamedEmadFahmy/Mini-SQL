@@ -1,13 +1,17 @@
 grammar BasicSQL;
 
-sqlStatement: selectStatement | insertStatement | createTableStatement;
+sqlStatement: selectStatement | insertStatement | createTableStatement | createIndexStatement;
 
 helloWorld: 'Hello';
 
 selectStatement: SELECT STAR FROM tableName WHERE condition (LOGICAL_OPERATOR condition)* SEMICOLON EOF;
-insertStatement: INSERT INTO tableName columnList VALUES valueList SEMICOLON EOF;
+insertStatement: INSERT INTO tableName columnNameList VALUES valueList SEMICOLON EOF;
 
 createTableStatement: CREATE TABLE tableName tableDefinition SEMICOLON EOF;
+
+createIndexStatement: CREATE INDEX indexName ON tableName columnNameList SEMICOLON EOF;
+
+deleteStatement: DELETE FROM tableName deleteCondition? SEMICOLON EOF;
 
 tableDefinition: '(' columnDefinition (',' columnDefinition)* ')';
 
@@ -16,7 +20,7 @@ columnConstraint: PRIMARYKEY;
 columnName: ID;
 
 literalValue: STRING | NUMBER | BOOLEAN;
-columnList: '(' columnName (',' columnName)* ')';
+columnNameList: '(' columnName (',' columnName)* ')';
 valueList: '(' literalValue (',' literalValue)* ')';
 tableName: ID;
 condition: ID OPERATOR (STRING | NUMBER);
@@ -24,6 +28,10 @@ condition: ID OPERATOR (STRING | NUMBER);
 columnDefinition: columnName dataType (columnConstraint)?;
 
 dataType: INTTYPE | FLOATTYPE | VARCHARTYPE;
+
+indexName: ID;
+
+deleteCondition: WHERE condition (LOGICAL_OPERATOR condition)*;
 
 
 
@@ -45,6 +53,11 @@ LOGICAL_OPERATOR: 'AND' | 'and' | 'OR' | 'or' | 'XOR' | 'xor';
 CREATE: 'CREATE' | 'create';
 
 TABLE: 'TABLE' | 'table';
+
+INDEX: 'INDEX' | 'index';
+ON: 'ON' | 'on';
+
+DELETE: 'DELETE' | 'delete';
 
 
 INTTYPE: 'INT' | 'int';
