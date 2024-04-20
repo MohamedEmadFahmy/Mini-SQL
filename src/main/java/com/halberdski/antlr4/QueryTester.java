@@ -1,3 +1,5 @@
+package com.halberdski.antlr4;
+
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -164,29 +166,64 @@ public class QueryTester {
 
         // -------------------Delete STATEMENTS-------------------
 
-        String[] invalidDeleteStatements = {
-                "DELETE FROM tableName WHERE id = 5 OR;",
-                "DELETE FROM tableName WHERE;",
-                "DELETE FROM tableName WHERE id IN (1, 2, 3);",
-                "DELETE FROM tableName WHERE EXISTS (SELECT * FROM otherTable WHERE otherTable.id = tableName.id);"
+        // String[] invalidDeleteStatements = {
+        // "DELETE FROM tableName WHERE id = 5 OR;",
+        // "DELETE FROM tableName WHERE;",
+        // "DELETE FROM tableName WHERE id IN (1, 2, 3);",
+        // "DELETE FROM tableName WHERE EXISTS (SELECT * FROM otherTable WHERE
+        // otherTable.id = tableName.id);"
+        // };
+
+        // String[] validDeleteStatements = {
+        // "DELETE FROM tableName WHERE id = 5 AND age = 10;",
+        // "DELETE FROM tableName;",
+        // "DELETE FROM tableName WHERE id = 5;",
+        // "DELETE FROM tableName WHERE id = 5 AND age > 18;",
+        // "DELETE FROM tableName WHERE id = 5 OR age < 18;",
+        // };
+
+        // for (String sql : invalidDeleteStatements) {
+        // testSelectStarQuery(sql);
+        // System.out.println("\n");
+        // }
+
+        // System.err.println("-----------VALID-----------");
+        // System.err.println();
+        // for (String sql : validDeleteStatements) {
+        // testSelectStarQuery(sql);
+        // System.out.println("\n");
+        // }
+
+        // -------------------Update STATEMENTS-------------------
+
+        String[] invalidUpdateStatements = {
+                "UPDATE SET column1 = value1 WHERE id = 5;",
+                "UPDATE tableName SET WHERE id = 5;",
+                "UPDATE tableName SET column1 = value1 AND column2 = value2 WHERE id = 5;",
+                "UPDATE tableName SET column1 = WHERE id = 5;",
+                "UPDATE tableName WHERE id = 5 SET column1 = value1;",
+                "UPDATE tableName SET column1 = 'value1' WHERE id == 5;",
+                "UPDATE tableName SET column1 = 'value1' WHERE id > 5;",
+                "UPDATE tableName SET column1 = 'value1' WHERE id =< 5;",
+                "UPDATE tableName SET column1 = 'value1', column2 = 'value2' WHERE id IN (1, 2, 3);",
+                "UPDATE tableName SET column1 = 'value1', column2 = 'value2' WHERE EXISTS (SELECT * FROM otherTable WHERE otherTable.id = tableName.id);",
+                "UPDATE tableName SET column1 = 'value1' WHERE id = ;",
         };
 
-        String[] validDeleteStatements = {
-                "DELETE FROM tableName WHERE id = 5 AND age = 10;",
-                "DELETE FROM tableName;",
-                "DELETE FROM tableName WHERE id = 5;",
-                "DELETE FROM tableName WHERE id = 5 AND age > 18;",
-                "DELETE FROM tableName WHERE id = 5 OR age < 18;",
+        String[] validUpdateStatements = {
+                "UPDATE tableName SET column1 = 'value1' WHERE id = 5;",
+                "UPDATE tableName SET column1 = 'value1', column2 = 'value2' WHERE id = 5;",
+                "UPDATE tableName SET column1 = 'value1', column2 = 'value2',    column3 = 1 WHERE id = 5;",
         };
 
-        for (String sql : invalidDeleteStatements) {
+        for (String sql : invalidUpdateStatements) {
             testSelectStarQuery(sql);
             System.out.println("\n");
         }
 
         System.err.println("-----------VALID-----------");
         System.err.println();
-        for (String sql : validDeleteStatements) {
+        for (String sql : validUpdateStatements) {
             testSelectStarQuery(sql);
             System.out.println("\n");
         }

@@ -1,3 +1,5 @@
+package com.halberdski.antlr4;
+
 // Generated from BasicSQL.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -16,16 +18,6 @@ public interface BasicSQLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitSqlStatement(BasicSQLParser.SqlStatementContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link BasicSQLParser#helloWorld}.
-	 * @param ctx the parse tree
-	 */
-	void enterHelloWorld(BasicSQLParser.HelloWorldContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link BasicSQLParser#helloWorld}.
-	 * @param ctx the parse tree
-	 */
-	void exitHelloWorld(BasicSQLParser.HelloWorldContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link BasicSQLParser#selectStatement}.
 	 * @param ctx the parse tree
@@ -76,6 +68,36 @@ public interface BasicSQLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitDeleteStatement(BasicSQLParser.DeleteStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BasicSQLParser#updateStatement}.
+	 * @param ctx the parse tree
+	 */
+	void enterUpdateStatement(BasicSQLParser.UpdateStatementContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BasicSQLParser#updateStatement}.
+	 * @param ctx the parse tree
+	 */
+	void exitUpdateStatement(BasicSQLParser.UpdateStatementContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BasicSQLParser#updateSetClause}.
+	 * @param ctx the parse tree
+	 */
+	void enterUpdateSetClause(BasicSQLParser.UpdateSetClauseContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BasicSQLParser#updateSetClause}.
+	 * @param ctx the parse tree
+	 */
+	void exitUpdateSetClause(BasicSQLParser.UpdateSetClauseContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BasicSQLParser#updateWhereClause}.
+	 * @param ctx the parse tree
+	 */
+	void enterUpdateWhereClause(BasicSQLParser.UpdateWhereClauseContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BasicSQLParser#updateWhereClause}.
+	 * @param ctx the parse tree
+	 */
+	void exitUpdateWhereClause(BasicSQLParser.UpdateWhereClauseContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link BasicSQLParser#tableDefinition}.
 	 * @param ctx the parse tree
@@ -156,6 +178,16 @@ public interface BasicSQLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitCondition(BasicSQLParser.ConditionContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link BasicSQLParser#updateCondition}.
+	 * @param ctx the parse tree
+	 */
+	void enterUpdateCondition(BasicSQLParser.UpdateConditionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link BasicSQLParser#updateCondition}.
+	 * @param ctx the parse tree
+	 */
+	void exitUpdateCondition(BasicSQLParser.UpdateConditionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link BasicSQLParser#columnDefinition}.
 	 * @param ctx the parse tree

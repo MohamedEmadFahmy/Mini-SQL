@@ -1,3 +1,5 @@
+package com.halberdski.antlr4;
+
 public class YourCustomListener extends BasicSQLBaseListener {
 
     @Override
@@ -23,5 +25,10 @@ public class YourCustomListener extends BasicSQLBaseListener {
     @Override
     public void enterDeleteStatement(BasicSQLParser.DeleteStatementContext ctx) {
         System.out.println("Entering DeleteStatement: " + ctx.toStringTree());
+    }
+
+    @Override
+    public void enterUpdateStatement(BasicSQLParser.UpdateStatementContext ctx) {
+        System.out.println("Entering UpdateStatement: " + ctx.toStringTree());
     }
 }
