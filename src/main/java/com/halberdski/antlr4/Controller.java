@@ -6,6 +6,7 @@ import java.util.Vector;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import com.halberdski.engine.DBApp;
+import com.halberdski.engine.utility;
 import com.halberdski.exceptions.DBAppException;
 
 public class Controller extends BasicSQLBaseListener {
@@ -131,17 +132,14 @@ public class Controller extends BasicSQLBaseListener {
 
     @Override
     public void enterCreateIndexStatement(BasicSQLParser.CreateIndexStatementContext ctx) {
-        System.out.println("Entering CreateIndexStatement: " + ctx.toStringTree());
+        // System.out.println("Entering CreateIndexStatement: " + ctx.toStringTree());
 
         String indexName = ctx.indexName().getText();
         String tableName = ctx.tableName().getText();
         Vector<String> columnNames = new Vector<String>();
 
-        for (int i = 0; i < ctx.columnNameList().getChildCount(); i++) {
-            if (ctx.columnNameList().getChild(i).getChildCount() > 0) {
-                columnNames.add(ctx.columnNameList().getChild(i).getText());
-            }
-        }
+        System.out.println(ctx.columnName().getChild(0).getText());
+        columnNames.add(ctx.columnName().getChild(0).getText());
 
         try {
 
@@ -186,10 +184,13 @@ public class Controller extends BasicSQLBaseListener {
     // }
 
     public static void main(String[] args) {
+        utility.clearDatabaseSystem();
         // QueryTester.testQuery("select * from mytable where name = 5;");
         // QueryTester.testQuery("CREATE INDEX ta ON tableName (column1);");
 
         // QueryTester.testQuery("insert into mytable (name, age) values ('mo', 5);");
         QueryTester.testQuery("CREATE TABLE moski (age INT, name VARCHAR primary key);");
+
+        QueryTester.testQuery("CREATE INDEX idx_age ON moski age;");
     }
 }

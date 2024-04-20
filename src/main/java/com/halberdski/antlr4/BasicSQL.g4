@@ -7,7 +7,7 @@ insertStatement: INSERT INTO tableName columnNameList VALUES valueList SEMICOLON
 
 createTableStatement: CREATE TABLE tableName tableDefinition SEMICOLON EOF;
 
-createIndexStatement: CREATE INDEX indexName ON tableName columnNameList SEMICOLON EOF;
+createIndexStatement: CREATE INDEX indexName ON tableName columnName SEMICOLON EOF;
 
 deleteStatement: DELETE FROM tableName deleteCondition? SEMICOLON EOF;
 
