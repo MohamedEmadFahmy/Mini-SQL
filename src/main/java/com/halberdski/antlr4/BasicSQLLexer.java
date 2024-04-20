@@ -41,7 +41,7 @@ public class BasicSQLLexer extends Lexer {
 
 	private static String[] makeLiteralNames() {
 		return new String[] {
-			null, "'Hello'", "'('", "')'", "','", "';'", null, "'*'", null, null, 
+			null, "'Hello'", "'('", "','", "')'", "';'", null, "'*'", null, null, 
 			null, null, null, null, null, null, null, null, null, "'.'"
 		};
 	}
@@ -174,7 +174,7 @@ public class BasicSQLLexer extends Lexer {
 		"\u00e0\u0001\u0000\u0000\u0000/0\u0005H\u0000\u000001\u0005e\u0000\u0000"+
 		"12\u0005l\u0000\u000023\u0005l\u0000\u000034\u0005o\u0000\u00004\u0002"+
 		"\u0001\u0000\u0000\u000056\u0005(\u0000\u00006\u0004\u0001\u0000\u0000"+
-		"\u000078\u0005)\u0000\u00008\u0006\u0001\u0000\u0000\u00009:\u0005,\u0000"+
+		"\u000078\u0005,\u0000\u00008\u0006\u0001\u0000\u0000\u00009:\u0005)\u0000"+
 		"\u0000:\b\u0001\u0000\u0000\u0000;<\u0005;\u0000\u0000<\n\u0001\u0000"+
 		"\u0000\u0000=>\u0005S\u0000\u0000>?\u0005E\u0000\u0000?@\u0005L\u0000"+
 		"\u0000@A\u0005E\u0000\u0000AB\u0005C\u0000\u0000BJ\u0005T\u0000\u0000"+

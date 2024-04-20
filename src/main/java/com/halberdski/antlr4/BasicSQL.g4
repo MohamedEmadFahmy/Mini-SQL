@@ -1,18 +1,18 @@
 grammar BasicSQL;
 
-sqlStatement: selectStatement | helloWorld;
+sqlStatement: selectStatement | insertStatement;
 
 helloWorld: 'Hello';
 
 selectStatement: SELECT STAR FROM tableName WHERE condition (LOGICAL_OPERATOR condition)* SEMICOLON EOF;
-insertStatement: INSERT INTO tableName '(' columnList ')' VALUES '(' valueList ')' SEMICOLON EOF;
+insertStatement: INSERT INTO tableName columnList VALUES valueList SEMICOLON EOF;
 
 
 columnName: ID;
 
 literalValue: STRING | NUMBER | BOOLEAN;
-columnList: columnName (',' columnName)*;
-valueList: literalValue (',' literalValue)*;
+columnList: '(' columnName (',' columnName)* ')';
+valueList: '(' literalValue (',' literalValue)* ')';
 tableName: ID;
 condition: ID OPERATOR (STRING | NUMBER);
 

@@ -61,24 +61,34 @@ public class QueryTester {
         // "SELECT * FROM table WHERE id = 'mo' OR age = 1.5..;",
         // "select * FROM table WHERE id = 5;;;",
         // };
-        String[] insertStatements = {
-                "hi",
-                "SELECT * FROM table",
-                "SELECT * FROM table;",
-                "select * FROM table WHERE id = 5;",
-                "SELECT * FROM table WHERE id = 5;",
-                "SELECT * FROM table WHERE id = 5 AND age = 1;",
-                "SELECT * FROM table WHERE id = 5 OR age = 1;",
-                "SELECT * FROM table WHERE id = 5 OR age = 10;",
-                "SELECT * FROM table WHERE id = 'mo' OR age = 10;",
-                "SELECT * FROM table WHERE id = mo OR age = 1.5.;",
-                "SELECT * FROM table WHERE id = mo OR age = 1. 5.;",
-                "SELECT * FROM table WHERE id = 'mo' OR age = 1. 5.;",
-                "SELECT * FROM table WHERE id = 'mo' OR age = 1.5..;",
-                "select * FROM table WHERE id = 5;;;",
+
+        // --------------------------------------------------------------------------
+
+        String[] validInsertStatements = {
+                "INSERT INTO tableName (column1, column2) VALUES ('value1', 'value2');",
+                "INSERT INTO tableName (column1, column2) VALUES (123, 456);",
+                "INSERT INTO tableName (column1, column2) VALUES (TRUE, FALSE);",
+                "INSERT INTO tableName (column1) VALUES ('value1');",
         };
 
-        for (String sql : insertStatements) {
+        String[] invalidInsertStatements = {
+                "INSERT INTO tableName (column1) VALUES (value1);",
+                "INSERT INTO tableName (column1, column2) VALUES (NULL, NULL);",
+                "INSERT INTO tableName VALUES (value1, value2);",
+                "INSERT INTO tableName VALUES ('value1', 'value2');",
+                "INSERT INTO tableName VALUES (123, 456);",
+                "INSERT INTO tableName VALUES (TRUE, FALSE);",
+                "INSERT INTO tableName VALUES (NULL, NULL);"
+        };
+
+        for (String sql : invalidInsertStatements) {
+            testSelectStarQuery(sql);
+            System.out.println("\n");
+        }
+
+        System.err.println("-----------VALID-----------");
+        System.err.println();
+        for (String sql : validInsertStatements) {
             testSelectStarQuery(sql);
             System.out.println("\n");
         }
