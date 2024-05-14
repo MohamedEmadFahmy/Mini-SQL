@@ -21,7 +21,7 @@ public class Page implements Serializable {
     private Tuple min;
     private Tuple max;
 
-    private static String pathToPagesFolder = "/src/main/resources/Serialized_Pages/";
+    private static String pathToPagesFolder = "./src/main/resources/Serialized_Pages/";
 
     public Page(String strTableName, String pageName, Hashtable<String, String> colNameType, String primaryKeyName,
             int maxTupleCount) {
@@ -73,7 +73,7 @@ public class Page implements Serializable {
         if (this.tupleCount > this.maxTupleCount) {
             this.tupleCount -= 1;
             overflow = tuples.remove(this.maxTupleCount);
-            tuple.deleteDataFromAvailableIndices(this.strTableName, this.pageName);
+            overflow.deleteDataFromAvailableIndices(this.strTableName, this.pageName);
 
             // System.out.println("Overflow: " + overflow.toString());
             // returns the last tuple

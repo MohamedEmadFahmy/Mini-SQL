@@ -39,7 +39,7 @@ public class Table implements Serializable {
     private int currentPageID;
     private int maxTupleCount;
 
-    private static String pathToTablesFolder = "/src/main/resources/Serialized_Tables/";
+    private static String pathToTablesFolder = "./src/main/resources/Serialized_Tables/";
     private static String pathToConfig = "./src/main/resources/DBApp.config";
 
     public Table(String strTableName, String primaryKeyName, Hashtable<String, String> htblColNameType)
@@ -342,7 +342,7 @@ public class Table implements Serializable {
                 System.out.println("Used index (" + index.getIndexName() + ") on column (" + columnName + ")");
                 switch (operator) {
                     case "=":
-                        pagesToSearch.addAll(index.search((Comparable) value));
+                        pagesToSearch.addAll(index.search((Comparable) value, (Comparable) value, true, true));
                         break;
                     case "!=":
                         pagesToSearch.addAll(this.pagesList);
@@ -367,7 +367,7 @@ public class Table implements Serializable {
 
             for (int i = 0; i < pagesToSearch.size(); i++) {
                 Page page = Page.loadPage(pagesToSearch.get(i));
-                // System.out.println("Page Loaded: " + pagesToSearch.get(i));
+                System.out.println("Page Loaded: " + pagesToSearch.get(i));
                 tuples = page.selectTuple(columnName, operator, value);
                 // -------> serialization not needed because the pages are unchanged
                 termResult.addAll(tuples);
@@ -601,7 +601,7 @@ public class Table implements Serializable {
 
     public void createIndex(String strColName, String strIndexName) throws DBAppException {
 
-        BTree index = new BTree(128, strIndexName);
+        BTree index = new BTree(2, strIndexName);
 
         // Loop on table and add the values to the index
 

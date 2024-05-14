@@ -222,13 +222,25 @@ public class BasicSQLBaseListener implements BasicSQLListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterUpdateCondition(BasicSQLParser.UpdateConditionContext ctx) { }
+	@Override public void enterDeleteCondition(BasicSQLParser.DeleteConditionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitUpdateCondition(BasicSQLParser.UpdateConditionContext ctx) { }
+	@Override public void exitDeleteCondition(BasicSQLParser.DeleteConditionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSelectCondition(BasicSQLParser.SelectConditionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSelectCondition(BasicSQLParser.SelectConditionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -265,18 +277,6 @@ public class BasicSQLBaseListener implements BasicSQLListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitIndexName(BasicSQLParser.IndexNameContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterDeleteCondition(BasicSQLParser.DeleteConditionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitDeleteCondition(BasicSQLParser.DeleteConditionContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

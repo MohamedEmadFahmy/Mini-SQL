@@ -14,7 +14,7 @@ import com.halberdski.exceptions.DBAppException;
 public class Metadata {
     private static Hashtable<String, Hashtable<String, Hashtable<String, String>>> ht = new Hashtable<String, Hashtable<String, Hashtable<String, String>>>();
 
-    private static String pathToMetadataFile = "/src/main/resources/metadata.csv";
+    private static String pathToMetadataFile = "./src/main/resources/metadata.csv";
 
     /*
      * 

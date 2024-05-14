@@ -7,10 +7,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class utility {
-    private static String pathToMetadataFile = "/src/main/resources/metadata.csv";
-    private static String pathToTablesFolder = "/src/main/resources/Serialized_Tables/";
-    private static String pathToPagesFolder = "/src/main/resources/Serialized_Pages/";
-    private static String pathToIndicesFolder = "/src/main/resources/Serialized_Indices/";
+    private static String pathToMetadataFile = "./src/main/resources/metadata.csv";
+    private static String pathToTablesFolder = "./src/main/resources/Serialized_Tables/";
+    private static String pathToPagesFolder = "./src/main/resources/Serialized_Pages/";
+    private static String pathToIndicesFolder = "./src/main/resources/Serialized_Indices/";
 
     // private static String pathToConfig = System.getProperty("user.dir") +
     // "\\src\\main\\resources\\DBApp.config";

@@ -18,6 +18,13 @@ public class SQLTerm {
 		this._objValue = _objValue;
 	}
 
+	@Override
+	public String toString() {
+		return "SQLTerm [_strTableName:" + _strTableName + ", _strColumnName:" + _strColumnName + ", _strOperator:"
+				+ _strOperator + ", _objValue:" + _objValue + "]";
+
+	}
+
 	// public class SQLTerm {
 	// private String tableName;
 	// private String columnName;

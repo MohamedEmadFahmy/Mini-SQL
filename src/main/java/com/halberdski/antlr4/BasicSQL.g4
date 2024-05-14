@@ -2,20 +2,20 @@ grammar BasicSQL;
 
 sqlStatement: selectStatement | insertStatement | createTableStatement | createIndexStatement | deleteStatement| updateStatement;
 
-selectStatement: SELECT STAR FROM tableName WHERE condition (LOGICAL_OPERATOR condition)* SEMICOLON EOF;
+selectStatement: SELECT STAR FROM tableName WHERE selectCondition SEMICOLON EOF;
 insertStatement: INSERT INTO tableName columnNameList VALUES valueList SEMICOLON EOF;
 
 createTableStatement: CREATE TABLE tableName tableDefinition SEMICOLON EOF;
 
-createIndexStatement: CREATE INDEX indexName ON tableName columnName SEMICOLON EOF;
+createIndexStatement: CREATE INDEX indexName ON tableName '(' columnName ')' SEMICOLON EOF;
 
-deleteStatement: DELETE FROM tableName deleteCondition? SEMICOLON EOF;
+deleteStatement: DELETE FROM tableName deleteCondition SEMICOLON EOF;
 
 updateStatement: UPDATE tableName SET updateSetClause updateWhereClause SEMICOLON EOF;
 
-updateSetClause: columnName '=' literalValue (',' columnName '=' literalValue)*;
+updateSetClause: condition (',' condition)*;
 
-updateWhereClause: WHERE updateCondition (LOGICAL_OPERATOR updateCondition)*;
+updateWhereClause: WHERE condition;
 
 tableDefinition: '(' columnDefinition (',' columnDefinition)* ')';
 
@@ -23,12 +23,14 @@ columnConstraint: PRIMARYKEY;
 
 columnName: ID;
 
-literalValue: STRING | NUMBER | BOOLEAN;
+literalValue: STRING | NUMBER ;
 columnNameList: '(' columnName (',' columnName)* ')';
 valueList: '(' literalValue (',' literalValue)* ')';
 tableName: ID;
 condition: ID OPERATOR (STRING | NUMBER);
-updateCondition: ID EQUAL (STRING|NUMBER);
+deleteCondition: (WHERE condition (LOGICAL_OPERATOR condition)*)?;
+
+selectCondition: condition (LOGICAL_OPERATOR condition)*;
 
 
 columnDefinition: columnName dataType (columnConstraint)?;
@@ -36,8 +38,6 @@ columnDefinition: columnName dataType (columnConstraint)?;
 dataType: INTTYPE | FLOATTYPE | VARCHARTYPE;
 
 indexName: ID;
-
-deleteCondition: WHERE condition (LOGICAL_OPERATOR condition)*;
 
 
 
@@ -53,7 +53,11 @@ WHERE: 'WHERE' | 'where';
 INSERT: 'INSERT' | 'insert';
 INTO: 'INTO' | 'into';
 VALUES: 'VALUES' | 'values';
-LOGICAL_OPERATOR: 'AND' | 'and' | 'OR' | 'or' | 'XOR' | 'xor';
+
+LOGICAL_OPERATOR: AND | OR | XOR;
+AND: 'AND' | 'and';
+OR: 'OR' | 'or';
+XOR: 'XOR' | 'xor';
 
 
 CREATE: 'CREATE' | 'create';

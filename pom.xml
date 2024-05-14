@@ -23,12 +23,25 @@
                     <outputDirectory>${project.basedir}</outputDirectory>
                     <archive>
                         <manifest>
-                            <!-- <mainClass>com.halberdski.engine.DBApp</mainClass> -->
-                            <mainClass>com.halberdski.tests.DBTests</mainClass>
+                            <mainClass>com.halberdski.engine.DBApp</mainClass>
+                            <!-- <mainClass>com.halberdski.tests.DBTests</mainClass> -->
                         </manifest>
                     </archive>
                 </configuration>
             </plugin>    
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
